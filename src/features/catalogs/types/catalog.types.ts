@@ -1,39 +1,13 @@
 export interface Product {
-  id: string;
-  code: string;
-  name: string;
-  description?: string;
+  id: number;
+  key: string;
   isActive: boolean;
 }
 
 export interface CreateProductCommand {
-  code: string;
-  name: string;
-  description?: string;
+  key: string;
+  isActive?: boolean;
 }
 
-export interface Machine {
-  id: string;
-  code: string;
-  name: string;
-  isActive: boolean;
-}
-
-export interface CreateMachineCommand {
-  code: string;
-  name: string;
-}
-
-export interface Responsable {
-  id: string;
-  firstName: string;
-  lastName: string;
-  employeeId: string;
-  isActive: boolean;
-}
-
-export interface CreateResponsableCommand {
-  firstName: string;
-  lastName: string;
-  employeeId: string;
-}
+// Nota: Eliminamos las referencias estáticas antiguas como 'name' o 'description'
+// para apegarnos estrictamente a la tabla 'product' de tu DB.
