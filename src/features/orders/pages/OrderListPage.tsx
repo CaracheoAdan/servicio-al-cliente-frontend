@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Plus, Edit2 } from 'lucide-react';
+import { ClipboardList, Plus, Edit2, Trash2 } from 'lucide-react';
 import { api } from '../../../shared/api/axiosInstance';
 import toast from 'react-hot-toast';
 
@@ -29,23 +29,39 @@ export function OrderListPage() {
     fetchOrders();
   }, []);
 
+  const handleDelete = async (id: number) => {
+    if (confirm('¿Estás seguro de eliminar esta orden? Todos sus productos asociados se perderán.')) {
+      try {
+        await api.delete(`/orders/${id}`);
+        toast.success('Orden eliminada correctamente.', {
+          style: { borderRadius: '10px', background: '#333', color: '#fff' }
+        });
+        fetchOrders(); // Recargar lista
+      } catch (error) {
+        toast.error('Error al eliminar la orden.', {
+          style: { borderRadius: '10px', background: '#333', color: '#fff' }
+        });
+      }
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'open':
-        return <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold border border-blue-100">Abierta</span>;
+        return <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold border border-blue-100 shadow-sm">Abierta</span>;
       case 'in_production':
       case 'in_process':
-        return <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-bold border border-yellow-100">En Proceso</span>;
+        return <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-bold border border-yellow-100 shadow-sm">En Proceso</span>;
       case 'produced':
-        return <span className="px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-bold border border-orange-100">Producido</span>;
+        return <span className="px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-bold border border-orange-100 shadow-sm">Producido</span>;
       case 'in_delivery':
-        return <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-bold border border-purple-100">En Tránsito</span>;
+        return <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-bold border border-purple-100 shadow-sm">En Tránsito</span>;
       case 'delivered':
-        return <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold border border-green-100">Entregada</span>;
+        return <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold border border-green-100 shadow-sm">Entregada</span>;
       case 'closed':
-        return <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold border border-gray-200">Cerrada</span>;
+        return <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold border border-gray-200 shadow-sm">Cerrada</span>;
       default:
-        return <span className="px-3 py-1 bg-gray-50 text-gray-700 rounded-full text-xs font-bold border border-gray-100">{status}</span>;
+        return <span className="px-3 py-1 bg-gray-50 text-gray-700 rounded-full text-xs font-bold border border-gray-100 shadow-sm">{status}</span>;
     }
   };
 
@@ -110,13 +126,20 @@ export function OrderListPage() {
                   <td className="px-8 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-600">{formatDate(order.scheduled_delivery_date || order.scheduledDeliveryDate)}</div>
                   </td>
-                  <td className="px-8 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-8 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
                     <button 
                       onClick={() => navigate(`/orders/${order.id}`)}
-                      className="text-gray-400 hover:text-totebin-600 bg-white hover:bg-totebin-50 border border-transparent hover:border-totebin-100 p-2 rounded-lg transition-all shadow-sm flex items-center justify-center ml-auto"
+                      className="text-gray-400 hover:text-totebin-600 bg-white hover:bg-totebin-50 border border-transparent hover:border-totebin-100 p-2 rounded-lg transition-all shadow-sm flex items-center justify-center"
                       title="Editar Orden"
                     >
                       <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(order.id)}
+                      className="text-gray-400 hover:text-red-600 bg-white hover:bg-red-50 border border-transparent hover:border-red-100 p-2 rounded-lg transition-all shadow-sm flex items-center justify-center"
+                      title="Eliminar Orden"
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>
