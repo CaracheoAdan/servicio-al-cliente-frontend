@@ -42,7 +42,7 @@ export function MasterTablePage() {
               producidoNo: !isProduced ? 'X' : '',
               salidaSi: isDelivered ? 'X' : '',
               salidaNo: !isDelivered ? 'X' : '',
-              fechaEnvio: order.detail.shippingDate || order.detail.shipping_date ? new Date(order.detail.shippingDate || order.detail.shipping_date).toLocaleDateString() : '',
+              horaEnvio: order.detail.shippingDate || order.detail.shipping_date ? new Date(order.detail.shippingDate || order.detail.shipping_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
               cerrarPedido: isClosed ? 'Cerrado' : '',
               comentarios: order.detail.comments || ''
             });
@@ -58,7 +58,7 @@ export function MasterTablePage() {
                 producidoNo: index === 0 && !isProduced ? 'X' : '',
                 salidaSi: index === 0 && isDelivered ? 'X' : '',
                 salidaNo: index === 0 && !isDelivered ? 'X' : '',
-                fechaEnvio: index === 0 && (order.detail.shippingDate || order.detail.shipping_date) ? new Date(order.detail.shippingDate || order.detail.shipping_date).toLocaleDateString() : '',
+                horaEnvio: index === 0 && (order.detail.shippingDate || order.detail.shipping_date) ? new Date(order.detail.shippingDate || order.detail.shipping_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
                 cerrarPedido: index === 0 && isClosed ? 'Cerrado' : '',
                 comentarios: index === 0 && order.detail.comments ? order.detail.comments : ''
               });
@@ -84,7 +84,7 @@ export function MasterTablePage() {
         // Header Row 1 (Super headers)
         ['', '', '', '', '', 'Pedido ya esta producido', '', 'Salida de transporte para entrega al cliente', '', '', '', ''],
         // Header Row 2
-        ['No. Orden', 'Producto', 'Cantidad pedida', 'Fecha compromiso de entrega', 'Cantidad surtida', 'Si', 'No', 'Si', 'No', 'Fecha de envio', 'Cerrar pedido', 'Comentarios para sistemas'],
+        ['No. Orden', 'Producto', 'Cantidad pedida', 'Fecha compromiso de entrega', 'Cantidad surtida', 'Si', 'No', 'Si', 'No', 'Hora de envio', 'Cerrar pedido', 'Comentarios para sistemas'],
         // Data Rows
         ...data.map(row => [
           row.noOrden,
@@ -96,7 +96,7 @@ export function MasterTablePage() {
           row.producidoNo,
           row.salidaSi,
           row.salidaNo,
-          row.fechaEnvio,
+          row.horaEnvio,
           row.cerrarPedido,
           row.comentarios
         ])
@@ -163,7 +163,7 @@ export function MasterTablePage() {
               <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">No</th>
               <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Sí</th>
               <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">No</th>
-              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Fecha de envio</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Hora de envio</th>
               <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Cerrar pedido</th>
               <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Comentarios</th>
             </tr>
@@ -185,7 +185,7 @@ export function MasterTablePage() {
                   <td className="px-6 py-4 text-center font-display font-bold text-[#DC2626] border-r border-[#EDF1EF]">{row.producidoNo}</td>
                   <td className="px-6 py-4 text-center font-display font-bold text-[#D97706] border-r border-[#EDF1EF] bg-[#FFFBEB]/30">{row.salidaSi}</td>
                   <td className="px-6 py-4 text-center font-display font-bold text-[#DC2626] border-r border-[#EDF1EF]">{row.salidaNo}</td>
-                  <td className="px-6 py-4 font-mono text-[#4B5A5D] border-r border-[#EDF1EF] text-center">{row.fechaEnvio}</td>
+                  <td className="px-6 py-4 font-mono text-[#4B5A5D] border-r border-[#EDF1EF] text-center">{row.horaEnvio}</td>
                   <td className="px-6 py-4 font-display font-bold text-[#0F1B17] border-r border-[#EDF1EF] text-center">{row.cerrarPedido}</td>
                   <td className="px-6 py-4 font-body text-[#4B5A5D] text-sm max-w-[200px] truncate" title={row.comentarios}>{row.comentarios}</td>
                 </tr>
