@@ -105,7 +105,6 @@ export function CatalogsPage() {
   };
 
   return (
-  return (
     <div className="bg-white rounded-[28px] shadow-card-base border border-[#E3E9E6] min-h-[500px] flex flex-col font-body animate-fade-in-up">
       <div className="p-8 border-b border-[#E3E9E6] flex justify-between items-center bg-white rounded-t-[28px] relative overflow-hidden">
         <div className="flex items-center space-x-4 relative z-10">
