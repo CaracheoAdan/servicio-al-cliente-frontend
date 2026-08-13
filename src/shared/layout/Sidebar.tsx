@@ -31,6 +31,7 @@ export function Sidebar() {
             <NavLink
               key={item.name}
               to={item.path}
+              end={item.path === '/orders'}
               className={({ isActive }) =>
                 `flex items-center px-4 py-3.5 text-sm font-display font-bold rounded-2xl transition-all duration-300 group ${
                   isActive
