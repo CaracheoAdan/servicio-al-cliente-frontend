@@ -28,7 +28,7 @@ export const orderService = {
 
   async getOrderById(id: string | number) {
     const combinedOrders = await this.getAllCombinedOrders();
-    return combinedOrders.find(o => o.id.toString() === id.toString());
+    return combinedOrders.find((o: any) => o.id.toString() === id.toString());
   },
 
   async createOrder(payload: any) {
