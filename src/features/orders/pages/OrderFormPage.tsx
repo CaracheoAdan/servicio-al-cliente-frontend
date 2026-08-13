@@ -289,8 +289,8 @@ export function OrderFormPage() {
           </div>
         </div>
 
-        {/* Estatus y Comentarios */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50/50 p-6 rounded-xl border border-gray-100">
+        {/* Estatus */}
+        <div className="bg-gray-50/50 p-6 rounded-xl border border-gray-100 max-w-2xl">
           <div className="space-y-4">
             {/* Pedido ya esta producido */}
             <div className={`border rounded-xl p-4 transition-colors ${status === 'produced' || status === 'in_delivery' || status === 'delivered' ? 'bg-totebin-50 border-totebin-200' : 'bg-white border-gray-200'}`}>
@@ -360,22 +360,10 @@ export function OrderFormPage() {
                   type="date"
                   value={shippingDate}
                   onChange={(e) => setShippingDate(e.target.value)}
-                  disabled={status !== 'in_delivery' && status !== 'delivered'}
-                  className="block w-full border-gray-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 bg-white transition-colors text-sm font-semibold disabled:opacity-50 disabled:bg-gray-100"
+                  className="block w-full border-gray-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 bg-white transition-colors text-sm font-semibold"
                 />
               </div>
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Comentarios para sistemas</label>
-            <textarea
-              value={comments}
-              onChange={(e) => setComments(e.target.value)}
-              placeholder="Escribe observaciones adicionales aquí..."
-              rows={8}
-              className="w-full border-gray-200 rounded-xl shadow-sm focus:border-totebin-500 focus:ring-totebin-500 px-4 py-3 bg-white text-sm h-full max-h-56"
-            ></textarea>
           </div>
         </div>
 
