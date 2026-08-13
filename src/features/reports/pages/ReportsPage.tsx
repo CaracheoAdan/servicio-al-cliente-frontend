@@ -11,6 +11,8 @@ const formatTimeAxis = (val: number) => {
   return `${hours}:${mins.toString().padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`;
 };
 
+import { orderService } from '../../../shared/api/orderService';
+
 export function ReportsPage() {
   const [transportData, setTransportData] = useState<any[]>([]);
   const [fulfillmentData, setFulfillmentData] = useState<any[]>([]);
@@ -20,28 +22,16 @@ export function ReportsPage() {
     const fetchAndComputeReports = async () => {
       try {
         setLoading(true);
-        // Pedimos todas las órdenes reales al servidor
-        const res = await api.get('/orders');
-        const ordersList = Array.isArray(res.data) ? res.data : (res.data.items || res.data.data || []);
-
-        const orders = await Promise.all(
-          ordersList.map(async (o: any) => {
-            try {
-              const detailRes = await api.get(`/orders/${o.id}`);
-              return detailRes.data.data || detailRes.data;
-            } catch (e) {
-              return o;
-            }
-          })
-        );
+        // Pedimos todas las órdenes reales al servidor, completamente hidratadas
+        const orders = await orderService.getAllCombinedOrders();
 
         const transport: any[] = [];
         const fulfillment: any[] = [];
 
         orders.forEach((order: any) => {
           // --- Cálculo de Picos de Transporte ---
-          // Intentamos usar shipping_date, si no existe usamos la fecha de hoy simulada
-          const shippingDateStr = order.shipping_date || order.shippingDate || order.scheduled_delivery_date || order.scheduledDeliveryDate;
+          // Usar la relación detail
+          const shippingDateStr = order.detail?.shippingDate || order.detail?.shipping_date || order.detail?.scheduledDeliveryDate;
           
           if (shippingDateStr) {
             const date = new Date(shippingDateStr);

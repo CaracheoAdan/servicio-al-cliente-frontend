@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardList, Plus, Edit2, Trash2 } from 'lucide-react';
-import { api } from '../../../shared/api/axiosInstance';
+import { orderService } from '../../../shared/api/orderService';
 import toast from 'react-hot-toast';
+import { api } from '../../../shared/api/axiosInstance';
 
 export function OrderListPage() {
   const navigate = useNavigate();
@@ -12,9 +13,8 @@ export function OrderListPage() {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/orders');
-      const data = Array.isArray(res.data) ? res.data : (res.data.items || res.data.data || []);
-      setOrders(data);
+      const ordersData = await orderService.getAllCombinedOrders();
+      setOrders(ordersData);
     } catch (error) {
       console.error("Error fetching orders:", error);
       toast.error('Error al cargar órdenes desde el servidor.', {
@@ -124,7 +124,7 @@ export function OrderListPage() {
                     {getStatusBadge(order.status)}
                   </td>
                   <td className="px-8 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-600">{formatDate(order.scheduled_delivery_date || order.scheduledDeliveryDate)}</div>
+                    <div className="text-sm font-medium text-gray-600">{formatDate(order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || order.scheduled_delivery_date)}</div>
                   </td>
                   <td className="px-8 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
                     <button 

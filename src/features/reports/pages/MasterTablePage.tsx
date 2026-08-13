@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, Table as TableIcon } from 'lucide-react';
 import { api } from '../../../shared/api/axiosInstance';
+import { orderService } from '../../../shared/api/orderService';
 import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
 
@@ -17,21 +18,8 @@ export function MasterTablePage() {
         const prodData = Array.isArray(prodRes.data) ? prodRes.data : (prodRes.data.items || prodRes.data.data || []);
         const productMap = new Map(prodData.map((p: any) => [p.id, p.key]));
 
-        // Fetch orders list
-        const res = await api.get('/orders');
-        const ordersList = Array.isArray(res.data) ? res.data : (res.data.items || res.data.data || []);
-
-        // Fetch full details for every single order to ensure items and dates are included
-        const orders = await Promise.all(
-          ordersList.map(async (o: any) => {
-            try {
-              const detailRes = await api.get(`/orders/${o.id}`);
-              return detailRes.data.data || detailRes.data;
-            } catch (e) {
-              return o; // fallback a los datos básicos si falla
-            }
-          })
-        );
+        // Fetch fully hydrated orders
+        const orders = await orderService.getAllCombinedOrders();
 
         const flattenedData: any[] = [];
 
@@ -48,15 +36,15 @@ export function MasterTablePage() {
               noOrden: order.key,
               producto: '',
               cantidadPedida: '',
-              fechaCompromiso: order.scheduled_delivery_date || order.scheduledDeliveryDate ? new Date(order.scheduled_delivery_date || order.scheduledDeliveryDate).toLocaleDateString() : '',
+              fechaCompromiso: order.detail.scheduledDeliveryDate || order.detail.scheduled_delivery_date ? new Date(order.detail.scheduledDeliveryDate || order.detail.scheduled_delivery_date).toLocaleDateString() : '',
               cantidadSurtida: '',
               producidoSi: isProduced ? 'X' : '',
               producidoNo: !isProduced ? 'X' : '',
               salidaSi: isDelivered ? 'X' : '',
               salidaNo: !isDelivered ? 'X' : '',
-              fechaEnvio: order.shipping_date || order.shippingDate ? new Date(order.shipping_date || order.shippingDate).toLocaleDateString() : '',
+              fechaEnvio: order.detail.shippingDate || order.detail.shipping_date ? new Date(order.detail.shippingDate || order.detail.shipping_date).toLocaleDateString() : '',
               cerrarPedido: isClosed ? 'Cerrado' : '',
-              comentarios: ''
+              comentarios: order.detail.comments || ''
             });
           } else {
             items.forEach((item: any, index: number) => {
@@ -64,15 +52,15 @@ export function MasterTablePage() {
                 noOrden: index === 0 ? order.key : '',
                 producto: productMap.get(item.productId || item.product_id) || item.productId || item.product_id || '',
                 cantidadPedida: item.orderedQuantity || item.ordered_quantity || 0,
-                fechaCompromiso: index === 0 && (order.scheduled_delivery_date || order.scheduledDeliveryDate) ? new Date(order.scheduled_delivery_date || order.scheduledDeliveryDate).toLocaleDateString() : '',
+                fechaCompromiso: index === 0 && (order.detail.scheduledDeliveryDate || order.detail.scheduled_delivery_date) ? new Date(order.detail.scheduledDeliveryDate || order.detail.scheduled_delivery_date).toLocaleDateString() : '',
                 cantidadSurtida: item.deliveredQuantity || item.delivered_quantity || 0,
                 producidoSi: index === 0 && isProduced ? 'X' : '',
                 producidoNo: index === 0 && !isProduced ? 'X' : '',
                 salidaSi: index === 0 && isDelivered ? 'X' : '',
                 salidaNo: index === 0 && !isDelivered ? 'X' : '',
-                fechaEnvio: index === 0 && (order.shipping_date || order.shippingDate) ? new Date(order.shipping_date || order.shippingDate).toLocaleDateString() : '',
+                fechaEnvio: index === 0 && (order.detail.shippingDate || order.detail.shipping_date) ? new Date(order.detail.shippingDate || order.detail.shipping_date).toLocaleDateString() : '',
                 cerrarPedido: index === 0 && isClosed ? 'Cerrado' : '',
-                comentarios: ''
+                comentarios: index === 0 && order.detail.comments ? order.detail.comments : ''
               });
             });
           }

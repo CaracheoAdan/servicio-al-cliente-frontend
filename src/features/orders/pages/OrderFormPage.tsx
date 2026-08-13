@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Save, Plus, X, FileText, CheckCircle2, Copy } from 'lucide-react';
 import { api } from '../../../shared/api/axiosInstance';
+import { orderService } from '../../../shared/api/orderService';
 import { OrderStatus } from '../types/order.types';
 
 export function OrderFormPage() {
@@ -32,27 +33,25 @@ export function OrderFormPage() {
         setAvailableProducts(activeProducts);
 
         if (isEditing) {
-          const orderRes = await api.get(`/orders/${id}`);
-          const orderData = orderRes.data.data || orderRes.data;
-          
-          setOrderKey(orderData.key || '');
-          if (orderData.scheduled_delivery_date || orderData.scheduledDeliveryDate) {
-            setScheduledDeliveryDate((orderData.scheduled_delivery_date || orderData.scheduledDeliveryDate).split('T')[0]);
-          }
-          setStatus(orderData.status || 'open');
-          setComments(orderData.comments || '');
-          
-          if (orderData.items && orderData.items.length > 0) {
-            setItems(orderData.items.map((i: any) => ({
-              productId: i.product_id || i.productId || '',
-              orderedQuantity: i.ordered_quantity || i.orderedQuantity || 1,
-              deliveredQuantity: i.delivered_quantity || i.deliveredQuantity || 0
-            })));
+          const orderData = await orderService.getOrderById(id!);
+          if (orderData) {
+            setOrderKey(orderData.key || '');
+            if (orderData.detail?.scheduledDeliveryDate || orderData.detail?.scheduled_delivery_date) {
+              setScheduledDeliveryDate((orderData.detail.scheduledDeliveryDate || orderData.detail.scheduled_delivery_date).split('T')[0]);
+            }
+            setStatus(orderData.status || 'open');
+            setComments(orderData.detail?.comments || '');
+            
+            if (orderData.items && orderData.items.length > 0) {
+              setItems(orderData.items.map((i: any) => ({
+                productId: i.product_id || i.productId || '',
+                orderedQuantity: i.ordered_quantity || i.orderedQuantity || 1,
+                deliveredQuantity: i.delivered_quantity || i.deliveredQuantity || 0
+              })));
+            }
           }
         } else {
-          // Si es nueva orden, cargar la lista de órdenes existentes para permitir pre-llenado
-          const ordersRes = await api.get('/orders');
-          const ordersData = Array.isArray(ordersRes.data) ? ordersRes.data : (ordersRes.data.items || ordersRes.data.data || []);
+          const ordersData = await orderService.getAllCombinedOrders();
           setExistingOrders(ordersData);
         }
       } catch (error) {
@@ -69,10 +68,9 @@ export function OrderFormPage() {
     if (!orderIdToCopy) return;
     try {
       setLoading(true);
-      const orderRes = await api.get(`/orders/${orderIdToCopy}`);
-      const orderData = orderRes.data.data || orderRes.data;
+      const orderData = await orderService.getOrderById(orderIdToCopy);
       
-      if (orderData.items && orderData.items.length > 0) {
+      if (orderData && orderData.items && orderData.items.length > 0) {
         setItems(orderData.items.map((i: any) => ({
           productId: i.product_id || i.productId || '',
           orderedQuantity: i.ordered_quantity || i.orderedQuantity || 1,
@@ -130,10 +128,10 @@ export function OrderFormPage() {
       };
 
       if (isEditing) {
-        await api.put(`/orders/${id}`, payload);
+        await orderService.updateOrder(id!, payload);
         toast.success('Orden actualizada en DB.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
       } else {
-        await api.post('/orders', payload);
+        await orderService.createOrder(payload);
         toast.success('Orden creada en DB.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
         setTimeout(() => navigate('/orders'), 1000);
       }
