@@ -14,36 +14,46 @@ export function OrderFormPage() {
   const [scheduledDeliveryDate, setScheduledDeliveryDate] = useState('');
   const [items, setItems] = useState([{ productId: '', orderedQuantity: 1, deliveredQuantity: 0 }]);
   const [status, setStatus] = useState<OrderStatus>('open');
-  const [loading, setLoading] = useState(isEditing);
+  const [loading, setLoading] = useState(true);
+  
+  // Estado para el menú desplegable de productos
+  const [availableProducts, setAvailableProducts] = useState<any[]>([]);
 
   useEffect(() => {
-    if (isEditing) {
-      const fetchOrder = async () => {
-        try {
-          const res = await api.get(`/orders/${id}`);
-          const data = res.data.data || res.data;
-          setOrderKey(data.key || '');
-          if (data.scheduled_delivery_date || data.scheduledDeliveryDate) {
-            setScheduledDeliveryDate((data.scheduled_delivery_date || data.scheduledDeliveryDate).split('T')[0]);
-          }
-          setStatus(data.status || 'open');
+    const fetchData = async () => {
+      try {
+        // Cargar primero el catálogo de productos para el dropdown
+        const prodRes = await api.get('/products');
+        const prodData = Array.isArray(prodRes.data) ? prodRes.data : (prodRes.data.items || prodRes.data.data || []);
+        setAvailableProducts(prodData);
+
+        // Si estamos editando, cargar los datos de la orden
+        if (isEditing) {
+          const orderRes = await api.get(`/orders/${id}`);
+          const orderData = orderRes.data.data || orderRes.data;
           
-          if (data.items && data.items.length > 0) {
-            setItems(data.items.map((i: any) => ({
+          setOrderKey(orderData.key || '');
+          if (orderData.scheduled_delivery_date || orderData.scheduledDeliveryDate) {
+            setScheduledDeliveryDate((orderData.scheduled_delivery_date || orderData.scheduledDeliveryDate).split('T')[0]);
+          }
+          setStatus(orderData.status || 'open');
+          
+          if (orderData.items && orderData.items.length > 0) {
+            setItems(orderData.items.map((i: any) => ({
               productId: i.product_id || i.productId || '',
               orderedQuantity: i.ordered_quantity || i.orderedQuantity || 1,
               deliveredQuantity: i.delivered_quantity || i.deliveredQuantity || 0
             })));
           }
-        } catch (error) {
-          console.error("Error fetching order:", error);
-          toast.error('Error al cargar la orden.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
-        } finally {
-          setLoading(false);
         }
-      };
-      fetchOrder();
-    }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast.error('Error al cargar datos del servidor.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, [id, isEditing]);
 
   const handleAddItem = () => {
@@ -67,12 +77,24 @@ export function OrderFormPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validar que se haya seleccionado un producto en todas las filas
+    if (items.some(item => !item.productId)) {
+      toast.error('Por favor selecciona un producto válido en todas las filas.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+      return;
+    }
+
     try {
       const payload = {
         key: orderKey,
         status: status,
         scheduledDeliveryDate: scheduledDeliveryDate,
-        items: items
+        // Convertir productId a entero si es necesario por la DB
+        items: items.map(item => ({
+          productId: parseInt(item.productId as string, 10),
+          orderedQuantity: item.orderedQuantity,
+          deliveredQuantity: item.deliveredQuantity
+        }))
       };
 
       if (isEditing) {
@@ -90,7 +112,7 @@ export function OrderFormPage() {
   };
 
   if (loading) {
-    return <div className="p-8 text-center text-gray-500 font-bold">Cargando datos del servidor...</div>;
+    return <div className="p-8 text-center text-gray-500 font-bold">Cargando catálogo y datos...</div>;
   }
 
   return (
@@ -158,14 +180,19 @@ export function OrderFormPage() {
                 {items.map((item, index) => (
                   <tr key={index} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-3 border-r border-gray-100">
-                      <input
-                        type="text"
-                        placeholder="Ej: 10000489"
+                      <select
                         value={item.productId}
                         onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
-                        className="w-full border-gray-200 rounded-lg shadow-sm focus:ring-totebin-500 focus:border-totebin-500 px-3 py-2 text-sm font-semibold"
+                        className="w-full border-gray-200 rounded-lg shadow-sm focus:ring-totebin-500 focus:border-totebin-500 px-3 py-2 text-sm font-semibold cursor-pointer"
                         required
-                      />
+                      >
+                        <option value="" disabled>-- Selecciona un Producto --</option>
+                        {availableProducts.map(prod => (
+                          <option key={prod.id} value={prod.id}>
+                            {prod.key} {prod.is_active === false || prod.isActive === false ? '(Inactivo)' : ''}
+                          </option>
+                        ))}
+                      </select>
                     </td>
                     <td className="px-6 py-3 border-r border-gray-100">
                       <input
