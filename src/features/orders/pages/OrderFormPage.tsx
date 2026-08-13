@@ -155,61 +155,18 @@ export function OrderFormPage() {
               className="block w-full border-gray-200 rounded-xl shadow-sm focus:border-totebin-500 focus:ring-totebin-500 px-4 py-2.5 bg-white transition-colors font-semibold text-gray-700"
             />
           </div>
-        </div>
-
-        {/* Productos */}
+        </div>        {/* Productos */}
         <div>
-          <div className="flex justify-between items-center mb-4">
-            <h4 className="text-lg font-bold text-gray-900">Productos a Producir</h4>
+          <div className="flex justify-between items-center mb-6">
+            <h4 className="text-lg font-display font-bold text-[#0F1B17]">Productos a Producir</h4>
             <button 
               type="button" 
               onClick={handleAddItem}
-              className="text-sm bg-totebin-50 text-totebin-700 hover:bg-totebin-100 font-bold py-2 px-4 rounded-lg border border-totebin-200 transition-colors flex items-center shadow-sm"
+              className="text-sm bg-[#F0FDF4] text-[#15803D] hover:bg-[#116932] hover:text-white font-display font-bold py-2.5 px-5 rounded-xl transition-colors flex items-center"
             >
-              <Plus className="w-4 h-4 mr-1" /> Agregar Fila
+              <Plus className="w-4 h-4 mr-1.5" /> Agregar Fila
             </button>
           </div>
-          <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Producto</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase w-40">Cantidad pedida</th>
-                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase w-40">Cantidad surtida</th>
-                  <th className="px-4 py-3 text-center w-16"></th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-100">
-                {items.map((item, index) => (
-                  <tr key={index}>
-                    <td className="px-4 py-3">
-                      <select
-                        value={item.productId}
-                        onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
-                        className="w-full border-gray-200 rounded-lg shadow-sm focus:ring-totebin-500 focus:border-totebin-500 text-sm font-semibold cursor-pointer"
-                        required
-                      >
-                        <option value="" disabled>-- Selecciona un Producto --</option>
-                        {availableProducts.map(prod => (
-                          <option key={prod.id} value={prod.id}>{prod.key}</option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="px-4 py-3">
-                      <input
-                        type="number"
-                        min="1"
-                        value={item.orderedQuantity}
-                        onChange={(e) => handleItemChange(index, 'orderedQuantity', parseInt(e.target.value) || 1)}
-                        className="w-full border-gray-200 rounded-lg shadow-sm focus:ring-totebin-500 text-sm font-semibold"
-                        required
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <input
-                        type="number"
-                        min="0"
-                        value={item.deliveredQuantity}
 
           <div className="space-y-4">
             {items.map((item, index) => (
@@ -218,13 +175,13 @@ export function OrderFormPage() {
                   <label className="block text-xs font-display font-bold text-[#6B7B76] mb-1.5 uppercase tracking-wide">Producto</label>
                   <select
                     value={item.productId}
-                    onChange={(e) => updateItem(index, 'productId', e.target.value)}
-                    className="w-full p-3.5 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-body transition-all"
+                    onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
+                    className="w-full p-3.5 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-body transition-all bg-white"
                     required
                   >
-                    <option value="">Selecciona un producto</option>
-                    {availableProducts.map(p => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
+                    <option value="" disabled>-- Selecciona un Producto --</option>
+                    {availableProducts.map(prod => (
+                      <option key={prod.id} value={prod.id}>{prod.key}</option>
                     ))}
                   </select>
                 </div>
@@ -234,8 +191,8 @@ export function OrderFormPage() {
                     type="number"
                     min="1"
                     value={item.orderedQuantity}
-                    onChange={(e) => updateItem(index, 'orderedQuantity', parseInt(e.target.value))}
-                    className="w-full p-3.5 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-mono font-bold transition-all"
+                    onChange={(e) => handleItemChange(index, 'orderedQuantity', parseInt(e.target.value) || 1)}
+                    className="w-full p-3.5 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-mono font-bold transition-all bg-white"
                     required
                   />
                 </div>
@@ -245,15 +202,20 @@ export function OrderFormPage() {
                     type="number"
                     min="0"
                     value={item.deliveredQuantity}
-                    onChange={(e) => updateItem(index, 'deliveredQuantity', parseInt(e.target.value))}
-                    className="w-full p-3.5 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-mono font-bold transition-all"
+                    onChange={(e) => handleItemChange(index, 'deliveredQuantity', parseInt(e.target.value) || 0)}
+                    className="w-full p-3.5 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-mono font-bold transition-all bg-white"
                   />
                 </div>
                 <button
                   type="button"
-                  onClick={() => removeItem(index)}
-                  className="p-3.5 bg-white text-[#9CA8A3] hover:text-[#DC2626] border-2 border-[#E3E9E6] hover:border-[#DC2626]/30 hover:bg-[#FEF2F2] rounded-xl transition-colors mb-0"
+                  onClick={() => {
+                    const newItems = [...items];
+                    newItems.splice(index, 1);
+                    setItems(newItems);
+                  }}
+                  className="p-3.5 bg-white text-[#9CA8A3] hover:text-[#DC2626] border-2 border-[#E3E9E6] hover:border-[#DC2626]/30 hover:bg-[#FEF2F2] rounded-xl transition-colors mb-0 disabled:opacity-50"
                   title="Eliminar fila"
+                  disabled={items.length === 1}
                 >
                   <X className="w-5 h-5" />
                 </button>
