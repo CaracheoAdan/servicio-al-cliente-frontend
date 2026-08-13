@@ -115,64 +115,82 @@ export function OrderFormPage() {
   };
 
   if (loading) {
-    return <div className="p-8 text-center text-gray-500 font-bold">Cargando datos...</div>;
+    return <div className="p-8 text-center text-[#6B7B76] font-display font-bold">Cargando datos...</div>;
   }
 
+  const isProduced = status === 'produced' || status === 'in_delivery' || status === 'delivered' || status === 'closed';
+  const isDelivered = status === 'in_delivery' || status === 'delivered' || status === 'closed';
+
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden font-sans animate-fade-in-up max-w-5xl mx-auto">
-      <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-        <h3 className="text-xl font-extrabold text-gray-900 tracking-tight flex items-center">
-          <FileText className="w-6 h-6 text-totebin-600 mr-3" />
-          {isEditing ? `Gestión de No. Orden: ${id}` : 'Nueva Orden de Producción'}
-        </h3>
-        <button onClick={() => navigate('/orders')} className="flex items-center text-gray-500 hover:text-gray-900 transition-colors font-bold text-sm bg-white border border-gray-200 px-4 py-2 rounded-lg shadow-sm">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Regresar
+    <div className="bg-white rounded-[28px] shadow-card-base border border-[#E3E9E6] overflow-hidden font-body animate-fade-in-up max-w-5xl mx-auto">
+      {/* Cabecera */}
+      <div className="px-8 py-8 border-b border-[#E3E9E6] bg-white flex justify-between items-start">
+        <div className="flex items-center space-x-4">
+          <div className="w-14 h-14 rounded-2xl bg-[#F0FDF4] flex items-center justify-center border border-[#E3E9E6] shrink-0">
+            <FileText className="w-7 h-7 text-[#15803D]" />
+          </div>
+          <div>
+            <span className="font-mono uppercase tracking-widest text-[#15803D] text-[11px] font-bold block mb-1">
+              {isEditing ? 'Producción · Gestión de orden' : 'Producción · Nueva orden'}
+            </span>
+            <h3 className="text-2xl font-display font-extrabold text-[#0F1B17] tracking-tight">
+              {isEditing ? `Orden No. ${id}` : 'Nueva Orden de Producción'}
+            </h3>
+          </div>
+        </div>
+        <button 
+          type="button"
+          onClick={() => navigate('/orders')} 
+          className="bg-[#F3F6F4] hover:bg-[#E7ECE9] text-[#0F1B17] px-4 py-2.5 rounded-xl font-display font-bold text-sm transition-colors flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" /> Regresar
         </button>
       </div>
 
-      <form onSubmit={handleSave} className="p-8 space-y-8">
+      <form onSubmit={handleSave} className="p-8 space-y-10">
         {/* Datos Principales */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50/50 p-6 rounded-xl border border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-[#F7FAF8] p-6 rounded-3xl border border-[#E3E9E6]">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">No. Orden</label>
+            <label className="block font-display font-bold text-sm text-[#0F1B17] mb-2">No. Orden</label>
             <input
               type="text"
               required
               value={orderKey}
               onChange={(e) => setOrderKey(e.target.value)}
               placeholder="Ej: 12515"
-              className="block w-full border-gray-200 rounded-xl shadow-sm focus:border-totebin-500 focus:ring-totebin-500 px-4 py-2.5 bg-white transition-colors font-semibold"
+              className="block w-full border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F1B17] outline-none"
             />
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Fecha compromiso de entrega</label>
+            <label className="block font-display font-bold text-sm text-[#0F1B17] mb-2">Fecha compromiso de entrega</label>
             <input
               type="date"
               required
               value={scheduledDeliveryDate}
               onChange={(e) => setScheduledDeliveryDate(e.target.value)}
-              className="block w-full border-gray-200 rounded-xl shadow-sm focus:border-totebin-500 focus:ring-totebin-500 px-4 py-2.5 bg-white transition-colors font-semibold text-gray-700"
+              className="block w-full border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F1B17] outline-none"
             />
           </div>
-        </div>        {/* Productos */}
+        </div>
+
+        {/* Productos */}
         <div>
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-4">
             <h4 className="text-lg font-display font-bold text-[#0F1B17]">Productos a Producir</h4>
             <button 
               type="button" 
               onClick={handleAddItem}
-              className="text-sm bg-[#F0FDF4] text-[#15803D] hover:bg-[#116932] hover:text-white font-display font-bold py-2.5 px-5 rounded-xl transition-colors flex items-center"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#F0FDF4] text-[#15803D] font-display font-bold text-sm border border-[#BBF7D0] hover:bg-[#DCFCE7] transition-colors"
             >
-              <Plus className="w-4 h-4 mr-1.5" /> Agregar Fila
+              <Plus className="w-4 h-4" /> Agregar Fila
             </button>
           </div>
 
           <div className="space-y-4">
             {items.map((item, index) => (
-              <div key={index} className="flex flex-col md:flex-row items-end gap-4 p-4 rounded-2xl bg-[#F7FAF8] border border-[#E3E9E6]">
+              <div key={index} className="flex flex-col md:flex-row items-end gap-4 p-5 rounded-2xl bg-[#F7FAF8] border border-[#E3E9E6]">
                 <div className="w-full md:w-2/5">
-                  <label className="block text-xs font-display font-bold text-[#6B7B76] mb-1.5 uppercase tracking-wide">Producto</label>
+                  <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#6B7B76] mb-2">Producto</label>
                   <select
                     value={item.productId}
                     onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
@@ -186,7 +204,7 @@ export function OrderFormPage() {
                   </select>
                 </div>
                 <div className="w-full md:w-1/4">
-                  <label className="block text-xs font-display font-bold text-[#6B7B76] mb-1.5 uppercase tracking-wide">Cant. Pedida</label>
+                  <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#6B7B76] mb-2">Cant. Pedida</label>
                   <input
                     type="number"
                     min="1"
@@ -197,7 +215,7 @@ export function OrderFormPage() {
                   />
                 </div>
                 <div className="w-full md:w-1/4">
-                  <label className="block text-xs font-display font-bold text-[#6B7B76] mb-1.5 uppercase tracking-wide">Cant. Surtida</label>
+                  <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#6B7B76] mb-2">Cant. Surtida</label>
                   <input
                     type="number"
                     min="0"
@@ -213,7 +231,7 @@ export function OrderFormPage() {
                     newItems.splice(index, 1);
                     setItems(newItems);
                   }}
-                  className="p-3.5 bg-white text-[#9CA8A3] hover:text-[#DC2626] border-2 border-[#E3E9E6] hover:border-[#DC2626]/30 hover:bg-[#FEF2F2] rounded-xl transition-colors mb-0 disabled:opacity-50"
+                  className="p-3.5 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#DC2626] rounded-xl transition-colors shrink-0 disabled:opacity-50"
                   title="Eliminar fila"
                   disabled={items.length === 1}
                 >
@@ -225,96 +243,79 @@ export function OrderFormPage() {
         </div>
 
         {/* Estatus */}
-        <div className="bg-white p-8 rounded-[28px] border border-[#E3E9E6] shadow-card-base max-w-2xl">
-          <div className="space-y-6">
-            {/* Pedido ya esta producido */}
-            <div className={`border-2 rounded-2xl p-6 transition-all duration-300 ${status === 'produced' || status === 'in_delivery' || status === 'delivered' ? 'bg-[#F0FDF4] border-[#15803D]/30' : 'bg-[#F7FAF8] border-[#E3E9E6]'}`}>
-              <div className="flex justify-between items-center mb-4">
-                <span className="font-display font-bold text-[#0F1B17] text-base">Pedido ya está producido</span>
-              </div>
-              <div className="flex space-x-6">
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input 
-                    type="radio" 
-                    name="producedStatus"
-                    checked={status === 'produced' || status === 'in_delivery' || status === 'delivered'}
-                    onChange={() => handleStatusToggle('produced')}
-                    className="h-5 w-5 text-[#15803D] focus:ring-[#15803D] border-[#E3E9E6]" 
-                  />
-                  <span className="font-display font-bold text-[#6B7B76]">Sí</span>
-                </label>
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input 
-                    type="radio" 
-                    name="producedStatus"
-                    checked={status === 'open'}
-                    onChange={() => handleStatusToggle('open')}
-                    className="h-5 w-5 text-[#DC2626] focus:ring-[#DC2626] border-[#E3E9E6]" 
-                  />
-                  <span className="font-display font-bold text-[#6B7B76]">No</span>
-                </label>
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Pedido ya esta producido */}
+          <div className="bg-[#F7FAF8] rounded-2xl border border-[#E3E9E6] p-5">
+            <h5 className="font-display font-bold text-[#0F1B17] mb-4">Pedido ya está producido</h5>
+            <div className="inline-flex rounded-xl bg-white border border-[#E3E9E6] p-1">
+              <button 
+                type="button" 
+                onClick={() => handleStatusToggle('produced')} 
+                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${isProduced ? 'bg-[#15803D] text-white shadow-sm' : 'text-[#6B7B76] hover:text-[#0F1B17]'}`}
+              >
+                Sí
+              </button>
+              <button 
+                type="button" 
+                onClick={() => handleStatusToggle('open')} 
+                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isProduced ? 'bg-[#DC2626] text-white shadow-sm' : 'text-[#6B7B76] hover:text-[#0F1B17]'}`}
+              >
+                No
+              </button>
+            </div>
+          </div>
+
+          {/* Salida de transporte */}
+          <div className="bg-[#F7FAF8] rounded-2xl border border-[#E3E9E6] p-5">
+            <h5 className="font-display font-bold text-[#0F1B17] mb-4">Salida de transporte para entrega</h5>
+            <div className="inline-flex rounded-xl bg-white border border-[#E3E9E6] p-1 mb-6 block">
+              <button 
+                type="button" 
+                onClick={() => {
+                  handleStatusToggle('in_delivery');
+                  if (!shippingDate) setShippingDate(new Date().toISOString().split('T')[0]);
+                }} 
+                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${isDelivered ? 'bg-[#15803D] text-white shadow-sm' : 'text-[#6B7B76] hover:text-[#0F1B17]'}`}
+              >
+                Sí
+              </button>
+              <button 
+                type="button" 
+                onClick={() => handleStatusToggle('produced')} 
+                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isDelivered ? 'bg-[#DC2626] text-white shadow-sm' : 'text-[#6B7B76] hover:text-[#0F1B17]'}`}
+              >
+                No
+              </button>
             </div>
 
-            {/* Salida de transporte */}
-            <div className={`border-2 rounded-2xl p-6 transition-all duration-300 ${status === 'in_delivery' || status === 'delivered' ? 'bg-[#FFFBEB] border-[#D97706]/30' : 'bg-[#F7FAF8] border-[#E3E9E6]'}`}>
-              <div className="flex justify-between items-center mb-4">
-                <span className="font-display font-bold text-[#0F1B17] text-base">Salida de transporte para entrega</span>
-              </div>
-              <div className="flex space-x-6 mb-5">
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input 
-                    type="radio" 
-                    name="shippingStatus"
-                    checked={status === 'in_delivery' || status === 'delivered'}
-                    onChange={() => {
-                      handleStatusToggle('in_delivery');
-                      if (!shippingDate) {
-                        setShippingDate(new Date().toISOString().split('T')[0]);
-                      }
-                    }}
-                    className="h-5 w-5 text-[#D97706] focus:ring-[#D97706] border-[#E3E9E6]" 
-                  />
-                  <span className="font-display font-bold text-[#6B7B76]">Sí</span>
-                </label>
-                <label className="flex items-center space-x-3 cursor-pointer">
-                  <input 
-                    type="radio" 
-                    name="shippingStatus"
-                    checked={status !== 'in_delivery' && status !== 'delivered'}
-                    onChange={() => handleStatusToggle('produced')}
-                    className="h-5 w-5 text-[#DC2626] focus:ring-[#DC2626] border-[#E3E9E6]" 
-                  />
-                  <span className="font-display font-bold text-[#6B7B76]">No</span>
-                </label>
-              </div>
-              
-              <div>
-                <label className="block text-xs font-display font-bold text-[#6B7B76] mb-1.5 uppercase tracking-wide">Fecha de envío</label>
+            {isDelivered && (
+              <div className="animate-fade-in-up">
+                <label className="block font-display font-bold text-xs uppercase tracking-wide text-[#6B7B76] mb-2">Fecha de envío</label>
                 <input
                   type="date"
                   value={shippingDate}
                   onChange={(e) => setShippingDate(e.target.value)}
-                  className="w-full md:w-2/3 p-3.5 border-2 border-[#E3E9E6] rounded-xl focus:border-[#D97706] focus:ring-4 focus:ring-[#D97706]/10 outline-none text-[#0F1B17] font-mono font-bold transition-all bg-white"
+                  className="block w-full border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F1B17] outline-none"
                 />
               </div>
-            </div>
+            )}
           </div>
         </div>
 
-        <div className="flex justify-between items-center pt-8 border-t border-[#E3E9E6]">
+        {/* Acciones */}
+        <div className="flex justify-between items-center pt-8 border-t border-[#EDF1EF]">
           <button
             type="button"
             onClick={() => handleStatusToggle('closed')}
-            className={`flex items-center px-6 py-3.5 rounded-2xl font-display font-bold transition-all ${status === 'closed' ? 'bg-[#F3F6F4] text-[#9CA8A3] cursor-not-allowed' : 'bg-[#FEF2F2] text-[#DC2626] hover:bg-red-100 shadow-[0_4px_0_#991B1B] active:shadow-[0_0px_0_#991B1B] active:translate-y-1'}`}
             disabled={status === 'closed'}
+            className={`flex items-center px-5 py-3 rounded-xl font-display font-bold border transition-all ${status === 'closed' ? 'bg-[#F3F6F4] text-[#9CA8A3] border-[#E3E9E6] cursor-not-allowed' : 'bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#DC2626] border-[#FCA5A5]/40 shadow-sm'}`}
           >
             <CheckCircle2 className="w-5 h-5 mr-2" /> Cerrar pedido
           </button>
 
           <button 
             type="submit"
-            className="bg-[#15803D] hover:bg-[#116932] disabled:opacity-60 text-white px-8 py-3.5 rounded-2xl font-display font-bold shadow-btn-3d transition-all flex items-center text-base"
+            className="bg-[#15803D] hover:bg-[#116932] disabled:opacity-60 text-white px-6 py-3.5 rounded-2xl font-display font-bold shadow-[0_4px_0_#0F5C2A] active:shadow-[0_0px_0_#0F5C2A] active:translate-y-1 transition-all flex items-center"
           >
             <Save className="w-5 h-5 mr-2" />
             {isEditing ? 'Guardar Cambios' : 'Crear Orden'}
