@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { Button } from '../../../shared/ui/Button';
 import { authApi } from '../api/auth.api';
 
@@ -11,15 +12,20 @@ export function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Llamada real a la API (descomentar cuando el backend no de CORS y esté listo)
-      // const res = await authApi.login({ email, password });
-      // localStorage.setItem('totebin_token', res.token);
+      // Llamada real a la API (el backend en localhost:5040 debe estar corriendo)
+      const res = await authApi.login({ email, password });
       
-      // Mock local para poder avanzar con la UI
-      localStorage.setItem('totebin_token', 'mock_jwt_token_totebin');
-      navigate('/');
+      if (res && res.token) {
+        localStorage.setItem('totebin_token', res.token);
+        navigate('/');
+      } else {
+        toast.error('El servidor no devolvió un token válido.');
+      }
     } catch (error) {
-      alert('Error de autenticación. Verifica tu backend en localhost:5040');
+      console.error("Login error:", error);
+      toast.error('Credenciales incorrectas o el servidor no responde.', {
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
     }
   };
 
@@ -90,11 +96,13 @@ export function LoginPage() {
                   Recordarme
                 </label>
               </div>
-              <div className="text-sm">
-                <a href="#" className="font-medium text-totebin-600 hover:text-totebin-500">
-                  ¿Olvidaste tu contraseña?
-                </a>
-              </div>
+            </div>
+
+            <div className="text-center text-sm pt-4 border-t border-gray-100">
+              <span className="text-gray-500">¿No tienes cuenta? </span>
+              <button type="button" onClick={() => navigate('/register')} className="font-bold text-totebin-600 hover:text-totebin-700 transition-colors">
+                Regístrate aquí
+              </button>
             </div>
 
             <div>

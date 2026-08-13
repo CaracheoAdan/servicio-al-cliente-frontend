@@ -2,6 +2,7 @@ import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { DashboardLayout } from '../shared/layout/DashboardLayout'
 import { LoginPage } from '../features/auth/pages/LoginPage'
+import { RegisterPage } from '../features/auth/pages/RegisterPage'
 import { CatalogsPage } from '../features/catalogs/pages/CatalogsPage'
 import { OrderListPage } from '../features/orders/pages/OrderListPage'
 import { OrderFormPage } from '../features/orders/pages/OrderFormPage'
@@ -23,6 +24,7 @@ function App() {
       <Toaster position="top-right" />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         
         {/* Rutas Privadas */}
         <Route path="/" element={
