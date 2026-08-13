@@ -98,7 +98,7 @@ export function ReportsPage() {
         <div className="bg-[#F7FAF8] border border-[#E3E9E6] px-5 py-2.5 rounded-2xl flex items-center shadow-sm relative z-10">
           <Clock className="w-4 h-4 text-[#15803D] mr-2" />
           <span className="text-sm font-display font-bold text-[#0F1B17]">
-            Última actualización: <span className="font-mono ml-1">{getCurrentTime()}</span>
+            Última actualización: <span className="font-mono ml-1">{new Date().toLocaleTimeString()}</span>
           </span>
         </div>
       </div>
