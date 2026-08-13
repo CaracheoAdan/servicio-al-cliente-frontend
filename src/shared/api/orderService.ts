@@ -34,8 +34,14 @@ export const orderService = {
   async createOrder(payload: any) {
     // 1. Crear Orden base
     const orderRes = await api.post('/orders', { key: payload.key, status: payload.status });
-    const order = orderRes.data.data || orderRes.data;
-    const orderId = order.id;
+    
+    let orderId: number;
+    if (typeof orderRes.data === 'number') {
+      orderId = orderRes.data;
+    } else {
+      const order = orderRes.data.data || orderRes.data;
+      orderId = order.id;
+    }
 
     // 2. Crear Detalle
     if (payload.scheduledDeliveryDate || payload.shippingDate || payload.comments) {
