@@ -22,7 +22,18 @@ export function ReportsPage() {
         setLoading(true);
         // Pedimos todas las órdenes reales al servidor
         const res = await api.get('/orders');
-        const orders = Array.isArray(res.data) ? res.data : (res.data.items || res.data.data || []);
+        const ordersList = Array.isArray(res.data) ? res.data : (res.data.items || res.data.data || []);
+
+        const orders = await Promise.all(
+          ordersList.map(async (o: any) => {
+            try {
+              const detailRes = await api.get(`/orders/${o.id}`);
+              return detailRes.data.data || detailRes.data;
+            } catch (e) {
+              return o;
+            }
+          })
+        );
 
         const transport: any[] = [];
         const fulfillment: any[] = [];

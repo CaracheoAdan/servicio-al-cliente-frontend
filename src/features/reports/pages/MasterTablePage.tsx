@@ -17,9 +17,21 @@ export function MasterTablePage() {
         const prodData = Array.isArray(prodRes.data) ? prodRes.data : (prodRes.data.items || prodRes.data.data || []);
         const productMap = new Map(prodData.map((p: any) => [p.id, p.key]));
 
-        // Fetch orders
+        // Fetch orders list
         const res = await api.get('/orders');
-        const orders = Array.isArray(res.data) ? res.data : (res.data.items || res.data.data || []);
+        const ordersList = Array.isArray(res.data) ? res.data : (res.data.items || res.data.data || []);
+
+        // Fetch full details for every single order to ensure items and dates are included
+        const orders = await Promise.all(
+          ordersList.map(async (o: any) => {
+            try {
+              const detailRes = await api.get(`/orders/${o.id}`);
+              return detailRes.data.data || detailRes.data;
+            } catch (e) {
+              return o; // fallback a los datos básicos si falla
+            }
+          })
+        );
 
         const flattenedData: any[] = [];
 
