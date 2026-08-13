@@ -1,25 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardList, Plus, Edit2 } from 'lucide-react';
+import { api } from '../../../shared/api/axiosInstance';
+import toast from 'react-hot-toast';
 
 export function OrderListPage() {
   const navigate = useNavigate();
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Datos simulados para visualizar la UI temporalmente
-  const mockOrders = [
-    { id: 1, key: 'ORD-2023-001', status: 'open', date: '2023-11-01' },
-    { id: 2, key: 'ORD-2023-002', status: 'in_production', date: '2023-11-02' },
-    { id: 3, key: 'ORD-2023-003', status: 'in_delivery', date: '2023-11-03' },
-    { id: 4, key: 'ORD-2023-004', status: 'delivered', date: '2023-11-04' },
-    { id: 5, key: 'ORD-2023-005', status: 'closed', date: '2023-11-05' },
-  ];
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get('/orders');
+      const data = Array.isArray(res.data) ? res.data : (res.data.items || res.data.data || []);
+      setOrders(data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      toast.error('Error al cargar órdenes desde el servidor.', {
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'open':
         return <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold border border-blue-100">Abierta</span>;
       case 'in_production':
-        return <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-bold border border-yellow-100">En Producción</span>;
+      case 'in_process':
+        return <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-bold border border-yellow-100">En Proceso</span>;
+      case 'produced':
+        return <span className="px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-bold border border-orange-100">Producido</span>;
       case 'in_delivery':
         return <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-bold border border-purple-100">En Tránsito</span>;
       case 'delivered':
@@ -28,6 +46,15 @@ export function OrderListPage() {
         return <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold border border-gray-200">Cerrada</span>;
       default:
         return <span className="px-3 py-1 bg-gray-50 text-gray-700 rounded-full text-xs font-bold border border-gray-100">{status}</span>;
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '-';
+    try {
+      return new Date(dateString).toLocaleDateString();
+    } catch {
+      return dateString;
     }
   };
 
@@ -56,35 +83,45 @@ export function OrderListPage() {
         <table className="min-w-full divide-y divide-gray-100">
           <thead className="bg-gray-50/80">
             <tr>
-              <th className="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Clave (Key)</th>
+              <th className="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">No. Orden (Key)</th>
               <th className="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Estado</th>
-              <th className="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">F. Programada</th>
+              <th className="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">F. Compromiso</th>
               <th className="px-8 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-50">
-            {mockOrders.map((order) => (
-              <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
-                <td className="px-8 py-4 whitespace-nowrap">
-                  <div className="text-sm font-bold text-gray-900">{order.key}</div>
-                </td>
-                <td className="px-8 py-4 whitespace-nowrap">
-                  {getStatusBadge(order.status)}
-                </td>
-                <td className="px-8 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-600">{order.date}</div>
-                </td>
-                <td className="px-8 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button 
-                    onClick={() => navigate(`/orders/${order.id}`)}
-                    className="text-gray-400 hover:text-totebin-600 bg-white hover:bg-totebin-50 border border-transparent hover:border-totebin-100 p-2 rounded-lg transition-all shadow-sm flex items-center justify-center ml-auto"
-                    title="Editar Orden"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                </td>
+            {loading ? (
+              <tr>
+                <td colSpan={4} className="px-8 py-8 text-center text-sm text-gray-500 font-medium">Cargando órdenes desde el backend...</td>
               </tr>
-            ))}
+            ) : orders.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="px-8 py-8 text-center text-sm text-gray-500 font-medium">No hay órdenes registradas en la base de datos.</td>
+              </tr>
+            ) : (
+              orders.map((order) => (
+                <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
+                  <td className="px-8 py-4 whitespace-nowrap">
+                    <div className="text-sm font-bold text-gray-900">{order.key}</div>
+                  </td>
+                  <td className="px-8 py-4 whitespace-nowrap">
+                    {getStatusBadge(order.status)}
+                  </td>
+                  <td className="px-8 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-600">{formatDate(order.scheduled_delivery_date || order.scheduledDeliveryDate)}</div>
+                  </td>
+                  <td className="px-8 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button 
+                      onClick={() => navigate(`/orders/${order.id}`)}
+                      className="text-gray-400 hover:text-totebin-600 bg-white hover:bg-totebin-50 border border-transparent hover:border-totebin-100 p-2 rounded-lg transition-all shadow-sm flex items-center justify-center ml-auto"
+                      title="Editar Orden"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

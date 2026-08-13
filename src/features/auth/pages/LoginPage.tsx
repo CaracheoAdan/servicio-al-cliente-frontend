@@ -24,7 +24,6 @@ export function LoginPage() {
       // Bypass temporal para poder visualizar y trabajar en el sistema
       localStorage.setItem('totebin_token', 'mock_token_temporal');
       toast.success('Bypass de Login activado.', {
-        icon: '🔓',
         style: { borderRadius: '10px', background: '#333', color: '#fff' }
       });
       navigate('/');

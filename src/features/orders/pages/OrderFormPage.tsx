@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Save, Plus, X, FileText, CheckCircle2 } from 'lucide-react';
+import { api } from '../../../shared/api/axiosInstance';
 import { OrderStatus } from '../types/order.types';
 
 export function OrderFormPage() {
@@ -13,6 +14,37 @@ export function OrderFormPage() {
   const [scheduledDeliveryDate, setScheduledDeliveryDate] = useState('');
   const [items, setItems] = useState([{ productId: '', orderedQuantity: 1, deliveredQuantity: 0 }]);
   const [status, setStatus] = useState<OrderStatus>('open');
+  const [loading, setLoading] = useState(isEditing);
+
+  useEffect(() => {
+    if (isEditing) {
+      const fetchOrder = async () => {
+        try {
+          const res = await api.get(`/orders/${id}`);
+          const data = res.data.data || res.data;
+          setOrderKey(data.key || '');
+          if (data.scheduled_delivery_date || data.scheduledDeliveryDate) {
+            setScheduledDeliveryDate((data.scheduled_delivery_date || data.scheduledDeliveryDate).split('T')[0]);
+          }
+          setStatus(data.status || 'open');
+          
+          if (data.items && data.items.length > 0) {
+            setItems(data.items.map((i: any) => ({
+              productId: i.product_id || i.productId || '',
+              orderedQuantity: i.ordered_quantity || i.orderedQuantity || 1,
+              deliveredQuantity: i.delivered_quantity || i.deliveredQuantity || 0
+            })));
+          }
+        } catch (error) {
+          console.error("Error fetching order:", error);
+          toast.error('Error al cargar la orden.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchOrder();
+    }
+  }, [id, isEditing]);
 
   const handleAddItem = () => {
     setItems([...items, { productId: '', orderedQuantity: 1, deliveredQuantity: 0 }]);
@@ -25,12 +57,9 @@ export function OrderFormPage() {
   };
 
   const handleStatusToggle = (newStatus: OrderStatus) => {
-    // Si se desmarca, se asume que regresa al estado anterior (simplificado visualmente)
-    // En backend requeriría lógica más estricta. Para la UI, forzamos el toggle.
     setStatus(newStatus);
     if (isEditing) {
-      toast.success(`PATCH /update_status: Estado capturado por el servidor.`, {
-        icon: '⏱️',
+      toast.success(`Estado seleccionado: ${newStatus}. No olvides Guardar Cambios.`, {
         style: { borderRadius: '10px', background: '#333', color: '#fff' }
       });
     }
@@ -38,12 +67,31 @@ export function OrderFormPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success(isEditing ? 'Orden actualizada en DB.' : 'Orden creada en DB.', {
-      icon: '✅',
-      style: { borderRadius: '10px', background: '#333', color: '#fff' }
-    });
-    if (!isEditing) setTimeout(() => navigate('/orders'), 1000);
+    try {
+      const payload = {
+        key: orderKey,
+        status: status,
+        scheduledDeliveryDate: scheduledDeliveryDate,
+        items: items
+      };
+
+      if (isEditing) {
+        await api.put(`/orders/${id}`, payload);
+        toast.success('Orden actualizada en DB.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+      } else {
+        await api.post('/orders', payload);
+        toast.success('Orden creada en DB.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+        setTimeout(() => navigate('/orders'), 1000);
+      }
+    } catch (error) {
+      console.error("Error saving order:", error);
+      toast.error('Error al guardar la orden. Revisa la consola o backend.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+    }
   };
+
+  if (loading) {
+    return <div className="p-8 text-center text-gray-500 font-bold">Cargando datos del servidor...</div>;
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden font-sans animate-fade-in-up">
@@ -59,7 +107,6 @@ export function OrderFormPage() {
       </div>
 
       <form onSubmit={handleSave} className="p-8 space-y-8">
-        {/* Cabecera Principal (Excel Columns) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50 p-6 rounded-xl border border-gray-100">
           <div>
             <label className="block text-sm font-extrabold text-gray-800 mb-2">No. Orden</label>
@@ -84,7 +131,6 @@ export function OrderFormPage() {
           </div>
         </div>
 
-        {/* Múltiples Productos de la Orden */}
         <div>
           <div className="flex justify-between items-center mb-4">
             <h4 className="text-lg font-bold text-gray-900 flex items-center">
@@ -157,7 +203,6 @@ export function OrderFormPage() {
           </div>
         </div>
 
-        {/* Panel de Decisiones (Checkboxes) - Mapea exactamente al Excel */}
         {isEditing && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
             <div className={`border rounded-xl p-5 transition-colors ${status === 'produced' || status === 'in_delivery' || status === 'delivered' ? 'bg-totebin-50 border-totebin-200' : 'bg-white border-gray-200'}`}>

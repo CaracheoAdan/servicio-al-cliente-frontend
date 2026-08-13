@@ -1,30 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Package, Search, Plus, X, Database, Edit2, Trash2 } from 'lucide-react';
+import { api } from '../../../shared/api/axiosInstance';
 
 export function CatalogsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newKey, setNewKey] = useState('');
+  const [isActive, setIsActive] = useState(true);
 
-  // Mock data para que la tabla no se vea vacía
-  const mockProducts = [
-    { id: 1, key: '10000489', isActive: true },
-    { id: 2, key: '12241', isActive: true },
-    { id: 3, key: '200', isActive: true },
-    { id: 4, key: '5000', isActive: true },
-  ];
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get('/products');
+      // Asegurar que si el backend devuelve un arreglo lo usemos, si devuelve un objeto con {data: []} usemos eso.
+      const data = Array.isArray(res.data) ? res.data : (res.data.items || res.data.data || []);
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast.error('No se pudieron cargar los productos desde el servidor.', {
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleSave = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsModalOpen(false);
-    toast.success('Producto guardado exitosamente en la base de datos.', {
-      duration: 3000,
-      icon: '✅',
-      style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
-      },
-    });
+    try {
+      await api.post('/products', { key: newKey, isActive });
+      toast.success('Producto guardado exitosamente en la base de datos.', {
+        duration: 3000,
+        style: { borderRadius: '10px', background: '#333', color: '#fff' },
+      });
+      setIsModalOpen(false);
+      setNewKey('');
+      setIsActive(true);
+      fetchProducts(); // Recargar lista
+    } catch (error) {
+      console.error("Error saving product:", error);
+      toast.error('Error al guardar el producto. Verifica el backend.', {
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (confirm('¿Estás seguro de eliminar este producto?')) {
+      try {
+        await api.delete(`/products/${id}`);
+        toast.success('Producto eliminado.', {
+          style: { borderRadius: '10px', background: '#333', color: '#fff' }
+        });
+        fetchProducts();
+      } catch (error) {
+        toast.error('Error al eliminar producto.', {
+          style: { borderRadius: '10px', background: '#333', color: '#fff' }
+        });
+      }
+    }
   };
 
   return (
@@ -75,39 +115,48 @@ export function CatalogsPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-50">
-              {mockProducts.map((p) => (
-                <tr key={p.id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{p.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{p.key}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {p.isActive ? (
-                      <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold border border-green-100">Activo</span>
-                    ) : (
-                      <span className="px-3 py-1 bg-gray-50 text-gray-600 rounded-full text-xs font-bold border border-gray-200">Inactivo</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
-                    <button className="text-gray-400 hover:text-totebin-600 bg-white hover:bg-totebin-50 border border-transparent hover:border-totebin-100 p-2 rounded-lg transition-all shadow-sm">
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button className="text-gray-400 hover:text-red-600 bg-white hover:bg-red-50 border border-transparent hover:border-red-100 p-2 rounded-lg transition-all shadow-sm">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
+              {loading ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-500 font-medium">Cargando productos desde el backend...</td>
                 </tr>
-              ))}
+              ) : products.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-500 font-medium">No hay productos registrados en la base de datos.</td>
+                </tr>
+              ) : (
+                products.map((p) => (
+                  <tr key={p.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{p.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{p.key}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {p.isActive || p.is_active ? (
+                        <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold border border-green-100">Activo</span>
+                      ) : (
+                        <span className="px-3 py-1 bg-gray-50 text-gray-600 rounded-full text-xs font-bold border border-gray-200">Inactivo</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
+                      <button className="text-gray-400 hover:text-totebin-600 bg-white hover:bg-totebin-50 border border-transparent hover:border-totebin-100 p-2 rounded-lg transition-all shadow-sm">
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleDelete(p.id)} className="text-gray-400 hover:text-red-600 bg-white hover:bg-red-50 border border-transparent hover:border-red-100 p-2 rounded-lg transition-all shadow-sm">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Modal Profesional */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform animate-slide-up">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
               <h3 className="text-lg font-bold text-gray-900">Crear Nuevo Producto</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+              <button type="button" onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -117,6 +166,8 @@ export function CatalogsPage() {
                 <input 
                   type="text" 
                   required 
+                  value={newKey}
+                  onChange={(e) => setNewKey(e.target.value)}
                   placeholder="Ej: 10000489"
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-totebin-500 focus:border-totebin-500 transition-shadow outline-none text-gray-800"
                 />
@@ -124,7 +175,8 @@ export function CatalogsPage() {
               <div className="flex items-center space-x-3 pt-2">
                 <input 
                   type="checkbox" 
-                  defaultChecked
+                  checked={isActive}
+                  onChange={(e) => setIsActive(e.target.checked)}
                   className="w-5 h-5 text-totebin-600 border-gray-300 rounded focus:ring-totebin-500 cursor-pointer"
                 />
                 <span className="text-sm font-medium text-gray-700">Producto Activo (is_active)</span>
