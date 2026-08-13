@@ -22,10 +22,13 @@ export function OrderFormPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Cargar primero el catálogo de productos para el dropdown
+        // Cargar primero el catálogo de productos para el dropdown (y filtrar inactivos)
         const prodRes = await api.get('/products');
         const prodData = Array.isArray(prodRes.data) ? prodRes.data : (prodRes.data.items || prodRes.data.data || []);
-        setAvailableProducts(prodData);
+        
+        // Solo mostrar los que están activos en la otra parte (OrderForm)
+        const activeProducts = prodData.filter((p: any) => p.isActive === true || p.is_active === true);
+        setAvailableProducts(activeProducts);
 
         // Si estamos editando, cargar los datos de la orden
         if (isEditing) {
