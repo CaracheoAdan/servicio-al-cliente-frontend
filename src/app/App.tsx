@@ -5,6 +5,8 @@ import { LoginPage } from '../features/auth/pages/LoginPage'
 import { CatalogsPage } from '../features/catalogs/pages/CatalogsPage'
 import { OrderListPage } from '../features/orders/pages/OrderListPage'
 import { OrderFormPage } from '../features/orders/pages/OrderFormPage'
+import { ReportsPage } from '../features/reports/pages/ReportsPage'
+import { UsersPage } from '../features/users/pages/UsersPage'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('totebin_token')
@@ -53,6 +55,22 @@ function App() {
                 <p className="text-gray-600">Administra los datos base del sistema</p>
               </div>
               <CatalogsPage />
+            </div>
+          </PrivateRoute>
+        } />
+
+        <Route path="/reports" element={
+          <PrivateRoute>
+            <div className="max-w-7xl mx-auto">
+              <ReportsPage />
+            </div>
+          </PrivateRoute>
+        } />
+
+        <Route path="/users" element={
+          <PrivateRoute>
+            <div className="max-w-7xl mx-auto">
+              <UsersPage />
             </div>
           </PrivateRoute>
         } />
