@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Package, Server, Users, Search, Plus, X, Database } from 'lucide-react';
+import { Package, Server, Users, Search, Plus, X, Database, Edit2, Trash2 } from 'lucide-react';
 
 export function CatalogsPage() {
   const [activeTab, setActiveTab] = useState<'products' | 'machines' | 'responsables'>('products');
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Mock data para que la tabla no se vea vacía
+  const mockProducts = [
+    { id: 1, key: 'PRD-ALUM-01', isActive: true },
+    { id: 2, key: 'PRD-ACER-05', isActive: true },
+    { id: 3, key: 'PRD-COBR-99', isActive: false },
+    { id: 4, key: 'PRD-PLAS-12', isActive: true },
+  ];
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,28 +103,46 @@ export function CatalogsPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-50">
-              <tr>
-                <td colSpan={4} className="px-6 py-20 text-center text-sm text-gray-500">
-                  <div className="flex flex-col items-center justify-center space-y-3">
-                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center">
-                      <Database className="w-8 h-8 text-gray-300" />
-                    </div>
-                    <p className="font-medium text-gray-500">No hay registros para mostrar.</p>
-                    <p className="text-xs text-gray-400">Presiona "Nuevo Registro" para comenzar o conecta la Base de Datos.</p>
-                  </div>
-                </td>
-              </tr>
+              {activeTab === 'products' ? (
+                mockProducts.map((p) => (
+                  <tr key={p.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{p.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{p.key}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {p.isActive ? (
+                        <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold border border-green-100">Activo</span>
+                      ) : (
+                        <span className="px-3 py-1 bg-gray-50 text-gray-600 rounded-full text-xs font-bold border border-gray-200">Inactivo</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
+                      <button className="text-gray-400 hover:text-totebin-600 bg-white hover:bg-totebin-50 border border-transparent hover:border-totebin-100 p-2 rounded-lg transition-all shadow-sm">
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button className="text-gray-400 hover:text-red-600 bg-white hover:bg-red-50 border border-transparent hover:border-red-100 p-2 rounded-lg transition-all shadow-sm">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="px-6 py-20 text-center text-sm text-gray-500">
+                    <p className="font-medium text-gray-500">Selecciona "Productos" para ver datos de prueba.</p>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Modal Profesional con Animación y Blur */}
+      {/* Modal Profesional */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform animate-slide-up">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <h3 className="text-lg font-bold text-gray-900">Crear Nuevo Producto</h3>
+              <h3 className="text-lg font-bold text-gray-900">Crear Nuevo Registro</h3>
               <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
                 <X className="w-5 h-5" />
               </button>
@@ -137,7 +163,7 @@ export function CatalogsPage() {
                   defaultChecked
                   className="w-5 h-5 text-totebin-600 border-gray-300 rounded focus:ring-totebin-500 cursor-pointer"
                 />
-                <span className="text-sm font-medium text-gray-700">Producto Activo (is_active)</span>
+                <span className="text-sm font-medium text-gray-700">Registro Activo (is_active)</span>
               </div>
               
               <div className="pt-4 flex justify-end space-x-3">
@@ -150,7 +176,7 @@ export function CatalogsPage() {
                 </button>
                 <button 
                   type="submit"
-                  className="px-6 py-2 text-sm font-semibold text-white bg-totebin-600 hover:bg-totebin-700 rounded-lg shadow-md hover:shadow-lg transition-all"
+                  className="px-6 py-2 text-sm font-semibold text-white bg-totebin-600 hover:bg-totebin-700 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center"
                 >
                   Guardar
                 </button>
