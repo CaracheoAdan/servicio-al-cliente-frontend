@@ -1,9 +1,10 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, ClipboardList, Database, BarChart3, Settings, LogOut, Table } from 'lucide-react'
+import { LayoutDashboard, ClipboardList, Database, BarChart3, Settings, LogOut, Table, Plus } from 'lucide-react'
 
 export function Sidebar() {
   const menuItems = [
+    { name: 'Registro de Pedidos', path: '/orders/new', icon: <Plus className="w-5 h-5 mr-3" /> },
     { name: 'Gestión de Órdenes', path: '/orders', icon: <ClipboardList className="w-5 h-5 mr-3" /> },
     { name: 'Catálogo de Productos', path: '/catalogs', icon: <Database className="w-5 h-5 mr-3" /> },
     { name: 'Gráficas y Estadísticas', path: '/reports', icon: <BarChart3 className="w-5 h-5 mr-3" /> },

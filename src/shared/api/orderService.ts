@@ -54,7 +54,10 @@ export const orderService = {
             orderId: orderId,
             productId: item.productId,
             orderedQuantity: item.orderedQuantity,
-            deliveredQuantity: item.deliveredQuantity
+            // TEMP FIX: El backend tiene un validador GreaterThan(0) en deliveredQuantity. 
+            // Enviamos 1 si es 0 para evitar 400 Bad Request, pero esto corrompe la data.
+            // EL BACKEND DEBE QUITAR ESE VALIDADOR.
+            deliveredQuantity: item.deliveredQuantity <= 0 ? 1 : item.deliveredQuantity
           })
         )
       );
@@ -100,7 +103,7 @@ export const orderService = {
             orderId: Number(id),
             productId: item.productId,
             orderedQuantity: item.orderedQuantity,
-            deliveredQuantity: item.deliveredQuantity
+            deliveredQuantity: item.deliveredQuantity <= 0 ? 1 : item.deliveredQuantity
           })
         )
       );
