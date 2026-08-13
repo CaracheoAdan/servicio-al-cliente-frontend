@@ -84,15 +84,15 @@ export function ReportsPage() {
 
   return (
     <div className="space-y-8 animate-fade-in-up font-body">
-      <div className="flex justify-between items-center bg-white p-8 rounded-[28px] shadow-card-base border border-[#E3E9E6] relative overflow-hidden">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white p-8 rounded-[28px] shadow-card-base border border-[#E3E9E6] relative overflow-hidden gap-6">
         <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-[#15803D]/[0.05] blur-3xl pointer-events-none blob-breathe" />
         <div className="flex items-center space-x-4 relative z-10">
-          <div className="bg-[#F0FDF4] p-3 rounded-2xl border border-[#E3E9E6]">
+          <div className="bg-[#F0FDF4] p-3 rounded-xl border border-[#E3E9E6]">
             <BarChart3 className="w-8 h-8 text-[#15803D]" />
           </div>
           <div>
-            <h3 className="text-2xl font-display font-extrabold text-[#0F1B17] tracking-tight">Gráficas y Estadísticas</h3>
-            <p className="text-sm text-[#6B7B76] mt-1 font-body">Análisis de rendimiento, producción y entregas</p>
+            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-[#0F1B17] tracking-tight">Gráficas y Estadísticas</h3>
+            <p className="text-sm text-[#6B7B76] mt-1 font-medium">Análisis de rendimiento, producción y entregas</p>
           </div>
         </div>
         <div className="bg-[#F7FAF8] border border-[#E3E9E6] px-5 py-2.5 rounded-2xl flex items-center shadow-sm relative z-10">

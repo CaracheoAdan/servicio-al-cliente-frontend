@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Plus, Edit2, Trash2 } from 'lucide-react';
+import { ClipboardList, Plus, Edit2, Trash2, Search, X, CheckCircle2, Clock, Inbox, Tag } from 'lucide-react';
 import { orderService } from '../../../shared/api/orderService';
 import toast from 'react-hot-toast';
 import { api } from '../../../shared/api/axiosInstance';
@@ -9,6 +9,7 @@ export function OrderListPage() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchOrders = async () => {
     try {
@@ -36,7 +37,7 @@ export function OrderListPage() {
         toast.success('Orden eliminada correctamente.', {
           style: { borderRadius: '10px', background: '#333', color: '#fff' }
         });
-        fetchOrders(); // Recargar lista
+        fetchOrders();
       } catch (error) {
         toast.error('Error al eliminar la orden.', {
           style: { borderRadius: '10px', background: '#333', color: '#fff' }
@@ -48,20 +49,48 @@ export function OrderListPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'open':
-        return <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#0F1B17] bg-[#E3E9E6]">Abierto</span>;
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#6B7B76] bg-[#F3F6F4] border border-[#E3E9E6]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#9CA8A3] mr-1.5"></span> Abierto
+          </span>
+        );
       case 'in_production':
       case 'in_process':
-        return <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#0F1B17] bg-[#E3E9E6]">En Proceso</span>;
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#0F1B17] bg-[#E3E9E6] border border-[#CBD5E1]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#475569] mr-1.5"></span> En Proceso
+          </span>
+        );
       case 'produced':
-        return <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#15803D] bg-[#F0FDF4]">Producido</span>;
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#15803D] bg-[#F0FDF4] border border-[#BBF7D0]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#15803D] mr-1.5"></span> Producido
+          </span>
+        );
       case 'in_delivery':
-        return <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#D97706] bg-[#FFFBEB]">En Transporte</span>;
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#D97706] bg-[#FFFBEB] border border-[#FDE68A]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] mr-1.5"></span> En Transporte
+          </span>
+        );
       case 'delivered':
-        return <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#15803D] bg-[#F0FDF4]">Entregado</span>;
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#15803D] bg-[#F0FDF4] border border-[#BBF7D0]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#15803D] mr-1.5"></span> Entregado
+          </span>
+        );
       case 'closed':
-        return <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#DC2626] bg-[#FEF2F2]">Cerrado</span>;
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#DC2626] bg-[#FEF2F2] border border-[#FECACA]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#DC2626] mr-1.5"></span> Cerrado
+          </span>
+        );
       default:
-        return <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#0F1B17] bg-[#E3E9E6]">{status}</span>;
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#6B7B76] bg-[#F3F6F4] border border-[#E3E9E6]">
+            {status}
+          </span>
+        );
     }
   };
 
@@ -74,84 +103,167 @@ export function OrderListPage() {
     }
   };
 
+  const filteredOrders = orders.filter(o => 
+    (o.key || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalOrders = orders.length;
+  const activeOrders = orders.filter(o => o.status !== 'closed' && o.status !== 'delivered').length;
+  const closedOrders = totalOrders - activeOrders;
+
   return (
-    <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden font-sans animate-fade-in-up">
-      <div className="p-8 border-b border-[#E3E9E6] flex justify-between items-center bg-white rounded-t-[28px] relative overflow-hidden">
+    <div className="bg-white rounded-[28px] shadow-card-base border border-[#E3E9E6] min-h-[500px] flex flex-col font-body animate-fade-in-up">
+      <div className="p-8 border-b border-[#E3E9E6] flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-t-[28px] relative overflow-hidden gap-6">
         <div className="flex items-center space-x-4 relative z-10">
-          <div className="bg-[#F0FDF4] p-3 rounded-2xl border border-[#E3E9E6]">
+          <div className="bg-[#F0FDF4] p-3 rounded-xl border border-[#E3E9E6]">
             <ClipboardList className="w-8 h-8 text-[#15803D]" />
           </div>
           <div>
-            <h3 className="text-2xl font-display font-extrabold text-[#0F1B17] tracking-tight">Listado de Órdenes</h3>
-            <p className="text-sm text-[#6B7B76] mt-1 font-body">Control visual del avance y estatus en el piso de producción</p>
+            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-[#0F1B17] tracking-tight">Listado de Órdenes</h3>
+            <p className="text-sm text-[#6B7B76] mt-1 font-medium">Control visual del avance y estatus en el piso de producción</p>
           </div>
+        </div>
+        
+        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 z-10 w-full lg:w-auto">
+          <div>
+            <div className="relative">
+              <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-[#9CA8A3]" />
+              <input 
+                type="text" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Buscar No. Orden..." 
+                className="pl-11 pr-10 py-3.5 border-2 border-[#E3E9E6] rounded-xl text-[#0F1B17] font-semibold focus:outline-none focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 transition-all w-full md:w-64 shadow-sm"
+              />
+              {searchTerm && (
+                <button 
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#9CA8A3] hover:text-[#DC2626] transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            {searchTerm && (
+              <p className="absolute mt-2 font-mono text-xs text-[#15803D] font-semibold">
+                Mostrando {filteredOrders.length} de {orders.length} órdenes
+              </p>
+            )}
+          </div>
+          <button 
+            onClick={() => navigate('/orders/new')}
+            className="bg-[#15803D] hover:bg-[#116932] disabled:opacity-60 text-white px-6 py-3.5 rounded-2xl font-display font-bold shadow-[0_4px_0_#0F5C2A] active:shadow-[0_0px_0_#0F5C2A] active:translate-y-1 transition-all flex items-center justify-center gap-2 text-sm whitespace-nowrap"
+          >
+            <Plus className="w-5 h-5" /> Nueva Orden
+          </button>
         </div>
       </div>
       
-      <div className="overflow-x-auto bg-white rounded-b-[28px]">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-[#F7FAF8] border-b border-[#E3E9E6]">
-              <th className="px-8 py-5 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">No. Orden</th>
-              <th className="px-8 py-5 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Productos</th>
-              <th className="px-8 py-5 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Estatus</th>
-              <th className="px-8 py-5 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">F. Entrega</th>
-              <th className="px-8 py-5 text-right text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#EDF1EF]">
-            {orders.length === 0 && !loading ? (
-              <tr>
-                <td colSpan={5} className="px-8 py-12 text-center">
-                  <div className="flex flex-col items-center justify-center">
-                    <div className="w-16 h-16 rounded-full border-2 border-dashed border-[#E3E9E6] flex items-center justify-center mb-4 bg-[#F7FAF8]">
-                      <ClipboardList className="w-8 h-8 text-[#9CA8A3]" />
-                    </div>
-                    <p className="font-display font-bold text-[#0F1B17]">No hay órdenes activas</p>
-                    <p className="text-[#6B7B76] text-sm mt-1">Las órdenes creadas aparecerán aquí.</p>
-                  </div>
-                </td>
-              </tr>
-            ) : (
-              orders.map((order) => (
-                <tr key={order.id} className="hover:bg-[#F0FDF4] transition-colors group">
-                  <td className="px-8 py-5 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="font-mono font-bold text-[#0F1B17] text-base">{order.key}</div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-5">
-                    <div className="text-sm font-body text-[#4B5A5D]">
-                      {order.items?.length || 0} {order.items?.length === 1 ? 'producto' : 'productos'}
-                    </div>
-                  </td>
-                  <td className="px-8 py-5 whitespace-nowrap">
-                    {getStatusBadge(order.status)}
-                  </td>
-                  <td className="px-8 py-5 whitespace-nowrap">
-                    <div className="text-sm font-mono text-[#4B5A5D]">{formatDate(order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || order.scheduled_delivery_date)}</div>
-                  </td>
-                  <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
-                    <button 
-                      onClick={() => navigate(`/orders/${order.id}`)}
-                      className="text-[#6B7B76] hover:text-[#15803D] bg-[#F3F6F4] hover:bg-[#E3E9E6] p-2 rounded-xl transition-colors"
-                      title="Editar"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(order.id)}
-                      className="text-[#6B7B76] hover:text-[#DC2626] bg-[#F3F6F4] hover:bg-[#FEF2F2] p-2 rounded-xl transition-colors"
-                      title="Eliminar"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
+      {/* KPIs Row */}
+      {!loading && (
+        <div className="px-8 py-5 border-b border-[#E3E9E6] bg-white grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="flex items-center gap-3 bg-[#F7FAF8] border border-[#E3E9E6] rounded-2xl px-4 py-3.5">
+            <div className="p-2 rounded-xl bg-white border border-[#E3E9E6]">
+              <ClipboardList className="w-5 h-5 text-[#15803D]" />
+            </div>
+            <div>
+              <div className="text-[10px] font-display font-bold text-[#6B7B76] uppercase tracking-wide">Total Órdenes</div>
+              <div className="font-mono font-bold text-lg text-[#0F1B17] tabular-nums">{totalOrders}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 bg-[#F7FAF8] border border-[#E3E9E6] rounded-2xl px-4 py-3.5">
+            <div className="p-2 rounded-xl bg-white border border-[#E3E9E6]">
+              <Clock className="w-5 h-5 text-[#D97706]" />
+            </div>
+            <div>
+              <div className="text-[10px] font-display font-bold text-[#6B7B76] uppercase tracking-wide">En Proceso</div>
+              <div className="font-mono font-bold text-lg text-[#0F1B17] tabular-nums">{activeOrders}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 bg-[#F7FAF8] border border-[#E3E9E6] rounded-2xl px-4 py-3.5">
+            <div className="p-2 rounded-xl bg-white border border-[#E3E9E6]">
+              <CheckCircle2 className="w-5 h-5 text-[#15803D]" />
+            </div>
+            <div>
+              <div className="text-[10px] font-display font-bold text-[#6B7B76] uppercase tracking-wide">Completadas</div>
+              <div className="font-mono font-bold text-lg text-[#0F1B17] tabular-nums">{closedOrders}</div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <div className="flex-1 bg-white rounded-b-[28px] overflow-hidden">
+        {loading ? (
+          <div className="flex justify-center items-center h-64 bg-white">
+            <div className="text-center">
+              <div className="inline-block animate-spin w-8 h-8 border-4 border-[#15803D] border-t-transparent rounded-full mb-4"></div>
+              <p className="font-display font-bold text-[#0F1B17]">Cargando órdenes...</p>
+            </div>
+          </div>
+        ) : filteredOrders.length === 0 ? (
+          <div className="p-8">
+            <div className="flex flex-col items-center justify-center gap-3 py-16 rounded-2xl border-2 border-dashed border-[#E3E9E6] bg-[#F7FAF8]">
+              <div className="p-4 rounded-2xl bg-white border border-[#E3E9E6]">
+                <Inbox className="w-8 h-8 text-[#9CA8A3]" />
+              </div>
+              <p className="font-display font-bold text-[#0F1B17]">No se encontraron órdenes</p>
+              <p className="text-sm text-[#6B7B76]">Prueba con otra búsqueda o crea una nueva orden.</p>
+            </div>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-[#F7FAF8] border-b border-[#EDF1EF]">
+                  <th className="px-8 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">No. Orden</th>
+                  <th className="px-8 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Productos</th>
+                  <th className="px-8 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Estatus</th>
+                  <th className="px-8 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">F. Entrega</th>
+                  <th className="px-8 py-4 text-right text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Acciones</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody className="divide-y divide-[#EDF1EF]">
+                {filteredOrders.map((order) => (
+                  <tr key={order.id} className="hover:bg-[#F0FDF4] transition-colors group">
+                    <td className="px-8 py-5 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Tag className="w-4 h-4 text-[#9CA8A3] mr-2" />
+                        <div className="font-mono font-bold text-[#0F1B17] text-base">{order.key}</div>
+                      </div>
+                    </td>
+                    <td className="px-8 py-5">
+                      <div className="text-sm font-mono text-[#0F1B17] font-semibold bg-[#F7FAF8] px-3 py-1.5 rounded-lg border border-[#E3E9E6] inline-block">
+                        {order.items?.length || 0} prod.
+                      </div>
+                    </td>
+                    <td className="px-8 py-5 whitespace-nowrap">
+                      {getStatusBadge(order.status)}
+                    </td>
+                    <td className="px-8 py-5 whitespace-nowrap">
+                      <div className="text-sm font-mono text-[#4B5A5D] font-medium">{formatDate(order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || order.scheduled_delivery_date)}</div>
+                    </td>
+                    <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
+                      <button 
+                        onClick={() => navigate(`/orders/${order.id}`)}
+                        className="flex items-center text-[#15803D] bg-[#F0FDF4] hover:bg-[#DCFCE7] px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
+                        title="Editar"
+                      >
+                        <Edit2 className="w-4 h-4 mr-1.5" /> Editar
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(order.id)}
+                        className="flex items-center text-[#DC2626] bg-[#FEF2F2] hover:bg-[#FEE2E2] px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
+                        title="Eliminar"
+                      >
+                        <Trash2 className="w-4 h-4 mr-1.5" /> Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

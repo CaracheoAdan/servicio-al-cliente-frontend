@@ -124,20 +124,20 @@ export function MasterTablePage() {
 
   return (
     <div className="bg-white rounded-[28px] shadow-card-base border border-[#E3E9E6] overflow-hidden font-body animate-fade-in-up">
-      <div className="p-8 border-b border-[#E3E9E6] flex justify-between items-center bg-white rounded-t-[28px] relative overflow-hidden">
+      <div className="p-8 border-b border-[#E3E9E6] flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-t-[28px] relative overflow-hidden gap-6">
         <div className="flex items-center space-x-4 relative z-10">
-          <div className="bg-[#F0FDF4] p-3 rounded-2xl border border-[#E3E9E6]">
+          <div className="bg-[#F0FDF4] p-3 rounded-xl border border-[#E3E9E6]">
             <TableIcon className="w-8 h-8 text-[#15803D]" />
           </div>
           <div>
-            <h3 className="text-2xl font-display font-extrabold text-[#0F1B17] tracking-tight">Tabla Maestra de Órdenes</h3>
-            <p className="text-sm text-[#6B7B76] mt-1 font-body">Vista detallada estilo Excel para exportación y análisis</p>
+            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-[#0F1B17] tracking-tight">Tabla Maestra de Órdenes</h3>
+            <p className="text-sm text-[#6B7B76] mt-1 font-medium">Vista detallada estilo Excel para exportación y análisis</p>
           </div>
         </div>
         <button 
           onClick={handleExportExcel}
           disabled={loading || data.length === 0}
-          className="bg-[#15803D] hover:bg-[#116932] disabled:opacity-60 text-white px-6 py-3.5 rounded-2xl font-display font-bold shadow-btn-3d transition-all flex items-center gap-2 text-sm z-10"
+          className="bg-[#15803D] hover:bg-[#116932] disabled:opacity-60 text-white px-6 py-3.5 rounded-2xl font-display font-bold shadow-[0_4px_0_#0F5C2A] active:shadow-[0_0px_0_#0F5C2A] active:translate-y-1 transition-all flex items-center justify-center gap-2 text-sm z-10 whitespace-nowrap"
         >
           <Download className="w-5 h-5" />
           Descargar Excel
