@@ -1,9 +1,10 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { DashboardLayout } from '../shared/layout/DashboardLayout'
-import { TicketList } from '../features/tickets'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { CatalogsPage } from '../features/catalogs/pages/CatalogsPage'
+import { OrderListPage } from '../features/orders/pages/OrderListPage'
+import { OrderFormPage } from '../features/orders/pages/OrderFormPage'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('totebin_token')
@@ -23,22 +24,34 @@ function App() {
         <Route path="/" element={
           <PrivateRoute>
             <div className="max-w-7xl mx-auto">
-              <div className="mb-6 flex justify-between items-center">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-800">Panel de Control</h2>
-                  <p className="text-gray-600">Gestión de órdenes de producción</p>
-                </div>
-              </div>
-              
-              {/* Aquí montaremos los features reales (Órdenes, Catálogos) */}
-              <TicketList />
+              <OrderListPage />
             </div>
           </PrivateRoute>
         } />
-        
+
+        <Route path="/orders/new" element={
+          <PrivateRoute>
+            <div className="max-w-7xl mx-auto">
+              <OrderFormPage />
+            </div>
+          </PrivateRoute>
+        } />
+
+        <Route path="/orders/:id" element={
+          <PrivateRoute>
+            <div className="max-w-7xl mx-auto">
+              <OrderFormPage />
+            </div>
+          </PrivateRoute>
+        } />
+
         <Route path="/catalogs" element={
           <PrivateRoute>
             <div className="max-w-7xl mx-auto">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">Catálogos Maestros</h2>
+                <p className="text-gray-600">Administra los datos base del sistema</p>
+              </div>
               <CatalogsPage />
             </div>
           </PrivateRoute>
