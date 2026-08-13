@@ -4,12 +4,11 @@ import { LayoutDashboard, ClipboardList, Database, BarChart3, Settings, LogOut, 
 
 export function Sidebar() {
   const menuItems = [
-    { name: 'Dashboard', path: '/', icon: <LayoutDashboard className="w-5 h-5 mr-3" /> },
-    { name: 'Órdenes de Prod.', path: '/orders', icon: <ClipboardList className="w-5 h-5 mr-3" /> },
-    { name: 'Catálogos', path: '/catalogs', icon: <Database className="w-5 h-5 mr-3" /> },
-    { name: 'Reportes', path: '/reports', icon: <BarChart3 className="w-5 h-5 mr-3" /> },
-    { name: 'Tabla Maestra', path: '/master-table', icon: <Table className="w-5 h-5 mr-3" /> },
-    { name: 'Admin. Usuarios', path: '/users', icon: <Settings className="w-5 h-5 mr-3" /> },
+    { name: 'Gestión de Órdenes', path: '/orders', icon: <ClipboardList className="w-5 h-5 mr-3" /> },
+    { name: 'Catálogo de Productos', path: '/catalogs', icon: <Database className="w-5 h-5 mr-3" /> },
+    { name: 'Gráficas y Estadísticas', path: '/reports', icon: <BarChart3 className="w-5 h-5 mr-3" /> },
+    { name: 'Exportar Excel (Tabla Maestra)', path: '/master-table', icon: <Table className="w-5 h-5 mr-3" /> },
+    { name: 'Usuarios y Permisos', path: '/users', icon: <Settings className="w-5 h-5 mr-3" /> },
   ]
 
   return (
