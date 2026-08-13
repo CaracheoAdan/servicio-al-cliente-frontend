@@ -210,66 +210,97 @@ export function OrderFormPage() {
                         type="number"
                         min="0"
                         value={item.deliveredQuantity}
-                        onChange={(e) => handleItemChange(index, 'deliveredQuantity', parseInt(e.target.value) || 0)}
-                        className="w-full border-gray-200 rounded-lg shadow-sm focus:ring-totebin-500 text-sm font-semibold text-totebin-700 bg-totebin-50"
-                      />
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <button 
-                        type="button"
-                        onClick={() => setItems(items.filter((_, i) => i !== index))}
-                        className="text-gray-400 hover:text-red-500 p-2 rounded-lg hover:bg-red-50"
-                        disabled={items.length === 1}
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+          <div className="space-y-4">
+            {items.map((item, index) => (
+              <div key={index} className="flex flex-col md:flex-row items-end gap-4 p-4 rounded-2xl bg-[#F7FAF8] border border-[#E3E9E6]">
+                <div className="w-full md:w-2/5">
+                  <label className="block text-xs font-display font-bold text-[#6B7B76] mb-1.5 uppercase tracking-wide">Producto</label>
+                  <select
+                    value={item.productId}
+                    onChange={(e) => updateItem(index, 'productId', e.target.value)}
+                    className="w-full p-3.5 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-body transition-all"
+                    required
+                  >
+                    <option value="">Selecciona un producto</option>
+                    {availableProducts.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="w-full md:w-1/4">
+                  <label className="block text-xs font-display font-bold text-[#6B7B76] mb-1.5 uppercase tracking-wide">Cant. Pedida</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={item.orderedQuantity}
+                    onChange={(e) => updateItem(index, 'orderedQuantity', parseInt(e.target.value))}
+                    className="w-full p-3.5 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-mono font-bold transition-all"
+                    required
+                  />
+                </div>
+                <div className="w-full md:w-1/4">
+                  <label className="block text-xs font-display font-bold text-[#6B7B76] mb-1.5 uppercase tracking-wide">Cant. Surtida</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={item.deliveredQuantity}
+                    onChange={(e) => updateItem(index, 'deliveredQuantity', parseInt(e.target.value))}
+                    className="w-full p-3.5 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-mono font-bold transition-all"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeItem(index)}
+                  className="p-3.5 bg-white text-[#9CA8A3] hover:text-[#DC2626] border-2 border-[#E3E9E6] hover:border-[#DC2626]/30 hover:bg-[#FEF2F2] rounded-xl transition-colors mb-0"
+                  title="Eliminar fila"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Estatus */}
-        <div className="bg-gray-50/50 p-6 rounded-xl border border-gray-100 max-w-2xl">
-          <div className="space-y-4">
+        <div className="bg-white p-8 rounded-[28px] border border-[#E3E9E6] shadow-card-base max-w-2xl">
+          <div className="space-y-6">
             {/* Pedido ya esta producido */}
-            <div className={`border rounded-xl p-4 transition-colors ${status === 'produced' || status === 'in_delivery' || status === 'delivered' ? 'bg-totebin-50 border-totebin-200' : 'bg-white border-gray-200'}`}>
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-bold text-gray-900 text-sm">Pedido ya esta producido</span>
+            <div className={`border-2 rounded-2xl p-6 transition-all duration-300 ${status === 'produced' || status === 'in_delivery' || status === 'delivered' ? 'bg-[#F0FDF4] border-[#15803D]/30' : 'bg-[#F7FAF8] border-[#E3E9E6]'}`}>
+              <div className="flex justify-between items-center mb-4">
+                <span className="font-display font-bold text-[#0F1B17] text-base">Pedido ya está producido</span>
               </div>
-              <div className="flex space-x-4">
-                <label className="flex items-center space-x-2 cursor-pointer">
+              <div className="flex space-x-6">
+                <label className="flex items-center space-x-3 cursor-pointer">
                   <input 
                     type="radio" 
                     name="producedStatus"
                     checked={status === 'produced' || status === 'in_delivery' || status === 'delivered'}
                     onChange={() => handleStatusToggle('produced')}
-                    className="h-4 w-4 text-totebin-600 focus:ring-totebin-500 border-gray-300" 
+                    className="h-5 w-5 text-[#15803D] focus:ring-[#15803D] border-[#E3E9E6]" 
                   />
-                  <span className="text-sm font-bold text-gray-700">Sí</span>
+                  <span className="font-display font-bold text-[#6B7B76]">Sí</span>
                 </label>
-                <label className="flex items-center space-x-2 cursor-pointer">
+                <label className="flex items-center space-x-3 cursor-pointer">
                   <input 
                     type="radio" 
                     name="producedStatus"
                     checked={status === 'open'}
                     onChange={() => handleStatusToggle('open')}
-                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300" 
+                    className="h-5 w-5 text-[#DC2626] focus:ring-[#DC2626] border-[#E3E9E6]" 
                   />
-                  <span className="text-sm font-bold text-gray-700">No</span>
+                  <span className="font-display font-bold text-[#6B7B76]">No</span>
                 </label>
               </div>
             </div>
 
             {/* Salida de transporte */}
-            <div className={`border rounded-xl p-4 transition-colors ${status === 'in_delivery' || status === 'delivered' ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200'}`}>
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-bold text-gray-900 text-sm">Salida de transporte para entrega al cliente</span>
+            <div className={`border-2 rounded-2xl p-6 transition-all duration-300 ${status === 'in_delivery' || status === 'delivered' ? 'bg-[#FFFBEB] border-[#D97706]/30' : 'bg-[#F7FAF8] border-[#E3E9E6]'}`}>
+              <div className="flex justify-between items-center mb-4">
+                <span className="font-display font-bold text-[#0F1B17] text-base">Salida de transporte para entrega</span>
               </div>
-              <div className="flex space-x-4 mb-3">
-                <label className="flex items-center space-x-2 cursor-pointer">
+              <div className="flex space-x-6 mb-5">
+                <label className="flex items-center space-x-3 cursor-pointer">
                   <input 
                     type="radio" 
                     name="shippingStatus"
@@ -280,40 +311,40 @@ export function OrderFormPage() {
                         setShippingDate(new Date().toISOString().split('T')[0]);
                       }
                     }}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" 
+                    className="h-5 w-5 text-[#D97706] focus:ring-[#D97706] border-[#E3E9E6]" 
                   />
-                  <span className="text-sm font-bold text-gray-700">Sí</span>
+                  <span className="font-display font-bold text-[#6B7B76]">Sí</span>
                 </label>
-                <label className="flex items-center space-x-2 cursor-pointer">
+                <label className="flex items-center space-x-3 cursor-pointer">
                   <input 
                     type="radio" 
                     name="shippingStatus"
                     checked={status !== 'in_delivery' && status !== 'delivered'}
                     onChange={() => handleStatusToggle('produced')}
-                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300" 
+                    className="h-5 w-5 text-[#DC2626] focus:ring-[#DC2626] border-[#E3E9E6]" 
                   />
-                  <span className="text-sm font-bold text-gray-700">No</span>
+                  <span className="font-display font-bold text-[#6B7B76]">No</span>
                 </label>
               </div>
               
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Fecha de envío</label>
+                <label className="block text-xs font-display font-bold text-[#6B7B76] mb-1.5 uppercase tracking-wide">Fecha de envío</label>
                 <input
                   type="date"
                   value={shippingDate}
                   onChange={(e) => setShippingDate(e.target.value)}
-                  className="block w-full border-gray-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 bg-white transition-colors text-sm font-semibold"
+                  className="w-full md:w-2/3 p-3.5 border-2 border-[#E3E9E6] rounded-xl focus:border-[#D97706] focus:ring-4 focus:ring-[#D97706]/10 outline-none text-[#0F1B17] font-mono font-bold transition-all bg-white"
                 />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex justify-between items-center pt-4">
+        <div className="flex justify-between items-center pt-8 border-t border-[#E3E9E6]">
           <button
             type="button"
             onClick={() => handleStatusToggle('closed')}
-            className={`flex items-center px-6 py-2.5 rounded-xl font-bold shadow-sm transition-colors ${status === 'closed' ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'}`}
+            className={`flex items-center px-6 py-3.5 rounded-2xl font-display font-bold transition-all ${status === 'closed' ? 'bg-[#F3F6F4] text-[#9CA8A3] cursor-not-allowed' : 'bg-[#FEF2F2] text-[#DC2626] hover:bg-red-100 shadow-[0_4px_0_#991B1B] active:shadow-[0_0px_0_#991B1B] active:translate-y-1'}`}
             disabled={status === 'closed'}
           >
             <CheckCircle2 className="w-5 h-5 mr-2" /> Cerrar pedido
@@ -321,10 +352,10 @@ export function OrderFormPage() {
 
           <button 
             type="submit"
-            className="bg-totebin-600 hover:bg-totebin-700 text-white font-bold py-2.5 px-8 rounded-xl shadow-md transition-all duration-200 flex items-center"
+            className="bg-[#15803D] hover:bg-[#116932] disabled:opacity-60 text-white px-8 py-3.5 rounded-2xl font-display font-bold shadow-btn-3d transition-all flex items-center text-base"
           >
             <Save className="w-5 h-5 mr-2" />
-            {isEditing ? 'Guardar Cambios' : 'Generar Orden'}
+            {isEditing ? 'Guardar Cambios' : 'Crear Orden'}
           </button>
         </div>
       </form>

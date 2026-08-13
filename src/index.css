@@ -1,3 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#F3F6F4] font-body text-[#0F1B17];
+  }
+}
+
+@layer utilities {
+  .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .font-body { font-family: 'Inter', sans-serif; }
+  .font-mono { font-family: 'IBM Plex Mono', monospace; }
+
+  .blob-breathe {
+    animation: blobBreathe 8s ease-in-out infinite;
+  }
+  
+  .card-glow { 
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; 
+  }
+  .card-glow:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 36px -16px rgba(21,128,61,0.28);
+    border-color: rgba(21,128,61,0.35);
+  }
+  
+  .shadow-card-base {
+    box-shadow: 0 6px 20px -16px rgba(15,27,23,0.15);
+  }
+  .shadow-card-green {
+    box-shadow: 0 8px 30px -18px rgba(21,128,61,0.25);
+  }
+  .shadow-btn-3d {
+    box-shadow: 0 4px 0 #0F5C2A;
+  }
+  .shadow-btn-3d:active {
+    box-shadow: 0 0px 0 #0F5C2A;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes blobBreathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.65; }
+}

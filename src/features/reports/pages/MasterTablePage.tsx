@@ -123,81 +123,71 @@ export function MasterTablePage() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden font-sans animate-fade-in-up">
-      <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-        <div className="flex items-center space-x-4">
-          <div className="bg-totebin-50 p-3 rounded-xl">
-            <TableIcon className="w-8 h-8 text-totebin-600" />
+    <div className="bg-white rounded-[28px] shadow-card-base border border-[#E3E9E6] overflow-hidden font-body animate-fade-in-up">
+      <div className="p-8 border-b border-[#E3E9E6] flex justify-between items-center bg-white rounded-t-[28px] relative overflow-hidden">
+        <div className="flex items-center space-x-4 relative z-10">
+          <div className="bg-[#F0FDF4] p-3 rounded-2xl border border-[#E3E9E6]">
+            <TableIcon className="w-8 h-8 text-[#15803D]" />
           </div>
           <div>
-            <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight">Tabla Maestra de Órdenes</h3>
-            <p className="text-sm text-gray-500 mt-1">Vista consolidada idéntica al formato Excel, con capacidad de exportación.</p>
+            <h3 className="text-2xl font-display font-extrabold text-[#0F1B17] tracking-tight">Tabla Maestra de Órdenes</h3>
+            <p className="text-sm text-[#6B7B76] mt-1 font-body">Vista detallada estilo Excel para exportación y análisis</p>
           </div>
         </div>
         <button 
-          onClick={handleExportExcel}
+          onClick={handleExportToExcel}
           disabled={loading || data.length === 0}
-          className="bg-green-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 hover:bg-green-700 transition-all duration-200 text-sm font-bold flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-[#15803D] hover:bg-[#116932] disabled:opacity-60 text-white px-6 py-3.5 rounded-2xl font-display font-bold shadow-btn-3d transition-all flex items-center gap-2 text-sm z-10"
         >
-          <Download className="w-5 h-5 mr-2" />
-          Exportar Excel
+          <FileDown className="w-5 h-5" />
+          Descargar Excel
         </button>
       </div>
 
-      <div className="overflow-x-auto w-full" style={{ maxHeight: 'calc(100vh - 250px)' }}>
-        <table className="w-full whitespace-nowrap">
-          <thead className="bg-slate-800 sticky top-0 z-10">
-            <tr>
-              <th colSpan={5} className="px-4 py-2 border-r border-slate-700"></th>
-              <th colSpan={2} className="px-4 py-2 border-r border-slate-700 text-center text-xs font-bold text-white uppercase bg-slate-700">Pedido ya esta producido</th>
-              <th colSpan={2} className="px-4 py-2 border-r border-slate-700 text-center text-xs font-bold text-white uppercase bg-slate-600">Salida de transporte</th>
-              <th colSpan={3} className="px-4 py-2"></th>
+      <div className="overflow-x-auto bg-white rounded-b-[28px]" style={{ maxHeight: 'calc(100vh - 250px)' }}>
+        <table className="w-full text-left border-collapse whitespace-nowrap">
+          <thead>
+            <tr className="bg-[#F7FAF8] border-b border-[#E3E9E6]">
+              <th colSpan={5} className="px-6 py-3 border-r border-[#EDF1EF]"></th>
+              <th colSpan={2} className="px-6 py-3 text-center border-r border-[#EDF1EF] text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Pedido ya está producido</th>
+              <th colSpan={2} className="px-6 py-3 text-center border-r border-[#EDF1EF] text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Salida de transporte</th>
+              <th colSpan={3} className="px-6 py-3"></th>
             </tr>
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-bold text-gray-300 border-r border-slate-700">No. Orden</th>
-              <th className="px-4 py-3 text-left text-xs font-bold text-gray-300 border-r border-slate-700">Producto</th>
-              <th className="px-4 py-3 text-center text-xs font-bold text-gray-300 border-r border-slate-700">Cantidad pedida</th>
-              <th className="px-4 py-3 text-center text-xs font-bold text-gray-300 border-r border-slate-700">Fecha compromiso</th>
-              <th className="px-4 py-3 text-center text-xs font-bold text-gray-300 border-r border-slate-700">Cantidad surtida</th>
-              
-              <th className="px-4 py-3 text-center text-xs font-bold text-gray-300 border-r border-slate-700">Si</th>
-              <th className="px-4 py-3 text-center text-xs font-bold text-gray-300 border-r border-slate-700">No</th>
-              
-              <th className="px-4 py-3 text-center text-xs font-bold text-gray-300 border-r border-slate-700">Si</th>
-              <th className="px-4 py-3 text-center text-xs font-bold text-gray-300 border-r border-slate-700">No</th>
-              
-              <th className="px-4 py-3 text-center text-xs font-bold text-gray-300 border-r border-slate-700">Fecha de envio</th>
-              <th className="px-4 py-3 text-center text-xs font-bold text-gray-300 border-r border-slate-700">Cerrar pedido</th>
-              <th className="px-4 py-3 text-left text-xs font-bold text-gray-300">Comentarios para sistemas</th>
+            <tr className="bg-[#F7FAF8] border-b border-[#E3E9E6]">
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">No. Orden</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Producto</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Cantidad pedida</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Fecha compromiso</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Cantidad surtida</th>
+              <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Sí</th>
+              <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">No</th>
+              <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Sí</th>
+              <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">No</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Fecha de envio</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Cerrar pedido</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Comentarios</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-100">
+          <tbody className="divide-y divide-[#EDF1EF]">
             {loading ? (
-              <tr>
-                <td colSpan={12} className="px-8 py-12 text-center text-sm text-gray-500 font-medium">Cargando base de datos completa...</td>
-              </tr>
+              <tr><td colSpan={12} className="px-6 py-12 text-center font-display font-bold text-[#0F1B17]">Cargando tabla...</td></tr>
             ) : data.length === 0 ? (
-              <tr>
-                <td colSpan={12} className="px-8 py-12 text-center text-sm text-gray-500 font-medium">No hay registros para mostrar.</td>
-              </tr>
+              <tr><td colSpan={12} className="px-6 py-12 text-center font-display font-bold text-[#0F1B17]">No hay datos para mostrar</td></tr>
             ) : (
               data.map((row, idx) => (
-                <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-4 py-2 border-r border-gray-100 font-bold text-sm text-gray-900">{row.noOrden}</td>
-                  <td className="px-4 py-2 border-r border-gray-100 text-sm font-medium text-gray-700">{row.producto}</td>
-                  <td className="px-4 py-2 border-r border-gray-100 text-center text-sm font-semibold text-gray-600">{row.cantidadPedida}</td>
-                  <td className="px-4 py-2 border-r border-gray-100 text-center text-sm text-gray-500">{row.fechaCompromiso}</td>
-                  <td className="px-4 py-2 border-r border-gray-100 text-center text-sm font-semibold text-totebin-700 bg-totebin-50">{row.cantidadSurtida}</td>
-                  
-                  <td className="px-4 py-2 border-r border-gray-100 text-center font-bold text-green-600">{row.producidoSi}</td>
-                  <td className="px-4 py-2 border-r border-gray-100 text-center font-bold text-red-600">{row.producidoNo}</td>
-                  
-                  <td className="px-4 py-2 border-r border-gray-100 text-center font-bold text-green-600">{row.salidaSi}</td>
-                  <td className="px-4 py-2 border-r border-gray-100 text-center font-bold text-red-600">{row.salidaNo}</td>
-                  
-                  <td className="px-4 py-2 border-r border-gray-100 text-center text-sm text-gray-500">{row.fechaEnvio}</td>
-                  <td className="px-4 py-2 border-r border-gray-100 text-center text-sm text-gray-500 font-bold">{row.cerrarPedido}</td>
-                  <td className="px-4 py-2 text-sm text-gray-500">{row.comentarios}</td>
+                <tr key={idx} className="hover:bg-[#F0FDF4] transition-colors">
+                  <td className="px-6 py-4 font-mono font-bold text-[#0F1B17] border-r border-[#EDF1EF]">{row.noOrden}</td>
+                  <td className="px-6 py-4 font-mono text-[#4B5A5D] border-r border-[#EDF1EF]">{row.producto}</td>
+                  <td className="px-6 py-4 font-mono text-[#4B5A5D] border-r border-[#EDF1EF] text-center">{row.cantidadPedida}</td>
+                  <td className="px-6 py-4 font-mono text-[#4B5A5D] border-r border-[#EDF1EF] text-center">{row.fechaCompromiso}</td>
+                  <td className="px-6 py-4 font-mono text-[#4B5A5D] border-r border-[#EDF1EF] text-center">{row.cantidadSurtida}</td>
+                  <td className="px-6 py-4 text-center font-display font-bold text-[#15803D] border-r border-[#EDF1EF] bg-[#F0FDF4]/30">{row.producidoSi}</td>
+                  <td className="px-6 py-4 text-center font-display font-bold text-[#DC2626] border-r border-[#EDF1EF]">{row.producidoNo}</td>
+                  <td className="px-6 py-4 text-center font-display font-bold text-[#D97706] border-r border-[#EDF1EF] bg-[#FFFBEB]/30">{row.salidaSi}</td>
+                  <td className="px-6 py-4 text-center font-display font-bold text-[#DC2626] border-r border-[#EDF1EF]">{row.salidaNo}</td>
+                  <td className="px-6 py-4 font-mono text-[#4B5A5D] border-r border-[#EDF1EF] text-center">{row.fechaEnvio}</td>
+                  <td className="px-6 py-4 font-display font-bold text-[#0F1B17] border-r border-[#EDF1EF] text-center">{row.cerrarPedido}</td>
+                  <td className="px-6 py-4 font-body text-[#4B5A5D] text-sm max-w-[200px] truncate" title={row.comentarios}>{row.comentarios}</td>
                 </tr>
               ))
             )}

@@ -48,20 +48,20 @@ export function OrderListPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'open':
-        return <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold border border-blue-100 shadow-sm">Abierta</span>;
+        return <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#0F1B17] bg-[#E3E9E6]">Abierto</span>;
       case 'in_production':
       case 'in_process':
-        return <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-bold border border-yellow-100 shadow-sm">En Proceso</span>;
+        return <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#0F1B17] bg-[#E3E9E6]">En Proceso</span>;
       case 'produced':
-        return <span className="px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-bold border border-orange-100 shadow-sm">Producido</span>;
+        return <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#15803D] bg-[#F0FDF4]">Producido</span>;
       case 'in_delivery':
-        return <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-bold border border-purple-100 shadow-sm">En Tránsito</span>;
+        return <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#D97706] bg-[#FFFBEB]">En Transporte</span>;
       case 'delivered':
-        return <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold border border-green-100 shadow-sm">Entregada</span>;
+        return <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#15803D] bg-[#F0FDF4]">Entregado</span>;
       case 'closed':
-        return <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-bold border border-gray-200 shadow-sm">Cerrada</span>;
+        return <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#DC2626] bg-[#FEF2F2]">Cerrado</span>;
       default:
-        return <span className="px-3 py-1 bg-gray-50 text-gray-700 rounded-full text-xs font-bold border border-gray-100 shadow-sm">{status}</span>;
+        return <span className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#0F1B17] bg-[#E3E9E6]">{status}</span>;
     }
   };
 
@@ -76,61 +76,73 @@ export function OrderListPage() {
 
   return (
     <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden font-sans animate-fade-in-up">
-      <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-        <div className="flex items-center space-x-4">
-          <div className="bg-totebin-50 p-3 rounded-xl">
-            <ClipboardList className="w-8 h-8 text-totebin-600" />
+      <div className="p-8 border-b border-[#E3E9E6] flex justify-between items-center bg-white rounded-t-[28px] relative overflow-hidden">
+        <div className="flex items-center space-x-4 relative z-10">
+          <div className="bg-[#F0FDF4] p-3 rounded-2xl border border-[#E3E9E6]">
+            <ClipboardList className="w-8 h-8 text-[#15803D]" />
           </div>
           <div>
-            <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight">Listado de Órdenes</h3>
-            <p className="text-sm text-gray-500 mt-1">Control visual del avance y estatus en el piso de producción</p>
+            <h3 className="text-2xl font-display font-extrabold text-[#0F1B17] tracking-tight">Listado de Órdenes</h3>
+            <p className="text-sm text-[#6B7B76] mt-1 font-body">Control visual del avance y estatus en el piso de producción</p>
           </div>
         </div>
       </div>
       
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-100">
-          <thead className="bg-gray-50/80">
-            <tr>
-              <th className="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">No. Orden (Key)</th>
-              <th className="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Estado</th>
-              <th className="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">F. Compromiso</th>
-              <th className="px-8 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Acciones</th>
+      <div className="overflow-x-auto bg-white rounded-b-[28px]">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-[#F7FAF8] border-b border-[#E3E9E6]">
+              <th className="px-8 py-5 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">No. Orden</th>
+              <th className="px-8 py-5 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Productos</th>
+              <th className="px-8 py-5 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Estatus</th>
+              <th className="px-8 py-5 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">F. Entrega</th>
+              <th className="px-8 py-5 text-right text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Acciones</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-50">
-            {loading ? (
+          <tbody className="divide-y divide-[#EDF1EF]">
+            {orders.length === 0 && !loading ? (
               <tr>
-                <td colSpan={4} className="px-8 py-8 text-center text-sm text-gray-500 font-medium">Cargando órdenes desde el backend...</td>
-              </tr>
-            ) : orders.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="px-8 py-8 text-center text-sm text-gray-500 font-medium">No hay órdenes registradas en la base de datos.</td>
+                <td colSpan={5} className="px-8 py-12 text-center">
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="w-16 h-16 rounded-full border-2 border-dashed border-[#E3E9E6] flex items-center justify-center mb-4 bg-[#F7FAF8]">
+                      <ClipboardList className="w-8 h-8 text-[#9CA8A3]" />
+                    </div>
+                    <p className="font-display font-bold text-[#0F1B17]">No hay órdenes activas</p>
+                    <p className="text-[#6B7B76] text-sm mt-1">Las órdenes creadas aparecerán aquí.</p>
+                  </div>
+                </td>
               </tr>
             ) : (
               orders.map((order) => (
-                <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-8 py-4 whitespace-nowrap">
-                    <div className="text-sm font-bold text-gray-900">{order.key}</div>
+                <tr key={order.id} className="hover:bg-[#F0FDF4] transition-colors group">
+                  <td className="px-8 py-5 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="font-mono font-bold text-[#0F1B17] text-base">{order.key}</div>
+                    </div>
                   </td>
-                  <td className="px-8 py-4 whitespace-nowrap">
+                  <td className="px-8 py-5">
+                    <div className="text-sm font-body text-[#4B5A5D]">
+                      {order.items?.length || 0} {order.items?.length === 1 ? 'producto' : 'productos'}
+                    </div>
+                  </td>
+                  <td className="px-8 py-5 whitespace-nowrap">
                     {getStatusBadge(order.status)}
                   </td>
-                  <td className="px-8 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-600">{formatDate(order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || order.scheduled_delivery_date)}</div>
+                  <td className="px-8 py-5 whitespace-nowrap">
+                    <div className="text-sm font-mono text-[#4B5A5D]">{formatDate(order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || order.scheduled_delivery_date)}</div>
                   </td>
-                  <td className="px-8 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
+                  <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
                     <button 
                       onClick={() => navigate(`/orders/${order.id}`)}
-                      className="text-gray-400 hover:text-totebin-600 bg-white hover:bg-totebin-50 border border-transparent hover:border-totebin-100 p-2 rounded-lg transition-all shadow-sm flex items-center justify-center"
-                      title="Editar Orden"
+                      className="text-[#6B7B76] hover:text-[#15803D] bg-[#F3F6F4] hover:bg-[#E3E9E6] p-2 rounded-xl transition-colors"
+                      title="Editar"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => handleDelete(order.id)}
-                      className="text-gray-400 hover:text-red-600 bg-white hover:bg-red-50 border border-transparent hover:border-red-100 p-2 rounded-lg transition-all shadow-sm flex items-center justify-center"
-                      title="Eliminar Orden"
+                      className="text-[#6B7B76] hover:text-[#DC2626] bg-[#F3F6F4] hover:bg-[#FEF2F2] p-2 rounded-xl transition-colors"
+                      title="Eliminar"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
