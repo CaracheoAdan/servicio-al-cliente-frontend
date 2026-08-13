@@ -12,18 +12,25 @@ export function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Llamada real a la API (el backend en localhost:5040 debe estar corriendo)
-      const res = await authApi.login({ email, password });
+      // TODO: Pendiente de habilitar cuando el backend de Auth esté listo
+      // const res = await authApi.login({ email, password });
+      // if (res && res.token) {
+      //   localStorage.setItem('totebin_token', res.token);
+      //   navigate('/');
+      // } else {
+      //   toast.error('El servidor no devolvió un token válido.');
+      // }
       
-      if (res && res.token) {
-        localStorage.setItem('totebin_token', res.token);
-        navigate('/');
-      } else {
-        toast.error('El servidor no devolvió un token válido.');
-      }
+      // Bypass temporal para poder visualizar y trabajar en el sistema
+      localStorage.setItem('totebin_token', 'mock_token_temporal');
+      toast.success('Bypass de Login activado.', {
+        icon: '🔓',
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
+      navigate('/');
     } catch (error) {
       console.error("Login error:", error);
-      toast.error('Credenciales incorrectas o el servidor no responde.', {
+      toast.error('Error al intentar acceder.', {
         style: { borderRadius: '10px', background: '#333', color: '#fff' }
       });
     }
