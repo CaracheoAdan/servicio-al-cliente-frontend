@@ -7,6 +7,7 @@ import { OrderListPage } from '../features/orders/pages/OrderListPage'
 import { OrderFormPage } from '../features/orders/pages/OrderFormPage'
 import { ReportsPage } from '../features/reports/pages/ReportsPage'
 import { UsersPage } from '../features/users/pages/UsersPage'
+import { Toaster } from 'react-hot-toast'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('totebin_token')
@@ -19,6 +20,7 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-right" />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         
