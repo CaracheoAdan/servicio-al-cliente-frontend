@@ -13,6 +13,7 @@ export function OrderFormPage() {
 
   const [orderKey, setOrderKey] = useState('');
   const [scheduledDeliveryDate, setScheduledDeliveryDate] = useState('');
+  const [shippingDate, setShippingDate] = useState('');
   const [items, setItems] = useState([{ productId: '', orderedQuantity: 1, deliveredQuantity: 0 }]);
   const [status, setStatus] = useState<OrderStatus>('open');
   const [comments, setComments] = useState('');
@@ -38,6 +39,9 @@ export function OrderFormPage() {
             setOrderKey(orderData.key || '');
             if (orderData.detail?.scheduledDeliveryDate || orderData.detail?.scheduled_delivery_date) {
               setScheduledDeliveryDate((orderData.detail.scheduledDeliveryDate || orderData.detail.scheduled_delivery_date).split('T')[0]);
+            }
+            if (orderData.detail?.shippingDate || orderData.detail?.shipping_date) {
+              setShippingDate((orderData.detail.shippingDate || orderData.detail.shipping_date).split('T')[0]);
             }
             setStatus(orderData.status || 'open');
             setComments(orderData.detail?.comments || '');
@@ -119,6 +123,7 @@ export function OrderFormPage() {
         key: orderKey,
         status: status,
         scheduledDeliveryDate: scheduledDeliveryDate,
+        shippingDate: shippingDate || undefined,
         comments: comments, // Enviamos el comentario al backend
         items: items.map(item => ({
           productId: parseInt(item.productId as string, 10),
@@ -284,65 +289,105 @@ export function OrderFormPage() {
           </div>
         </div>
 
-        {/* Estatus y Comentarios (Edición) */}
-        {isEditing && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50/50 p-6 rounded-xl border border-gray-100">
-            <div className="space-y-4">
-              <div className={`border rounded-xl p-4 transition-colors ${status === 'produced' || status === 'in_delivery' || status === 'delivered' ? 'bg-totebin-50 border-totebin-200' : 'bg-white border-gray-200'}`}>
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-gray-900 text-sm">Pedido ya está producido</span>
-                  <label className="flex items-center space-x-2 cursor-pointer bg-white border border-gray-300 rounded-md p-1 px-2 shadow-sm">
-                    <span className="text-xs font-bold text-gray-700">Sí</span>
-                    <input 
-                      type="checkbox" 
-                      checked={status === 'produced' || status === 'in_delivery' || status === 'delivered'}
-                      onChange={() => handleStatusToggle('produced')}
-                      className="h-4 w-4 text-totebin-600 focus:ring-totebin-500 border-gray-300 rounded" 
-                    />
-                  </label>
-                </div>
+        {/* Estatus y Comentarios */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50/50 p-6 rounded-xl border border-gray-100">
+          <div className="space-y-4">
+            {/* Pedido ya esta producido */}
+            <div className={`border rounded-xl p-4 transition-colors ${status === 'produced' || status === 'in_delivery' || status === 'delivered' ? 'bg-totebin-50 border-totebin-200' : 'bg-white border-gray-200'}`}>
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-bold text-gray-900 text-sm">Pedido ya esta producido</span>
               </div>
-
-              <div className={`border rounded-xl p-4 transition-colors ${status === 'in_delivery' || status === 'delivered' ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200'}`}>
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-gray-900 text-sm">Salida de transporte (Envío)</span>
-                  <label className="flex items-center space-x-2 cursor-pointer bg-white border border-gray-300 rounded-md p-1 px-2 shadow-sm">
-                    <span className="text-xs font-bold text-gray-700">Sí</span>
-                    <input 
-                      type="checkbox" 
-                      checked={status === 'in_delivery' || status === 'delivered'}
-                      onChange={() => handleStatusToggle('in_delivery')}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" 
-                    />
-                  </label>
-                </div>
+              <div className="flex space-x-4">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input 
+                    type="radio" 
+                    name="producedStatus"
+                    checked={status === 'produced' || status === 'in_delivery' || status === 'delivered'}
+                    onChange={() => handleStatusToggle('produced')}
+                    className="h-4 w-4 text-totebin-600 focus:ring-totebin-500 border-gray-300" 
+                  />
+                  <span className="text-sm font-bold text-gray-700">Sí</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input 
+                    type="radio" 
+                    name="producedStatus"
+                    checked={status === 'open'}
+                    onChange={() => handleStatusToggle('open')}
+                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300" 
+                  />
+                  <span className="text-sm font-bold text-gray-700">No</span>
+                </label>
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Comentarios para sistemas</label>
-              <textarea
-                value={comments}
-                onChange={(e) => setComments(e.target.value)}
-                placeholder="Escribe observaciones adicionales aquí..."
-                rows={4}
-                className="w-full border-gray-200 rounded-xl shadow-sm focus:border-totebin-500 focus:ring-totebin-500 px-4 py-3 bg-white text-sm"
-              ></textarea>
+            {/* Salida de transporte */}
+            <div className={`border rounded-xl p-4 transition-colors ${status === 'in_delivery' || status === 'delivered' ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200'}`}>
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-bold text-gray-900 text-sm">Salida de transporte para entrega al cliente</span>
+              </div>
+              <div className="flex space-x-4 mb-3">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input 
+                    type="radio" 
+                    name="shippingStatus"
+                    checked={status === 'in_delivery' || status === 'delivered'}
+                    onChange={() => {
+                      handleStatusToggle('in_delivery');
+                      if (!shippingDate) {
+                        setShippingDate(new Date().toISOString().split('T')[0]);
+                      }
+                    }}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" 
+                  />
+                  <span className="text-sm font-bold text-gray-700">Sí</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input 
+                    type="radio" 
+                    name="shippingStatus"
+                    checked={status !== 'in_delivery' && status !== 'delivered'}
+                    onChange={() => handleStatusToggle('produced')}
+                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300" 
+                  />
+                  <span className="text-sm font-bold text-gray-700">No</span>
+                </label>
+              </div>
+              
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Fecha de envío</label>
+                <input
+                  type="date"
+                  value={shippingDate}
+                  onChange={(e) => setShippingDate(e.target.value)}
+                  disabled={status !== 'in_delivery' && status !== 'delivered'}
+                  className="block w-full border-gray-200 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 bg-white transition-colors text-sm font-semibold disabled:opacity-50 disabled:bg-gray-100"
+                />
+              </div>
             </div>
           </div>
-        )}
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-2">Comentarios para sistemas</label>
+            <textarea
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+              placeholder="Escribe observaciones adicionales aquí..."
+              rows={8}
+              className="w-full border-gray-200 rounded-xl shadow-sm focus:border-totebin-500 focus:ring-totebin-500 px-4 py-3 bg-white text-sm h-full max-h-56"
+            ></textarea>
+          </div>
+        </div>
 
         <div className="flex justify-between items-center pt-4">
-          {isEditing ? (
-            <button
-              type="button"
-              onClick={() => handleStatusToggle('closed')}
-              className={`flex items-center px-6 py-2.5 rounded-xl font-bold shadow-sm transition-colors ${status === 'closed' ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'}`}
-              disabled={status === 'closed'}
-            >
-              <CheckCircle2 className="w-5 h-5 mr-2" /> Cerrar pedido
-            </button>
-          ) : <div></div>}
+          <button
+            type="button"
+            onClick={() => handleStatusToggle('closed')}
+            className={`flex items-center px-6 py-2.5 rounded-xl font-bold shadow-sm transition-colors ${status === 'closed' ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'}`}
+            disabled={status === 'closed'}
+          >
+            <CheckCircle2 className="w-5 h-5 mr-2" /> Cerrar pedido
+          </button>
 
           <button 
             type="submit"
