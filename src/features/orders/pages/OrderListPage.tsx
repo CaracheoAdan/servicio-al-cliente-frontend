@@ -83,16 +83,9 @@ export function OrderListPage() {
           </div>
           <div>
             <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight">Listado de Órdenes</h3>
-            <p className="text-sm text-gray-500 mt-1">Consulta y administra las órdenes de producción.</p>
+            <p className="text-sm text-gray-500 mt-1">Control visual del avance y estatus en el piso de producción</p>
           </div>
         </div>
-        <button 
-          onClick={() => navigate('/orders/new')}
-          className="bg-totebin-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 hover:bg-totebin-700 transition-all duration-200 text-sm font-bold flex items-center"
-        >
-          <Plus className="w-5 h-5 mr-1" />
-          Crear Orden
-        </button>
       </div>
       
       <div className="overflow-x-auto">
