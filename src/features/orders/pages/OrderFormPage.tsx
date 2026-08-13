@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Save, Plus, X, FileText, CheckCircle2, Copy } from 'lucide-react';
+import { ArrowLeft, Save, Plus, X, FileText, CheckCircle2 } from 'lucide-react';
 import { api } from '../../../shared/api/axiosInstance';
 import { orderService } from '../../../shared/api/orderService';
 import { OrderStatus } from '../types/order.types';
@@ -20,10 +20,6 @@ export function OrderFormPage() {
   
   const [loading, setLoading] = useState(true);
   const [availableProducts, setAvailableProducts] = useState<any[]>([]);
-  
-  // Estado para la función de pre-llenado
-  const [existingOrders, setExistingOrders] = useState<any[]>([]);
-  const [selectedOrderToCopy, setSelectedOrderToCopy] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,9 +50,6 @@ export function OrderFormPage() {
               })));
             }
           }
-        } else {
-          const ordersData = await orderService.getAllCombinedOrders();
-          setExistingOrders(ordersData);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -67,30 +60,6 @@ export function OrderFormPage() {
     };
     fetchData();
   }, [id, isEditing]);
-
-  const handlePrefillFromOrder = async (orderIdToCopy: string) => {
-    if (!orderIdToCopy) return;
-    try {
-      setLoading(true);
-      const orderData = await orderService.getOrderById(orderIdToCopy);
-      
-      if (orderData && orderData.items && orderData.items.length > 0) {
-        setItems(orderData.items.map((i: any) => ({
-          productId: i.product_id || i.productId || '',
-          orderedQuantity: i.ordered_quantity || i.orderedQuantity || 1,
-          deliveredQuantity: 0 // Resetear a 0 porque es una nueva orden
-        })));
-        toast.success(`Formulario pre-llenado usando los productos de la orden ${orderData.key}`, { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
-      } else {
-        toast.error('La orden seleccionada no tiene productos.');
-      }
-    } catch (error) {
-      toast.error('Error al intentar pre-llenar la orden.');
-    } finally {
-      setLoading(false);
-      setSelectedOrderToCopy('');
-    }
-  };
 
   const handleAddItem = () => {
     setItems([...items, { productId: '', orderedQuantity: 1, deliveredQuantity: 0 }]);
@@ -163,33 +132,6 @@ export function OrderFormPage() {
       </div>
 
       <form onSubmit={handleSave} className="p-8 space-y-8">
-        
-        {/* Pre-llenado (Solo al crear nueva orden) */}
-        {!isEditing && existingOrders.length > 0 && (
-          <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-xl flex items-center space-x-4">
-            <div className="bg-blue-100 p-2 rounded-lg text-blue-700">
-              <Copy className="w-5 h-5" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-bold text-blue-900">¿Quieres pre-llenar los productos usando una orden anterior?</p>
-              <p className="text-xs text-blue-700">Selecciona una orden y copiaremos sus productos (sin las cantidades surtidas) para ahorrarte tiempo.</p>
-            </div>
-            <select
-              value={selectedOrderToCopy}
-              onChange={(e) => {
-                setSelectedOrderToCopy(e.target.value);
-                handlePrefillFromOrder(e.target.value);
-              }}
-              className="border-gray-200 rounded-lg text-sm font-semibold text-gray-700 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
-            >
-              <option value="">-- Seleccionar Orden --</option>
-              {existingOrders.map(o => (
-                <option key={o.id} value={o.id}>Orden: {o.key}</option>
-              ))}
-            </select>
-          </div>
-        )}
-
         {/* Datos Principales */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50/50 p-6 rounded-xl border border-gray-100">
           <div>
