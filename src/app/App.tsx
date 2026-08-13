@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { DashboardLayout } from '../shared/layout/DashboardLayout'
 import { TicketList } from '../features/tickets'
 import { LoginPage } from '../features/auth/pages/LoginPage'
+import { CatalogsPage } from '../features/catalogs/pages/CatalogsPage'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('totebin_token')
@@ -31,6 +32,14 @@ function App() {
               
               {/* Aquí montaremos los features reales (Órdenes, Catálogos) */}
               <TicketList />
+            </div>
+          </PrivateRoute>
+        } />
+        
+        <Route path="/catalogs" element={
+          <PrivateRoute>
+            <div className="max-w-7xl mx-auto">
+              <CatalogsPage />
             </div>
           </PrivateRoute>
         } />
