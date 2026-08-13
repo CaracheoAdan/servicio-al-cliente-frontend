@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Plus, Edit2, Trash2, Search, X, CheckCircle2, Clock, Inbox, Tag } from 'lucide-react';
+import { ClipboardList, Edit2, Trash2, Search, X, CheckCircle2, Clock, Inbox, Tag } from 'lucide-react';
 import { orderService } from '../../../shared/api/orderService';
 import toast from 'react-hot-toast';
 import { api } from '../../../shared/api/axiosInstance';
@@ -150,12 +150,6 @@ export function OrderListPage() {
               </p>
             )}
           </div>
-          <button 
-            onClick={() => navigate('/orders/new')}
-            className="bg-[#15803D] hover:bg-[#116932] disabled:opacity-60 text-white px-6 py-3.5 rounded-2xl font-display font-bold shadow-[0_4px_0_#0F5C2A] active:shadow-[0_0px_0_#0F5C2A] active:translate-y-1 transition-all flex items-center justify-center gap-2 text-sm whitespace-nowrap"
-          >
-            <Plus className="w-5 h-5" /> Nueva Orden
-          </button>
         </div>
       </div>
       
