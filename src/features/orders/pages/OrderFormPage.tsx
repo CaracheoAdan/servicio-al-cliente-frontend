@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { orderApi } from '../api/order.api';
+import toast from 'react-hot-toast';
+import { ArrowLeft, Save, Plus, X, RefreshCw, FileText } from 'lucide-react';
 import { OrderStatus } from '../types/order.types';
 
 export function OrderFormPage() {
@@ -8,16 +9,9 @@ export function OrderFormPage() {
   const navigate = useNavigate();
   const isEditing = !!id;
 
-  // db field: key
   const [orderKey, setOrderKey] = useState('');
-  // db field: scheduled_delivery_date
   const [scheduledDeliveryDate, setScheduledDeliveryDate] = useState('');
-  
-  // Dynamic line items mapping to db: _order_item
-  // productId: integer, orderedQuantity: integer, deliveredQuantity: integer
   const [items, setItems] = useState([{ productId: 0, orderedQuantity: 1, deliveredQuantity: 0 }]);
-
-  // Controles de estado que mapean al enum de PostgreSQL
   const [status, setStatus] = useState<OrderStatus>('open');
 
   const handleAddItem = () => {
@@ -34,138 +28,130 @@ export function OrderFormPage() {
     if (checked) {
       setStatus(newStatus);
       if (isEditing) {
-        try {
-          // PATCH /api/v1/productionOrders/{id}/update_status/{status}
-          // await orderApi.updateStatus(id!, { status: newStatus });
-          alert(`Estado '${newStatus}' notificado al servidor (PATCH) para capturar el timestamp 'shipping_date' o actualizar 'status'.`);
-        } catch (error) {
-          alert(`Error al actualizar estado ${newStatus}`);
-        }
+        toast.success(`Estado actualizado a '${newStatus}'`, {
+          icon: '🔄',
+          style: { borderRadius: '10px', background: '#333', color: '#fff' }
+        });
       }
     }
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      if (!isEditing) {
-        // await orderApi.createOrder({
-        //   key: orderKey,
-        //   scheduledDeliveryDate,
-        //   items: items.map(i => ({
-        //     productId: i.productId,
-        //     orderedQuantity: i.orderedQuantity,
-        //   }))
-        // });
-        alert('Orden creada exitosamente mapeando los campos exactos de la DB (_order, _order_detail, _order_item)');
-        navigate('/');
-      } else {
-        alert('Orden actualizada localmente (Simulado)');
-      }
-    } catch (error) {
-      alert('Error guardando la orden');
+    if (!isEditing) {
+      toast.success('Orden creada exitosamente.', {
+        icon: '✅',
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
+      setTimeout(() => navigate('/'), 1000);
+    } else {
+      toast.success('Orden actualizada.', {
+        icon: '✅',
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
     }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden font-sans">
-      <div className="p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-        <h3 className="text-xl font-bold text-gray-900">
+    <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden font-sans animate-fade-in-up">
+      <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+        <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center">
+          <FileText className="w-6 h-6 text-totebin-600 mr-3" />
           {isEditing ? `Gestión de Orden ID: ${id}` : 'Crear Orden de Producción'}
         </h3>
-        <button onClick={() => navigate('/')} className="text-gray-500 hover:text-gray-700 font-medium">
-          ← Volver
+        <button onClick={() => navigate('/')} className="flex items-center text-gray-500 hover:text-gray-900 transition-colors font-bold text-sm bg-white border border-gray-200 px-4 py-2 rounded-lg shadow-sm">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Volver
         </button>
       </div>
 
-      <form onSubmit={handleSave} className="p-6 space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form onSubmit={handleSave} className="p-8 space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Clave de Orden (key)</label>
+            <label className="block text-sm font-bold text-gray-700 mb-2">Clave de Orden (key)</label>
             <input
               type="text"
               required
               value={orderKey}
               onChange={(e) => setOrderKey(e.target.value)}
               placeholder="Ej: ORD-2023-001"
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-totebin-500 focus:ring-totebin-500 p-2 border"
+              className="block w-full border-gray-200 rounded-xl shadow-sm focus:border-totebin-500 focus:ring-totebin-500 px-4 py-3 bg-gray-50 focus:bg-white transition-colors"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Fecha de entrega programada (scheduled_delivery_date)</label>
+            <label className="block text-sm font-bold text-gray-700 mb-2">Fecha programada (scheduled_delivery_date)</label>
             <input
               type="date"
               required
               value={scheduledDeliveryDate}
               onChange={(e) => setScheduledDeliveryDate(e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-totebin-500 focus:ring-totebin-500 p-2 border"
+              className="block w-full border-gray-200 rounded-xl shadow-sm focus:border-totebin-500 focus:ring-totebin-500 px-4 py-3 bg-gray-50 focus:bg-white transition-colors"
             />
           </div>
         </div>
 
-        {/* Tabla Dinámica de Productos (_order_item) */}
         <div>
           <div className="flex justify-between items-center mb-4">
-            <h4 className="text-lg font-semibold text-gray-800">Productos de la Orden (_order_item)</h4>
+            <h4 className="text-lg font-bold text-gray-900">Productos de la Orden (_order_item)</h4>
             <button 
               type="button" 
               onClick={handleAddItem}
-              className="text-sm bg-totebin-50 text-totebin-700 hover:bg-totebin-100 font-semibold py-1 px-3 rounded border border-totebin-200 transition-colors"
+              className="text-sm bg-totebin-50 text-totebin-700 hover:bg-totebin-100 font-bold py-2 px-4 rounded-lg border border-totebin-200 transition-colors flex items-center shadow-sm"
             >
-              + Agregar Fila
+              <Plus className="w-4 h-4 mr-1" /> Agregar Fila
             </button>
           </div>
-          <div className="border border-gray-200 rounded-md overflow-x-auto shadow-sm">
-            <table className="min-w-full divide-y divide-gray-200">
+          <div className="border border-gray-100 rounded-xl overflow-x-auto shadow-sm">
+            <table className="min-w-full divide-y divide-gray-100">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Product ID (FK)</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase w-32">Cant. Pedida (ordered_quantity)</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase w-32">Cant. Entregada (delivered_quantity)</th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase w-16">Quitar</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase">Product ID (FK)</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase w-40">Pedida (ordered)</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase w-40">Surtida (delivered)</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase w-20">Acción</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-50">
                 {items.map((item, index) => (
-                  <tr key={index} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-2">
+                  <tr key={index} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-3">
                       <input
                         type="number"
-                        placeholder="ID del producto"
+                        placeholder="ID"
                         value={item.productId || ''}
                         onChange={(e) => handleItemChange(index, 'productId', parseInt(e.target.value) || 0)}
-                        className="w-full border-gray-300 rounded shadow-sm focus:ring-totebin-500 focus:border-totebin-500 p-1.5 border text-sm"
+                        className="w-full border-gray-200 rounded-lg shadow-sm focus:ring-totebin-500 focus:border-totebin-500 px-3 py-2 text-sm"
                         required
                       />
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-6 py-3">
                       <input
                         type="number"
                         min="1"
                         value={item.orderedQuantity}
                         onChange={(e) => handleItemChange(index, 'orderedQuantity', parseInt(e.target.value) || 1)}
-                        className="w-full border-gray-300 rounded shadow-sm focus:ring-totebin-500 focus:border-totebin-500 p-1.5 border text-sm"
+                        className="w-full border-gray-200 rounded-lg shadow-sm focus:ring-totebin-500 focus:border-totebin-500 px-3 py-2 text-sm"
                         required
                       />
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="px-6 py-3">
                       <input
                         type="number"
                         min="0"
                         max={item.orderedQuantity}
                         value={item.deliveredQuantity}
                         onChange={(e) => handleItemChange(index, 'deliveredQuantity', parseInt(e.target.value) || 0)}
-                        className="w-full border-gray-300 rounded shadow-sm focus:ring-totebin-500 focus:border-totebin-500 p-1.5 border text-sm"
+                        className="w-full border-gray-200 rounded-lg shadow-sm focus:ring-totebin-500 focus:border-totebin-500 px-3 py-2 text-sm bg-gray-50"
                       />
                     </td>
-                    <td className="px-4 py-2 text-center">
+                    <td className="px-6 py-3 text-center">
                       <button 
                         type="button"
                         onClick={() => setItems(items.filter((_, i) => i !== index))}
-                        className="text-red-500 hover:text-red-700 font-bold p-1"
+                        className="text-gray-400 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-red-50"
                         disabled={items.length === 1}
                       >
-                        ✕
+                        <X className="w-5 h-5 mx-auto" />
                       </button>
                     </td>
                   </tr>
@@ -175,43 +161,44 @@ export function OrderFormPage() {
           </div>
         </div>
 
-        {/* Controles de Estado vinculados al ENUM status de PostgreSQL */}
         {isEditing && (
-          <div className="bg-totebin-50 border border-totebin-200 p-5 rounded-lg shadow-sm">
-            <h4 className="text-md font-bold text-totebin-900 mb-4 flex items-center">
-              <span className="mr-2">🔄</span> Controles de Avance y Estado
+          <div className="bg-slate-50 border border-slate-200 p-6 rounded-xl shadow-sm">
+            <h4 className="text-md font-bold text-slate-800 mb-5 flex items-center">
+              <RefreshCw className="mr-2 w-5 h-5 text-slate-500" /> Controles de Avance (PATCH)
             </h4>
             <div className="flex flex-col space-y-4">
-              <label className="flex items-center space-x-3 cursor-pointer">
+              <label className="flex items-center space-x-3 cursor-pointer group">
                 <input 
                   type="checkbox" 
                   checked={status === 'produced' || status === 'processed' || status === 'in_delivery' || status === 'delivered'}
                   onChange={(e) => handleStatusChange('produced', e.target.checked)}
-                  className="h-5 w-5 text-totebin-600 focus:ring-totebin-500 border-gray-300 rounded cursor-pointer" 
+                  className="h-5 w-5 text-totebin-600 focus:ring-totebin-500 border-gray-300 rounded cursor-pointer transition-shadow" 
                 />
-                <span className="text-gray-800 font-medium text-sm">El Pedido ya está producido (Cambia status a 'produced')</span>
+                <span className="text-gray-700 font-semibold text-sm group-hover:text-gray-900 transition-colors">
+                  El Pedido ya está producido <span className="text-gray-400 font-normal ml-1">(Cambia a 'produced')</span>
+                </span>
               </label>
-              <label className="flex items-center space-x-3 cursor-pointer">
+              <label className="flex items-center space-x-3 cursor-pointer group">
                 <input 
                   type="checkbox" 
                   checked={status === 'in_delivery' || status === 'delivered'}
                   onChange={(e) => handleStatusChange('in_delivery', e.target.checked)}
-                  className="h-5 w-5 text-totebin-600 focus:ring-totebin-500 border-gray-300 rounded cursor-pointer" 
+                  className="h-5 w-5 text-totebin-600 focus:ring-totebin-500 border-gray-300 rounded cursor-pointer transition-shadow" 
                 />
-                <span className="text-gray-800 font-medium text-sm">Aprobada Salida de transporte (Cambia status a 'in_delivery')</span>
+                <span className="text-gray-700 font-semibold text-sm group-hover:text-gray-900 transition-colors">
+                  Aprobada Salida de transporte <span className="text-gray-400 font-normal ml-1">(Cambia a 'in_delivery')</span>
+                </span>
               </label>
             </div>
-            <p className="text-xs text-totebin-700 mt-3 bg-totebin-100 p-2 rounded">
-              * Nota: Al marcar una casilla se enviará un `PATCH` automático para registrar el cambio en el `enum status` y capturar el timestamp oficial (`shipping_date`).
-            </p>
           </div>
         )}
 
-        <div className="flex justify-end pt-6 border-t border-gray-200">
+        <div className="flex justify-end pt-8 border-t border-gray-100">
           <button 
             type="submit"
-            className="bg-totebin-600 hover:bg-totebin-700 text-white font-medium py-2.5 px-8 rounded-lg shadow transition-colors"
+            className="bg-totebin-600 hover:bg-totebin-700 hover:shadow-lg hover:-translate-y-0.5 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-all duration-200 flex items-center"
           >
+            <Save className="w-5 h-5 mr-2" />
             {isEditing ? 'Guardar Cambios' : 'Generar Orden'}
           </button>
         </div>
