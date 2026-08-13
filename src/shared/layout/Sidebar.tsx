@@ -1,54 +1,47 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { NavLink } from 'react-router-dom'
+import { LayoutDashboard, ClipboardList, Database, BarChart3, Settings } from 'lucide-react'
 
 export function Sidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false)
-
-  const navItemClass = ({ isActive }: { isActive: boolean }) => 
-    `p-2 rounded cursor-pointer flex items-center space-x-3 transition-colors font-medium ${
-      isActive ? 'bg-totebin-800 text-white' : 'hover:bg-totebin-800 text-gray-300 hover:text-white'
-    }`
+  const menuItems = [
+    { name: 'Dashboard', path: '/', icon: <LayoutDashboard className="w-5 h-5 mr-3" /> },
+    { name: 'Órdenes de Prod.', path: '/orders', icon: <ClipboardList className="w-5 h-5 mr-3" /> },
+    { name: 'Catálogos', path: '/catalogs', icon: <Database className="w-5 h-5 mr-3" /> },
+    { name: 'Reportes', path: '/reports', icon: <BarChart3 className="w-5 h-5 mr-3" /> },
+    { name: 'Admin. Usuarios', path: '/users', icon: <Settings className="w-5 h-5 mr-3" /> },
+  ]
 
   return (
-    <div className={`bg-totebin-900 text-white transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'} flex flex-col min-h-screen shrink-0 shadow-lg z-10`}>
-      <div className="flex items-center justify-between p-4 border-b border-totebin-800 h-16 shrink-0">
-        {!isCollapsed && (
-          <div className="flex items-center space-x-2 font-extrabold text-2xl tracking-tight">
-            <div className="h-8 w-8 bg-white rounded flex items-center justify-center overflow-hidden">
-               <img src="/src/assets/logo.png" alt="Totebin Logo" className="w-full h-full object-cover" />
-            </div>
-            <span>Totebin</span>
-          </div>
-        )}
-        {isCollapsed && (
-          <div className="h-8 w-8 mx-auto bg-white rounded flex items-center justify-center overflow-hidden">
-             <img src="/src/assets/logo.png" alt="Logo" className="w-full h-full object-cover" />
-          </div>
-        )}
+    <aside className="w-64 bg-white border-r border-gray-100 flex-shrink-0 flex flex-col font-sans">
+      <div className="h-16 flex items-center px-6 border-b border-gray-100">
+        <h1 className="text-2xl font-extrabold text-totebin-700 tracking-tight">Totebin</h1>
       </div>
-      <nav className="flex-1 p-4 space-y-1">
-        <NavLink to="/" className={navItemClass}>
-          <span className="w-6 text-center text-lg">📋</span>
-          {!isCollapsed && <span>Órdenes</span>}
-        </NavLink>
-        <NavLink to="/catalogs" className={navItemClass}>
-          <span className="w-6 text-center text-lg">📁</span>
-          {!isCollapsed && <span>Catálogos</span>}
-        </NavLink>
-        <NavLink to="/reports" className={navItemClass}>
-          <span className="w-6 text-center text-lg">📊</span>
-          {!isCollapsed && <span>Reportes</span>}
-        </NavLink>
-        <NavLink to="/users" className={navItemClass}>
-          <span className="w-6 text-center text-lg">👥</span>
-          {!isCollapsed && <span>Usuarios</span>}
-        </NavLink>
+      
+      <nav className="flex-1 p-4 space-y-2">
+        {menuItems.map((item) => (
+          <NavLink
+            key={item.name}
+            to={item.path}
+            className={({ isActive }) =>
+              `flex items-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 ${
+                isActive
+                  ? 'bg-totebin-50 text-totebin-600 shadow-[0_0_15px_rgba(22,163,74,0.15)] scale-[1.02]'
+                  : 'text-gray-500 hover:bg-totebin-50 hover:text-totebin-600 hover:shadow-[0_0_15px_rgba(22,163,74,0.2)] hover:scale-[1.02]'
+              }`
+            }
+          >
+            {item.icon}
+            {item.name}
+          </NavLink>
+        ))}
       </nav>
-      <div className="p-4 border-t border-totebin-800">
-        <button onClick={() => setIsCollapsed(!isCollapsed)} className="w-full p-2 bg-totebin-800 rounded hover:bg-totebin-700 text-sm font-semibold transition-colors">
-          {isCollapsed ? '>>' : 'Colapsar'}
-        </button>
+      
+      <div className="p-4 border-t border-gray-100">
+        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 shadow-sm text-center">
+          <p className="text-xs text-gray-500 font-medium">Versión 1.0.0</p>
+          <p className="text-[10px] text-gray-400 mt-1">Conectado a Localhost</p>
+        </div>
       </div>
-    </div>
+    </aside>
   )
 }
