@@ -27,7 +27,9 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         
         {/* Rutas Privadas */}
-        <Route path="/" element={
+        <Route path="/" element={<Navigate to="/orders" replace />} />
+        
+        <Route path="/orders" element={
           <PrivateRoute>
             <div className="max-w-7xl mx-auto">
               <OrderListPage />
