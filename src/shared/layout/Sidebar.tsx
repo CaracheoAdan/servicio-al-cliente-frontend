@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, ClipboardList, Database, BarChart3, Settings } from 'lucide-react'
+import { LayoutDashboard, ClipboardList, Database, BarChart3, Settings, LogOut, Table } from 'lucide-react'
 
 export function Sidebar() {
   const menuItems = [
@@ -8,6 +8,7 @@ export function Sidebar() {
     { name: 'Órdenes de Prod.', path: '/orders', icon: <ClipboardList className="w-5 h-5 mr-3" /> },
     { name: 'Catálogos', path: '/catalogs', icon: <Database className="w-5 h-5 mr-3" /> },
     { name: 'Reportes', path: '/reports', icon: <BarChart3 className="w-5 h-5 mr-3" /> },
+    { name: 'Tabla Maestra', path: '/master-table', icon: <Table className="w-5 h-5 mr-3" /> },
     { name: 'Admin. Usuarios', path: '/users', icon: <Settings className="w-5 h-5 mr-3" /> },
   ]
 

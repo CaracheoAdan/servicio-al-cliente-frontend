@@ -7,6 +7,7 @@ import { CatalogsPage } from '../features/catalogs/pages/CatalogsPage'
 import { OrderListPage } from '../features/orders/pages/OrderListPage'
 import { OrderFormPage } from '../features/orders/pages/OrderFormPage'
 import { ReportsPage } from '../features/reports/pages/ReportsPage'
+import { MasterTablePage } from '../features/reports/pages/MasterTablePage'
 import { UsersPage } from '../features/users/pages/UsersPage'
 import { Toaster } from 'react-hot-toast'
 
@@ -73,6 +74,13 @@ function App() {
           </PrivateRoute>
         } />
 
+        <Route path="/master-table" element={
+          <PrivateRoute>
+            <div className="max-w-[95%] mx-auto">
+              <MasterTablePage />
+            </div>
+          </PrivateRoute>
+        } />
         <Route path="/users" element={
           <PrivateRoute>
             <div className="max-w-7xl mx-auto">
