@@ -31,43 +31,51 @@ export function OrderListPage() {
     fetchOrders();
   }, []);
 
-  const handleDelete = async (id: number) => {
-    if (confirm('¿Estás seguro de eliminar esta orden? Todos sus productos asociados se perderán.')) {
-      try {
-        await api.delete(`/orders/${id}`);
-        toast.success('Orden eliminada correctamente.', {
-          style: { borderRadius: '10px', background: '#333', color: '#fff' }
-        });
-        fetchOrders();
-      } catch (error) {
-        toast.error('Error al eliminar la orden.', {
-          style: { borderRadius: '10px', background: '#333', color: '#fff' }
-        });
-      }
+  const [confirmAction, setConfirmAction] = useState<{type: 'delete'|'release', order: any} | null>(null);
+
+  const proceedDelete = async (id: number) => {
+    setConfirmAction(null);
+    try {
+      await api.delete(`/orders/${id}`);
+      toast.success('Orden eliminada correctamente.', {
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
+      fetchOrders();
+    } catch (error) {
+      toast.error('Error al eliminar la orden.', {
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
     }
   };
 
-  const handleLiberarCamion = async (order: any) => {
-    if (confirm(`¿Confirmar la salida del transporte para la Orden ${order.key}?`)) {
-      try {
-        const payload = {
-          key: order.key,
-          status: 'in_delivery',
-          scheduledDeliveryDate: order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || new Date().toISOString(),
-          shippingDate: new Date().toISOString(),
-          items: order.items || []
-        };
-        await orderService.updateOrder(order.id, payload);
-        toast.success('Camión liberado. Se ha registrado la hora de salida.', {
-          style: { borderRadius: '10px', background: '#333', color: '#fff' }
-        });
-        fetchOrders();
-      } catch (error) {
-        toast.error('Error al liberar el camión.', {
-          style: { borderRadius: '10px', background: '#333', color: '#fff' }
-        });
-      }
+  const proceedLiberar = async (order: any) => {
+    setConfirmAction(null);
+    try {
+      const payload = {
+        key: order.key,
+        status: 'in_delivery',
+        scheduledDeliveryDate: order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || new Date().toISOString(),
+        shippingDate: new Date().toISOString(),
+        items: order.items || []
+      };
+      await orderService.updateOrder(order.id, payload);
+      toast.success('Camión liberado. Se ha registrado la hora de salida.', {
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
+      fetchOrders();
+    } catch (error) {
+      toast.error('Error al liberar el camión.', {
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
     }
+  };
+
+  const handleDelete = (order: any) => {
+    setConfirmAction({ type: 'delete', order });
+  };
+
+  const handleLiberarCamion = (order: any) => {
+    setConfirmAction({ type: 'release', order });
   };
 
   const getStatusBadge = (status: string) => {
@@ -296,7 +304,7 @@ export function OrderListPage() {
                         <Edit2 className="w-4 h-4 mr-1.5" /> Editar
                       </button>
                       <button 
-                        onClick={() => handleDelete(order.id)}
+                        onClick={() => handleDelete(order)}
                         className="flex items-center text-[#DC2626] bg-[#FEF2F2] hover:bg-[#FEE2E2] px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs"
                         title="Eliminar"
                       >
@@ -310,6 +318,52 @@ export function OrderListPage() {
           </div>
         )}
       </div>
+
+      {confirmAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F172A]/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 lg:p-8 font-body border border-[#E2E8F0] animate-fade-in-up">
+            <div className="flex items-center gap-4 mb-6">
+              <div className={`p-4 rounded-2xl flex-shrink-0 ${confirmAction.type === 'delete' ? 'bg-[#FEF2F2] text-[#DC2626]' : 'bg-[#FFFBEB] text-[#D97706]'}`}>
+                {confirmAction.type === 'delete' ? <Trash2 className="w-8 h-8" /> : <Truck className="w-8 h-8" />}
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-[#0F172A] text-xl">
+                  {confirmAction.type === 'delete' ? 'Eliminar Orden' : 'Liberar Camión'}
+                </h3>
+                <p className="text-sm font-display font-bold text-[#64748B] mt-1">Orden No. {confirmAction.order.key}</p>
+              </div>
+            </div>
+            
+            <p className="text-[#475569] text-base leading-relaxed mb-8">
+              {confirmAction.type === 'delete' ? (
+                <>¿Estás seguro de eliminar esta orden? Todos sus productos asociados se perderán de la base de datos. <strong className="text-[#DC2626]">Esta acción no se puede deshacer.</strong></>
+              ) : (
+                <>¿Confirmas la salida del transporte para esta orden? Se registrará la hora actual como la <strong className="text-[#0F172A]">hora de salida oficial</strong> para las estadísticas.</>
+              )}
+            </p>
+            
+            <div className="flex justify-end gap-3">
+              <button 
+                onClick={() => setConfirmAction(null)}
+                className="px-6 py-3 rounded-xl font-display font-bold text-sm bg-white border-2 border-[#E2E8F0] text-[#64748B] hover:border-[#94A3B8] hover:text-[#0F172A] transition-all"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={() => {
+                  if (confirmAction.type === 'delete') proceedDelete(confirmAction.order.id);
+                  else proceedLiberar(confirmAction.order);
+                }}
+                className={`px-6 py-3 rounded-xl font-display font-bold text-sm text-white transition-all flex items-center ${
+                  confirmAction.type === 'delete' ? 'bg-[#DC2626] hover:bg-[#B91C1C] shadow-[0_4px_0_#991B1B] active:shadow-[0_0px_0_#991B1B] active:translate-y-1' : 'bg-[#D97706] hover:bg-[#B45309] shadow-[0_4px_0_#92400E] active:shadow-[0_0px_0_#92400E] active:translate-y-1'
+                }`}
+              >
+                {confirmAction.type === 'delete' ? 'Sí, eliminar orden' : 'Sí, liberar camión'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
