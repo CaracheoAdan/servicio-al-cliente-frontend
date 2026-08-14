@@ -5,33 +5,26 @@ type Variant = 'forklifts' | 'drones' | 'tanks' | 'humanoids' | 'crane';
 const VARIANTS: Variant[] = ['forklifts', 'drones', 'tanks', 'humanoids', 'crane'];
 const DUR = 8;
 
-// ~62 boxes forming the exact shape of the Inter 800 "T"
-const BOXES = (() => {
-  const boxes = [];
-  // Stem: 8 rows (bottom to top), 4 cols
-  for (let row = 7; row >= 0; row--) {
-    const y = 54 + row * 12;
-    boxes.push({ x: 136, y, side: 'L' as const });
-    boxes.push({ x: 172, y, side: 'R' as const });
-    boxes.push({ x: 148, y, side: 'L' as const });
-    boxes.push({ x: 160, y, side: 'R' as const });
-  }
-  // Top bar: 3 rows (bottom to top), 10 cols
-  for (let row = 2; row >= 0; row--) {
-    const y = 18 + row * 12;
-    boxes.push({ x: 148, y, side: 'L' as const });
-    boxes.push({ x: 160, y, side: 'R' as const });
-    boxes.push({ x: 136, y, side: 'L' as const });
-    boxes.push({ x: 172, y, side: 'R' as const });
-    boxes.push({ x: 124, y, side: 'L' as const });
-    boxes.push({ x: 184, y, side: 'R' as const });
-    boxes.push({ x: 112, y, side: 'L' as const });
-    boxes.push({ x: 196, y, side: 'R' as const });
-    boxes.push({ x: 100, y, side: 'L' as const });
-    boxes.push({ x: 208, y, side: 'R' as const });
-  }
-  return boxes;
-})();
+// 14 box positions forming the T (28x28 boxes)
+// Build order: stem bottom-up, then top bar center-out
+const BOXES = [
+  // Stem bottom-up (centered at x=160: cols at 132, 160)
+  { x: 132, y: 132, side: 'L' as const },
+  { x: 160, y: 132, side: 'R' as const },
+  { x: 132, y: 104, side: 'L' as const },
+  { x: 160, y: 104, side: 'R' as const },
+  { x: 132, y: 76, side: 'L' as const },
+  { x: 160, y: 76, side: 'R' as const },
+  // Top bar center-out (8 cols symmetric around x=160)
+  { x: 132, y: 48, side: 'L' as const },
+  { x: 160, y: 48, side: 'R' as const },
+  { x: 104, y: 48, side: 'L' as const },
+  { x: 188, y: 48, side: 'R' as const },
+  { x: 76, y: 48, side: 'L' as const },
+  { x: 216, y: 48, side: 'R' as const },
+  { x: 48, y: 48, side: 'L' as const },
+  { x: 244, y: 48, side: 'R' as const },
+];
 
 const pct = (t: number): string => ((t / DUR) * 100).toFixed(2) + '%';
 
@@ -56,7 +49,7 @@ export function AnimatedLogoContainer() {
 
     // Box keyframes
     BOXES.forEach((box, i) => {
-      const st = 0.3 + i * 0.088;
+      const st = 0.3 + i * 0.38;
       const tt = st + 0.22;
       const lt = tt + 0.25;
 
@@ -79,7 +72,7 @@ export function AnimatedLogoContainer() {
           + pct(lt) + ',100%{transform:translate(' + box.x + 'px,' + box.y + 'px);opacity:1}'
           + '}\n';
       } else {
-        const cst = 0.3 + i * 0.088;
+        const cst = 0.3 + i * 0.38;
         const clt = cst + 0.25;
         css += '@keyframes b' + i + '{'
           + '0%,' + pct(cst) + '{transform:translate(' + box.x + 'px,36px);opacity:0}'
@@ -101,7 +94,7 @@ export function AnimatedLogoContainer() {
 
         BOXES.forEach((box, i) => {
           if (box.side !== side) return;
-          const st = 0.3 + i * 0.088;
+          const st = 0.3 + i * 0.38;
           const en = Math.max(0.05, st - 0.25);
           const tt = st + 0.22;
           const ex = tt + 0.25;
@@ -121,11 +114,11 @@ export function AnimatedLogoContainer() {
 
         BOXES.forEach((box, i) => {
           if (box.side !== side) return;
-          const st = 0.3 + i * 0.088;
+          const st = 0.3 + i * 0.38;
           const en = Math.max(0.05, st - 0.2);
           const tt = st + 0.22;
           const ex = tt + 0.2;
-          const bx = box.x + 6;
+          const bx = box.x + 14;
           const by = box.y - 20;
 
           kf += pct(en) + '{transform:translate(' + bx + 'px,-30px)} ';
@@ -141,9 +134,9 @@ export function AnimatedLogoContainer() {
       let kf = '@keyframes cr{0%{transform:translate(160px,0px)} ';
 
       BOXES.forEach((box, i) => {
-        const st = 0.3 + i * 0.088;
+        const st = 0.3 + i * 0.38;
         const lt = st + 0.25;
-        const bx = box.x + 6;
+        const bx = box.x + 14;
 
         kf += pct(Math.max(0.05, st - 0.08)) + '{transform:translate(' + bx + 'px,0px)} ';
         kf += pct(st) + '{transform:translate(' + bx + 'px,0px)} ';
@@ -165,6 +158,7 @@ export function AnimatedLogoContainer() {
   const commonCss = [
     '@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}',
     '@keyframes fadeIn{0%{opacity:0;transform:scale(0.95)}100%{opacity:1;transform:scale(1)}}',
+    '@keyframes pulse{0%,100%{filter:drop-shadow(0 2px 6px rgba(42,93,143,0.2))}50%{filter:drop-shadow(0 2px 14px rgba(42,93,143,0.5))}}',
   ].join('\n');
 
   // ─── Robot SVG ────────────────────────────────────────
@@ -278,9 +272,9 @@ export function AnimatedLogoContainer() {
             <g className="bf">
               {BOXES.map((_, i) => (
                 <g key={i} className={'ab' + i}>
-                  <rect width="12" height="12" rx="1.5" fill="#DEB887" stroke="#B48E5D" strokeWidth="0.5" />
-                  <rect x="2.5" y="5" width="7" height="2" rx="0.5" fill="#E6C280" />
-                  <path d="M 0 6 L 12 6" stroke="#B48E5D" strokeWidth="0.5" opacity="0.5" />
+                  <rect width="28" height="28" rx="3" fill="#DEB887" stroke="#B48E5D" strokeWidth="0.5" />
+                  <rect x="6" y="12" width="16" height="4" rx="1" fill="#E6C280" />
+                  <path d="M 0 14 L 28 14" stroke="#B48E5D" strokeWidth="0.5" opacity="0.5" />
                 </g>
               ))}
             </g>
@@ -296,17 +290,20 @@ export function AnimatedLogoContainer() {
             )}
           </svg>
         ) : (
-          <svg viewBox="0 0 320 200" className="w-full h-full fadeIn">
-            <text
-              x="160"
-              y="150"
-              textAnchor="middle"
-              fontFamily="'Inter', sans-serif"
-              fontWeight="800"
-              fontSize="180"
-              fill="#2A5D8F"
-              letterSpacing="-4"
-            >T</text>
+          <svg viewBox="0 0 320 200" className="w-full h-full fadeIn pulse">
+            <defs>
+              <linearGradient id="tG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#3B7AC0" />
+                <stop offset="100%" stopColor="#1E4D7A" />
+              </linearGradient>
+              <filter id="tS">
+                <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#1E3A5F" floodOpacity="0.25" />
+              </filter>
+            </defs>
+            <g filter="url(#tS)">
+              <rect x="48" y="20" width="224" height="56" rx="6" fill="url(#tG)" />
+              <rect x="132" y="20" width="56" height="140" rx="6" fill="url(#tG)" />
+            </g>
           </svg>
         )}
       </div>
