@@ -58,17 +58,6 @@ export function Header() {
         </div>
 
         <div className="flex items-center space-x-6">
-          <div className="hidden md:flex flex-col items-end">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[#64748B] dark:text-[#A1A1AA]">Progreso de Turno</span>
-              <span className="text-[10px] font-bold text-[#2A5D8F] dark:text-[#5BA3D9]">75%</span>
-            </div>
-            <div className="w-32 h-1.5 bg-[#EFF2F7] dark:bg-[#27272A] rounded-full overflow-hidden shadow-inner">
-              <div className="h-full bg-gradient-to-r from-[#1E4D73] to-[#5BA3D9] rounded-full" style={{ width: '75%' }}></div>
-            </div>
-          </div>
-          
-          <div className="h-8 w-px bg-[#E2E8F0] dark:bg-[#3F3F46]"></div>
 
           <button 
             onClick={handleLogout}
