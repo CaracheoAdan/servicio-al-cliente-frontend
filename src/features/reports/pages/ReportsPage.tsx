@@ -72,7 +72,7 @@ const RealTimeClock = () => {
   const formattedDate = dateString.charAt(0).toUpperCase() + dateString.slice(1);
 
   return (
-    <div className="bg-gradient-to-br from-[#BFDBFE] to-white border border-[#DBEAFE] rounded-3xl p-6 shadow-card-brand relative overflow-hidden flex items-center justify-between w-full lg:w-auto">
+    <div className="flex items-center justify-end w-full lg:w-auto relative z-10">
       <div className="flex items-center">
         <div className="flex-shrink-0 bg-white/80 backdrop-blur-md w-16 h-16 rounded-full flex items-center justify-center shadow-sm border border-white/60 mr-6 z-10">
           {isDay ? <Sun className="w-8 h-8 text-[#F59E0B]" /> : <Moon className="w-8 h-8 text-[#6366F1]" />}
@@ -89,8 +89,6 @@ const RealTimeClock = () => {
           </div>
         </div>
       </div>
-      {/* Decorative background elements */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
     </div>
   );
 };
@@ -116,17 +114,20 @@ export function ReportsPage() {
 
   return (
     <div className="space-y-8 animate-fade-in-up font-body">
-      <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
-        <div className="bg-gradient-to-r from-[#BFDBFE] to-white p-6 rounded-3xl shadow-card-brand border border-[#DBEAFE] flex-1 w-full h-full flex flex-col justify-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-32 h-32 bg-white/40 rounded-full blur-2xl -translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
-          <div className="font-display font-bold text-[#0F172A] text-xl flex items-center gap-3 mb-2 relative z-10">
+      <div className="bg-gradient-to-r from-[#BFDBFE] to-white p-6 md:p-8 rounded-3xl shadow-card-brand border border-[#DBEAFE] relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+        <div className="absolute top-0 left-0 w-48 h-48 bg-white/40 rounded-full blur-2xl -translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+        
+        <div className="flex-1 relative z-10">
+          <div className="font-display font-bold text-[#0F172A] text-2xl flex items-center gap-4 mb-2">
             <div className="flex-shrink-0 bg-white/80 backdrop-blur-md w-12 h-12 rounded-full flex items-center justify-center shadow-sm border border-white/60">
               <BarChart3 className="w-6 h-6 text-[#2A5D8F]" />
             </div>
             Inteligencia de Negocios
           </div>
-          <p className="text-[#475569] text-sm max-w-md relative z-10 font-medium">Monitoreo en tiempo real de operaciones, nivel de cumplimiento de surtido y picos de distribución de camiones.</p>
+          <p className="text-[#475569] text-sm md:text-base max-w-xl font-medium ml-16">Monitoreo en tiempo real de operaciones, nivel de cumplimiento de surtido y picos de distribución de camiones.</p>
         </div>
+
         <RealTimeClock />
       </div>
 
