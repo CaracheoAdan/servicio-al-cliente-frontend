@@ -279,14 +279,14 @@ export function OrderFormPage() {
               <button 
                 type="button" 
                 onClick={() => handleStatusToggle('produced')} 
-                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${isProduced ? 'bg-white dark:bg-[#333333] text-[#0F172A] dark:text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
+                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${isProduced ? 'bg-[#10B981] text-white shadow-[0_2px_0_#047857]' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
               >
                 Sí
               </button>
               <button 
                 type="button" 
                 onClick={() => handleStatusToggle('open')} 
-                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isProduced ? 'bg-white dark:bg-[#333333] text-[#0F172A] dark:text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
+                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isProduced ? 'bg-[#64748B] text-white shadow-[0_2px_0_#334155]' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
               >
                 No
               </button>
@@ -300,14 +300,14 @@ export function OrderFormPage() {
               <button 
                 type="button" 
                 onClick={() => handleStatusToggle('in_delivery')} 
-                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${isDelivered ? 'bg-white dark:bg-[#333333] text-[#0F172A] dark:text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
+                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${isDelivered ? 'bg-[#10B981] text-white shadow-[0_2px_0_#047857]' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
               >
                 Sí
               </button>
               <button 
                 type="button" 
                 onClick={() => handleStatusToggle('produced')} 
-                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isDelivered ? 'bg-white dark:bg-[#333333] text-[#0F172A] dark:text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
+                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isDelivered ? 'bg-[#64748B] text-white shadow-[0_2px_0_#334155]' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
               >
                 No
               </button>
