@@ -79,6 +79,7 @@ export const useReports = () => {
         const decimalTime = calculateDecimalTime(order.detail.shippingDate);
         if (decimalTime !== null) {
           transport.push({
+            order: order.key,
             time: decimalTime,
             label: `${Math.floor(decimalTime)}:${Math.round((decimalTime % 1) * 60).toString().padStart(2, '0')}`
           });
