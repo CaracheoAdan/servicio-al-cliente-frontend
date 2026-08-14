@@ -5,25 +5,24 @@ type Variant = 'forklifts' | 'drones' | 'tanks' | 'humanoids' | 'crane';
 const VARIANTS: Variant[] = ['forklifts', 'drones', 'tanks', 'humanoids', 'crane'];
 const DUR = 8;
 
-// 15 box positions forming the T (28x28 boxes)
-// Build order: stem bottom-up, then top bar center-out
+// 22 box positions forming the exact T typographic shape (20x20 boxes)
+// Stem is 5 rows x 2 cols. Top bar is 2 rows x 6 cols.
 const BOXES = [
-  // Stem bottom-up (centered at x=160: cols at 132, 160)
-  { x: 132, y: 132, side: 'L' as const },
-  { x: 160, y: 132, side: 'R' as const },
-  { x: 132, y: 104, side: 'L' as const },
-  { x: 160, y: 104, side: 'R' as const },
-  { x: 132, y: 76, side: 'L' as const },
-  { x: 160, y: 76, side: 'R' as const },
-  // Top bar center-out (8 cols symmetric around x=160)
-  { x: 132, y: 48, side: 'L' as const },
-  { x: 160, y: 48, side: 'R' as const },
-  { x: 104, y: 48, side: 'L' as const },
-  { x: 188, y: 48, side: 'R' as const },
-  { x: 76, y: 48, side: 'L' as const },
-  { x: 216, y: 48, side: 'R' as const },
-  { x: 48, y: 48, side: 'L' as const },
-  { x: 244, y: 48, side: 'R' as const },
+  // Stem (bottom up, 5 rows, 2 cols, width 40, centered at 160)
+  { x: 140, y: 130, side: 'L' as const }, { x: 160, y: 130, side: 'R' as const },
+  { x: 140, y: 110, side: 'L' as const }, { x: 160, y: 110, side: 'R' as const },
+  { x: 140, y: 90, side: 'L' as const }, { x: 160, y: 90, side: 'R' as const },
+  { x: 140, y: 70, side: 'L' as const }, { x: 160, y: 70, side: 'R' as const },
+  { x: 140, y: 50, side: 'L' as const }, { x: 160, y: 50, side: 'R' as const },
+  
+  // Top bar (bottom up, 2 rows, center out, width 120, centered at 160)
+  { x: 140, y: 30, side: 'L' as const }, { x: 160, y: 30, side: 'R' as const },
+  { x: 120, y: 30, side: 'L' as const }, { x: 180, y: 30, side: 'R' as const },
+  { x: 100, y: 30, side: 'L' as const }, { x: 200, y: 30, side: 'R' as const },
+  
+  { x: 140, y: 10, side: 'L' as const }, { x: 160, y: 10, side: 'R' as const },
+  { x: 120, y: 10, side: 'L' as const }, { x: 180, y: 10, side: 'R' as const },
+  { x: 100, y: 10, side: 'L' as const }, { x: 200, y: 10, side: 'R' as const },
 ];
 
 const pct = (t: number): string => ((t / DUR) * 100).toFixed(2) + '%';
@@ -49,7 +48,7 @@ export function AnimatedLogoContainer() {
 
     // Box keyframes
     BOXES.forEach((box, i) => {
-      const st = 0.3 + i * 0.38;
+      const st = 0.3 + i * 0.24;
       const tt = st + 0.22;
       const lt = tt + 0.25;
 
@@ -72,7 +71,7 @@ export function AnimatedLogoContainer() {
           + pct(lt) + ',100%{transform:translate(' + box.x + 'px,' + box.y + 'px);opacity:1}'
           + '}\n';
       } else {
-        const cst = 0.3 + i * 0.38;
+        const cst = 0.3 + i * 0.24;
         const clt = cst + 0.25;
         css += '@keyframes b' + i + '{'
           + '0%,' + pct(cst) + '{transform:translate(' + box.x + 'px,36px);opacity:0}'
@@ -94,7 +93,7 @@ export function AnimatedLogoContainer() {
 
         BOXES.forEach((box, i) => {
           if (box.side !== side) return;
-          const st = 0.3 + i * 0.38;
+          const st = 0.3 + i * 0.24;
           const en = Math.max(0.05, st - 0.25);
           const tt = st + 0.22;
           const ex = tt + 0.25;
@@ -114,11 +113,11 @@ export function AnimatedLogoContainer() {
 
         BOXES.forEach((box, i) => {
           if (box.side !== side) return;
-          const st = 0.3 + i * 0.38;
+          const st = 0.3 + i * 0.24;
           const en = Math.max(0.05, st - 0.2);
           const tt = st + 0.22;
           const ex = tt + 0.2;
-          const bx = box.x + 14;
+          const bx = box.x + 10;
           const by = box.y - 20;
 
           kf += pct(en) + '{transform:translate(' + bx + 'px,-30px)} ';
@@ -134,9 +133,9 @@ export function AnimatedLogoContainer() {
       let kf = '@keyframes cr{0%{transform:translate(160px,0px)} ';
 
       BOXES.forEach((box, i) => {
-        const st = 0.3 + i * 0.38;
+        const st = 0.3 + i * 0.24;
         const lt = st + 0.25;
-        const bx = box.x + 14;
+        const bx = box.x + 10;
 
         kf += pct(Math.max(0.05, st - 0.08)) + '{transform:translate(' + bx + 'px,0px)} ';
         kf += pct(st) + '{transform:translate(' + bx + 'px,0px)} ';
@@ -158,10 +157,6 @@ export function AnimatedLogoContainer() {
   const commonCss = [
     '@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}',
     '@keyframes fadeIn{0%{opacity:0;transform:scale(0.95)}100%{opacity:1;transform:scale(1)}}',
-    '@keyframes pulse{0%,100%{filter:drop-shadow(0 2px 6px rgba(42,93,143,0.2))}50%{filter:drop-shadow(0 2px 14px rgba(42,93,143,0.5))}}',
-    '.bob{animation:bob 0.25s infinite}',
-    '.fadeIn{animation:fadeIn 0.6s ease-out forwards}',
-    '.pulse{animation:pulse 3s ease-in-out infinite}',
   ].join('\n');
 
   // ─── Robot SVG ────────────────────────────────────────
@@ -275,9 +270,9 @@ export function AnimatedLogoContainer() {
             <g className="bf">
               {BOXES.map((_, i) => (
                 <g key={i} className={'ab' + i}>
-                  <rect width="28" height="28" rx="3" fill="#DEB887" stroke="#B48E5D" strokeWidth="0.5" />
-                  <rect x="6" y="12" width="16" height="4" rx="1" fill="#E6C280" />
-                  <path d="M 0 14 L 28 14" stroke="#B48E5D" strokeWidth="0.5" opacity="0.5" />
+                  <rect width="20" height="20" rx="2" fill="#DEB887" stroke="#B48E5D" strokeWidth="0.5" />
+                  <rect x="4" y="8" width="12" height="4" rx="1" fill="#E6C280" />
+                  <path d="M 0 10 L 20 10" stroke="#B48E5D" strokeWidth="0.5" opacity="0.5" />
                 </g>
               ))}
             </g>
