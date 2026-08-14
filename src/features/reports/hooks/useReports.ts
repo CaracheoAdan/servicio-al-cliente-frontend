@@ -64,7 +64,8 @@ export const calculateDecimalTime = (dateString: string): number | null => {
 export const useReports = () => {
   const { data: orders = [], isLoading: loading, error } = useQuery<CombinedOrder[], Error>({
     queryKey: ['combinedOrders'],
-    queryFn: () => orderService.getAllCombinedOrders()
+    queryFn: () => orderService.getAllCombinedOrders(),
+    refetchInterval: 15000, // Refetch every 15 seconds automatically
   });
 
   // useMemo used to optimize heavy client-side processing

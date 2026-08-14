@@ -46,6 +46,33 @@ const CustomFulfillmentTooltip = ({ active, payload, label }: any) => {
 
 import { useReports } from '../hooks/useReports';
 
+const RealTimeClock = () => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="bg-[#0F172A] border border-[#1E293B] px-5 py-2.5 rounded-2xl flex items-center shadow-lg relative z-10 overflow-hidden group transition-all duration-300 hover:shadow-[#2A5D8F]/20 hover:border-[#2A5D8F]">
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#2A5D8F]/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+      
+      {/* Animated glowing dot */}
+      <div className="relative flex h-3 w-3 mr-3">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#38BDF8] opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-3 w-3 bg-[#0EA5E9] shadow-[0_0_8px_#38BDF8]"></span>
+      </div>
+      
+      <span className="text-sm font-display font-bold text-[#94A3B8]">
+        En vivo: <span className="font-mono ml-1 text-[#38BDF8] tracking-wider text-base tabular-nums drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]">
+          {time.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+        </span>
+      </span>
+    </div>
+  );
+};
+
 export function ReportsPage() {
   const { loading, error, transportData, fulfillmentData, latestOrder, generalMetrics } = useReports();
 
@@ -72,12 +99,7 @@ export function ReportsPage() {
           <BarChart3 className="w-5 h-5 text-[#2A5D8F]" />
           Métricas en Tiempo Real
         </div>
-        <div className="bg-[#F8FAFC] border border-[#E2E8F0] px-5 py-2.5 rounded-2xl flex items-center shadow-sm relative z-10">
-          <Clock className="w-4 h-4 text-[#2A5D8F] mr-2" />
-          <span className="text-sm font-display font-bold text-[#0F172A]">
-            Última actualización: <span className="font-mono ml-1">{new Date().toLocaleTimeString()}</span>
-          </span>
-        </div>
+        <RealTimeClock />
       </div>
 
       {loading ? (
