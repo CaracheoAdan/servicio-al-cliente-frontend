@@ -1,125 +1,166 @@
 import React from 'react';
 
-// Componente: Robot "T" Drone Builder
-// Animación épica de 12 segundos donde un drone futurista construye el logo caja por caja
+// Componente: Flotilla de Robots "T" Builder
+// Animación SVG masiva: 2 montacargas construyendo la T con cajas grandes
 export function AnimatedLogoContainer() {
   return (
     <div className="mx-auto w-full max-w-[320px] h-52 mb-8 relative">
       <style>
         {`
-          @keyframes robotMove {
-            0%       { transform: translate(-50px, 145px); }
-            5%, 10%  { transform: translate(135px, 145px); }
-            15%      { transform: translate(-50px, 145px); }
-            16%      { transform: translate(-50px, 125px); }
-            20%, 25% { transform: translate(135px, 125px); }
-            30%      { transform: translate(-50px, 125px); }
-            31%      { transform: translate(-50px, 105px); }
-            35%, 40% { transform: translate(135px, 105px); }
-            45%      { transform: translate(-50px, 105px); }
-            50%, 55% { transform: translate(115px, 105px); }
-            60%      { transform: translate(-50px, 105px); }
-            65%, 70% { transform: translate(155px, 105px); }
-            75%, 100%{ transform: translate(40px, 145px); }
+          @keyframes robotLeftMove {
+            0%       { transform: translate(-80px, 0); }
+            5%, 10%  { transform: translate(104px, 0); }
+            15%      { transform: translate(-80px, 0); }
+            30%      { transform: translate(-80px, 0); }
+            35%, 40% { transform: translate(104px, 0); }
+            45%      { transform: translate(-80px, 0); }
+            50%, 55% { transform: translate(64px, 0); }
+            60%, 100%{ transform: translate(-20px, 0); }
+          }
+          @keyframes forkLeftMove {
+            0%, 5%   { transform: translateY(170px); }
+            10%, 15% { transform: translateY(180px); }
+            30%, 35% { transform: translateY(90px); }
+            40%, 45% { transform: translateY(100px); }
+            50%, 55% { transform: translateY(90px); }
+            60%, 100%{ transform: translateY(180px); }
+          }
+          @keyframes robotRightMove {
+            0%, 15%  { transform: translate(400px, 0); }
+            20%, 25% { transform: translate(216px, 0); }
+            30%, 45% { transform: translate(400px, 0); }
+            50%, 55% { transform: translate(256px, 0); }
+            60%, 100%{ transform: translate(340px, 0); }
+          }
+          @keyframes forkRightMove {
+            0%, 20%  { transform: translateY(130px); }
+            25%, 30% { transform: translateY(140px); }
+            45%, 50% { transform: translateY(90px); }
+            55%, 60% { transform: translateY(100px); }
+            65%, 100%{ transform: translateY(180px); }
           }
           @keyframes box1Move {
-            0%       { transform: translate(-35px, 150px); opacity: 0; }
+            0%       { transform: translate(-44px, 130px); opacity: 0; }
             1%       { opacity: 1; }
-            5%, 100% { transform: translate(150px, 150px); opacity: 1; }
+            5%       { transform: translate(140px, 130px); opacity: 1; }
+            10%, 100%{ transform: translate(140px, 140px); opacity: 1; }
           }
           @keyframes box2Move {
-            0%, 15%  { transform: translate(-35px, 130px); opacity: 0; }
+            0%, 15%  { transform: translate(324px, 90px); opacity: 0; }
             16%      { opacity: 1; }
-            20%, 100%{ transform: translate(150px, 130px); opacity: 1; }
+            20%      { transform: translate(140px, 90px); opacity: 1; }
+            25%, 100%{ transform: translate(140px, 100px); opacity: 1; }
           }
           @keyframes box3Move {
-            0%, 30%  { transform: translate(-35px, 110px); opacity: 0; }
+            0%, 30%  { transform: translate(-44px, 50px); opacity: 0; }
             31%      { opacity: 1; }
-            35%, 100%{ transform: translate(150px, 110px); opacity: 1; }
+            35%      { transform: translate(140px, 50px); opacity: 1; }
+            40%, 100%{ transform: translate(140px, 60px); opacity: 1; }
           }
           @keyframes box4Move {
-            0%, 45%  { transform: translate(-35px, 110px); opacity: 0; }
+            0%, 45%  { transform: translate(-44px, 50px); opacity: 0; }
             46%      { opacity: 1; }
-            50%, 100%{ transform: translate(130px, 110px); opacity: 1; }
+            50%      { transform: translate(100px, 50px); opacity: 1; }
+            55%, 100%{ transform: translate(100px, 60px); opacity: 1; }
           }
           @keyframes box5Move {
-            0%, 60%  { transform: translate(-35px, 110px); opacity: 0; }
-            61%      { opacity: 1; }
-            65%, 100%{ transform: translate(170px, 110px); opacity: 1; }
+            0%, 45%  { transform: translate(324px, 50px); opacity: 0; }
+            46%      { opacity: 1; }
+            50%      { transform: translate(180px, 50px); opacity: 1; }
+            55%, 100%{ transform: translate(180px, 60px); opacity: 1; }
           }
           @keyframes colorTransform {
-            0%, 78% { fill: #DEB887; stroke: #B48E5D; stroke-width: 1px; }
-            80%, 82% { fill: #FFFFFF; stroke: #FFFFFF; stroke-width: 2px; filter: drop-shadow(0 0 12px #5BA3D9); }
-            85%, 100% { fill: #2A5D8F; stroke: #2A5D8F; stroke-width: 0px; filter: drop-shadow(0 0 0px transparent); }
+            0%, 68% { fill: #DEB887; stroke: #B48E5D; stroke-width: 1px; }
+            72%, 75% { fill: #FFFFFF; stroke: #FFFFFF; stroke-width: 2px; filter: drop-shadow(0 0 15px #5BA3D9); }
+            80%, 100% { fill: #2A5D8F; stroke: #2A5D8F; stroke-width: 0px; filter: drop-shadow(0 0 0px transparent); }
           }
           @keyframes tapeFade {
-            0%, 78% { opacity: 1; fill: #E6C280; }
-            80%, 100% { opacity: 0; }
+            0%, 68% { opacity: 1; fill: #E6C280; }
+            72%, 100% { opacity: 0; }
           }
-          @keyframes thrusterFlicker {
-            0%, 100% { transform: scaleY(1); opacity: 0.8; }
-            50% { transform: scaleY(1.4); opacity: 1; }
-          }
-          @keyframes robotHoverAnim {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-4px); }
-          }
-          @keyframes eyeBlink {
-            0%, 88%, 92%, 96%, 100% { transform: scaleY(1); }
-            90%, 94% { transform: scaleY(0.1); }
+          @keyframes sirenFlash {
+            0%, 100% { fill: #EF4444; filter: drop-shadow(0 0 0px transparent); }
+            50% { fill: #FCA5A5; filter: drop-shadow(0 0 8px #EF4444); }
           }
           @keyframes popIn {
             0% { transform: scale(0.9); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
           }
+
+          .anim-robot-left { animation: robotLeftMove 10s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+          .anim-fork-left { animation: forkLeftMove 10s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+          .anim-robot-right { animation: robotRightMove 10s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+          .anim-fork-right { animation: forkRightMove 10s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
           
-          .anim-robot { animation: robotMove 12s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-          .anim-robot-hover { animation: robotHoverAnim 2s ease-in-out infinite; }
-          .anim-box1 { animation: box1Move 12s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-          .anim-box2 { animation: box2Move 12s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-          .anim-box3 { animation: box3Move 12s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-          .anim-box4 { animation: box4Move 12s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-          .anim-box5 { animation: box5Move 12s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-          .anim-color { animation: colorTransform 12s ease-out forwards; }
-          .anim-tape { animation: tapeFade 12s ease-out forwards; }
-          .anim-thruster { animation: thrusterFlicker 0.15s infinite; transform-origin: top; }
-          .anim-eye { animation: eyeBlink 12s linear infinite; transform-origin: 8px 2px; }
+          .anim-box1 { animation: box1Move 10s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+          .anim-box2 { animation: box2Move 10s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+          .anim-box3 { animation: box3Move 10s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+          .anim-box4 { animation: box4Move 10s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+          .anim-box5 { animation: box5Move 10s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+          
+          .anim-color { animation: colorTransform 10s ease-out forwards; }
+          .anim-tape { animation: tapeFade 10s ease-out forwards; }
+          .anim-siren { animation: sirenFlash 0.5s infinite; }
         `}
       </style>
       
       <div className="w-full h-full bg-white rounded-3xl flex items-center justify-center shadow-2xl relative overflow-hidden animate-pop-in">
         <svg viewBox="0 0 320 200" className="w-full h-full">
-          {/* Suelo punteado */}
-          <line x1="20" y1="170" x2="300" y2="170" stroke="#E2E8F0" strokeWidth="2" strokeDasharray="6 6" strokeLinecap="round" />
+          <defs>
+            <g id="forklift">
+              {/* Mast */}
+              <rect x="26" y="50" width="8" height="130" rx="2" fill="#64748B" />
+              <rect x="30" y="50" width="2" height="130" fill="#94A3B8" />
+              {/* Body */}
+              <path d="M -15 140 L 20 140 L 26 170 L -10 170 Z" fill="#EAB308" />
+              {/* Cabin */}
+              <path d="M -5 140 L -5 100 L 15 100 L 20 140 Z" fill="#0F172A" opacity="0.8" />
+              <rect x="-8" y="96" width="26" height="4" rx="2" fill="#1E293B" />
+              <path d="M -15 140 L -25 140 L -25 160 L -10 170 Z" fill="#334155" />
+              {/* Wheels */}
+              <circle cx="-5" cy="170" r="12" fill="#0F172A" />
+              <circle cx="-5" cy="170" r="5" fill="#94A3B8" />
+              <circle cx="18" cy="170" r="10" fill="#0F172A" />
+              <circle cx="18" cy="170" r="4" fill="#94A3B8" />
+              {/* Siren */}
+              <circle cx="-2" cy="92" r="3" className="anim-siren" />
+            </g>
+            <g id="box">
+              <rect width="40" height="40" rx="3" className="anim-color" />
+              <rect x="10" y="16" width="20" height="8" rx="1" className="anim-tape" />
+              <path d="M 0 20 L 40 20" stroke="#B48E5D" strokeWidth="1" className="anim-tape" opacity="0.5" />
+            </g>
+          </defs>
 
-          {/* Grupo de la T (Las 5 cajas) */}
+          {/* Suelo */}
+          <line x1="0" y1="182" x2="320" y2="182" stroke="#E2E8F0" strokeWidth="3" strokeDasharray="8 8" strokeLinecap="round" />
+
+          {/* Las 5 cajas gigantes */}
           <g>
-            <g className="anim-box1"><rect width="20" height="20" rx="2" className="anim-color"/><rect x="5" y="8" width="10" height="4" rx="1" className="anim-tape"/></g>
-            <g className="anim-box2"><rect width="20" height="20" rx="2" className="anim-color"/><rect x="5" y="8" width="10" height="4" rx="1" className="anim-tape"/></g>
-            <g className="anim-box3"><rect width="20" height="20" rx="2" className="anim-color"/><rect x="5" y="8" width="10" height="4" rx="1" className="anim-tape"/></g>
-            <g className="anim-box4"><rect width="20" height="20" rx="2" className="anim-color"/><rect x="5" y="8" width="10" height="4" rx="1" className="anim-tape"/></g>
-            <g className="anim-box5"><rect width="20" height="20" rx="2" className="anim-color"/><rect x="5" y="8" width="10" height="4" rx="1" className="anim-tape"/></g>
+            <g className="anim-box1"><use href="#box" /></g>
+            <g className="anim-box2"><use href="#box" /></g>
+            <g className="anim-box3"><use href="#box" /></g>
+            <g className="anim-box4"><use href="#box" /></g>
+            <g className="anim-box5"><use href="#box" /></g>
           </g>
 
-          {/* Drone Robot */}
-          <g className="anim-robot">
-            <g className="anim-robot-hover">
-              {/* Fuego del propulsor */}
-              <path d="M -8 15 L 0 15 L -4 30 Z" fill="#06B6D4" opacity="0.6" className="anim-thruster" />
-              <path d="M -6 15 L -2 15 L -4 25 Z" fill="#FFFFFF" className="anim-thruster" />
-              <rect x="-10" y="10" width="12" height="6" rx="2" fill="#1E293B" />
-              
-              {/* Chasis */}
-              <path d="M -15 -10 L 5 -10 L 15 0 L 10 12 L -12 12 Z" fill="#94A3B8" />
-              <path d="M -10 -5 L 2 -5 L 8 2 L 5 8 L -8 8 Z" fill="#64748B" />
-              
-              {/* Visor y Ojo */}
-              <path d="M 5 -5 L 15 0 L 10 8 L 2 8 Z" fill="#0F172A" />
-              <circle cx="8" cy="2" r="2" fill="#06B6D4" className="anim-eye" />
-              
-              {/* Brazo Mecánico */}
-              <path d="M 0 5 L 12 5 L 16 15" fill="none" stroke="#334155" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M 14 10 L 18 15 L 14 20" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          {/* Robot Izquierdo */}
+          <g className="anim-robot-left">
+            <use href="#forklift" />
+            <g className="anim-fork-left">
+              <rect x="32" y="-20" width="4" height="24" rx="1" fill="#334155" />
+              <path d="M 36 0 L 76 0 L 76 4 L 36 4 Z" fill="#F59E0B" />
+            </g>
+          </g>
+
+          {/* Robot Derecho (Espejo) */}
+          <g className="anim-robot-right">
+            <g transform="scale(-1, 1)">
+              <use href="#forklift" />
+              <g className="anim-fork-right">
+                <rect x="32" y="-20" width="4" height="24" rx="1" fill="#334155" />
+                <path d="M 36 0 L 76 0 L 76 4 L 36 4 Z" fill="#F59E0B" />
+              </g>
             </g>
           </g>
         </svg>
