@@ -98,6 +98,66 @@ html.dark .dashboard-main {
   background: #0F172A !important;
 }
 
+/* ── Form & Content Dark Mode Overrides ──────────────── */
+html.dark .dashboard-main .bg-white,
+html.dark .fixed .bg-white {
+  background-color: #1E293B !important;
+  border-color: #334155 !important;
+}
+
+html.dark .dashboard-main .bg-\[\#F8FAFC\],
+html.dark .fixed .bg-\[\#F8FAFC\] {
+  background-color: #0F172A !important;
+  border-color: #334155 !important;
+}
+
+html.dark .dashboard-main .bg-\[\#EFF6FF\],
+html.dark .fixed .bg-\[\#EFF6FF\] {
+  background-color: #334155 !important;
+  border-color: #475569 !important;
+}
+
+html.dark .dashboard-main .border-\[\#E2E8F0\],
+html.dark .fixed .border-\[\#E2E8F0\] {
+  border-color: #334155 !important;
+}
+
+html.dark .dashboard-main .text-\[\#0F172A\],
+html.dark .fixed .text-\[\#0F172A\] {
+  color: #F1F5F9 !important;
+}
+
+html.dark .dashboard-main .text-\[\#64748B\],
+html.dark .fixed .text-\[\#64748B\] {
+  color: #94A3B8 !important;
+}
+
+/* Inputs, Selects, and Tables */
+html.dark .dashboard-main input,
+html.dark .dashboard-main select,
+html.dark .fixed input,
+html.dark .fixed select {
+  background-color: #0F172A !important;
+  border-color: #475569 !important;
+  color: #F1F5F9 !important;
+}
+
+html.dark .dashboard-main th,
+html.dark .fixed th {
+  background-color: #0F172A !important;
+  border-color: #334155 !important;
+}
+
+html.dark .dashboard-main tr:hover,
+html.dark .fixed tr:hover {
+  background-color: #1E293B !important;
+}
+
+html.dark .dashboard-main td,
+html.dark .fixed td {
+  border-color: #334155 !important;
+}
+
 @layer utilities {
   .blob-breathe {
     animation: blobBreathe 8s ease-in-out infinite;
