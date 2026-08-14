@@ -12,22 +12,35 @@ type PhysicsBox = {
   color: string;
 };
 
-// Componente: Chibi Robots Builders & Physics Engine
-// Una maravilla interactiva donde robots humanoides tiran cajas haciendo un arco perfecto.
-// Al terminar, corren por la pantalla y si pasas el mouse, explotan cajas físicas por todos lados.
+// Configuración de la secuencia de construcción (15 segundos)
+const TOTAL_TIME = 15;
+// T construida con 8 cajitas (20x20). Centro X = 160. Suelo Y = 180 (Base en 160).
+const trips = [
+  { r: 1, s: 0,    t: 1.5,  e: 3.0,  side: 'L', tx: 110, bx: 150, by: 160 },
+  { r: 2, s: 1.5,  t: 3.0,  e: 4.5,  side: 'R', tx: 210, bx: 150, by: 140 },
+  { r: 3, s: 3.0,  t: 4.5,  e: 6.0,  side: 'L', tx: 110, bx: 150, by: 120 },
+  { r: 4, s: 4.5,  t: 6.0,  e: 7.5,  side: 'R', tx: 210, bx: 150, by: 100 },
+  { r: 1, s: 6.0,  t: 7.5,  e: 9.0,  side: 'L', tx: 90,  bx: 130, by: 100 },
+  { r: 2, s: 7.5,  t: 9.0,  e: 10.5, side: 'R', tx: 230, bx: 170, by: 100 },
+  { r: 3, s: 9.0,  t: 10.5, e: 12.0, side: 'L', tx: 70,  bx: 110, by: 100 },
+  { r: 4, s: 10.5, t: 12.0, e: 13.5, side: 'R', tx: 250, bx: 190, by: 100 },
+];
+
+const p = (t: number) => ((t / TOTAL_TIME) * 100).toFixed(2) + '%';
+
 export function AnimatedLogoContainer() {
   const [phase, setPhase] = useState<'build' | 'loop'>('build');
   const [physicsBoxes, setPhysicsBoxes] = useState<PhysicsBox[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const lastThrow = useRef<number>(0);
 
-  // Terminar construcción a los 8 segundos
+  // Transición a la fase de loop al terminar (15s)
   useEffect(() => {
-    const timer = setTimeout(() => setPhase('loop'), 8000);
+    const timer = setTimeout(() => setPhase('loop'), TOTAL_TIME * 1000);
     return () => clearTimeout(timer);
   }, []);
 
-  // Motor de Físicas de Gravedad a 60 FPS
+  // Motor de físicas a 60 FPS
   useEffect(() => {
     let frame: number;
     const update = () => {
@@ -39,7 +52,7 @@ export function AnimatedLogoContainer() {
           y: b.y + b.vy,
           vy: b.vy + 0.8, // Gravedad
           rot: b.rot + b.vr
-        })).filter(b => b.y < window.innerHeight + 100); // Eliminar al salir de pantalla
+        })).filter(b => b.y < window.innerHeight + 100);
       });
       frame = requestAnimationFrame(update);
     };
@@ -47,119 +60,142 @@ export function AnimatedLogoContainer() {
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  // Lanzar cajas interactivas con el mouse
-  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
+  // Erupción de cajas desde la posición visual exacta del robot activo
+  const handleMouseMove = () => {
     const now = Date.now();
-    if (now - lastThrow.current > 40) { // Disparo ultra rápido (metralleta de cajas)
+    if (now - lastThrow.current > 40) {
       lastThrow.current = now;
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
       
-      // Origen de la erupción (centro del contenedor)
-      const spawnX = rect.left + rect.width / 2;
-      const spawnY = rect.top + rect.height / 2 + 50;
+      // Encontrar los robots en pantalla
+      const bots = [1, 2, 3, 4].map(i => document.getElementById(`robot-${i}`)).filter(Boolean) as HTMLElement[];
+      const activeBots = bots.filter(b => {
+         const rect = b.getBoundingClientRect();
+         return rect.left > 0 && rect.right < window.innerWidth;
+      });
+      
+      const sourceBot = activeBots.length > 0 
+        ? activeBots[Math.floor(Math.random() * activeBots.length)]
+        : bots[0]; // fallback
+        
+      if (!sourceBot) return;
 
-      setPhysicsBoxes(prev => [...prev, {
-        id: Math.random(),
-        x: spawnX + (Math.random() * 60 - 30),
-        y: spawnY + (Math.random() * 20 - 10),
-        vx: (Math.random() - 0.5) * 35, // Explosión horizontal
-        vy: -15 - Math.random() * 25,   // Salto vertical fuerte
-        vr: (Math.random() - 0.5) * 45, // Rotación loca
-        rot: 0,
-        color: Math.random() > 0.3 ? '#DEB887' : '#2A5D8F'
-      }]);
+      const rect = sourceBot.getBoundingClientRect();
+      const spawnX = rect.left + rect.width / 2;
+      const spawnY = rect.top + rect.height / 2;
+
+      setPhysicsBoxes(prev => {
+        const newBoxes = [];
+        for(let i=0; i<2; i++) {
+          newBoxes.push({
+            id: Math.random(),
+            x: spawnX,
+            y: spawnY,
+            vx: (Math.random() - 0.5) * 40,
+            vy: -10 - Math.random() * 25,
+            vr: (Math.random() - 0.5) * 50,
+            rot: 0,
+            color: Math.random() > 0.4 ? '#DEB887' : '#2A5D8F'
+          });
+        }
+        return [...prev, ...newBoxes];
+      });
     }
   };
 
-  const cssBuild = `
-    @keyframes hLeftRun {
-      0%, 2% { transform: translate(-50px, 135px); }
-      10%    { transform: translate(60px, 135px); }
-      15%, 25% { transform: translate(-50px, 135px); }
-      35%    { transform: translate(60px, 135px); }
-      40%, 50% { transform: translate(-50px, 135px); }
-      60%    { transform: translate(60px, 135px); }
-      65%, 100%{ transform: translate(0px, 135px); }
-    }
-    @keyframes hRightRun {
-      0%, 15%  { transform: translate(350px, 135px) scaleX(-1); }
-      22%      { transform: translate(220px, 135px) scaleX(-1); }
-      27%, 37% { transform: translate(350px, 135px) scaleX(-1); }
-      47%      { transform: translate(220px, 135px) scaleX(-1); }
-      52%, 100%{ transform: translate(280px, 135px) scaleX(-1); }
-    }
-    @keyframes box1Toss {
-      0%, 5%   { transform: translate(-50px, 120px); opacity: 0; }
-      10%      { transform: translate(60px, 120px); opacity: 1; }
-      12.5%    { transform: translate(100px, 80px) rotate(180deg); }
-      15%, 100%{ transform: translate(140px, 140px) rotate(360deg); opacity: 1; }
-    }
-    @keyframes box2Toss {
-      0%, 17%  { transform: translate(350px, 120px); opacity: 0; }
-      22%      { transform: translate(220px, 120px); opacity: 1; }
-      24.5%    { transform: translate(180px, 40px) rotate(-180deg); }
-      27%, 100%{ transform: translate(140px, 100px) rotate(-360deg); opacity: 1; }
-    }
-    @keyframes box3Toss {
-      0%, 30%  { transform: translate(-50px, 120px); opacity: 0; }
-      35%      { transform: translate(60px, 120px); opacity: 1; }
-      37.5%    { transform: translate(100px, 0px) rotate(180deg); }
-      40%, 100%{ transform: translate(140px, 60px) rotate(360deg); opacity: 1; }
-    }
-    @keyframes box5Toss {
-      0%, 42%  { transform: translate(350px, 120px); opacity: 0; }
-      47%      { transform: translate(220px, 120px); opacity: 1; }
-      49.5%    { transform: translate(200px, 0px) rotate(-180deg); }
-      52%, 100%{ transform: translate(180px, 60px) rotate(-360deg); opacity: 1; }
-    }
-    @keyframes box4Toss {
-      0%, 55%  { transform: translate(-50px, 120px); opacity: 0; }
-      60%      { transform: translate(60px, 120px); opacity: 1; }
-      62.5%    { transform: translate(80px, 0px) rotate(180deg); }
-      65%, 100%{ transform: translate(100px, 60px) rotate(360deg); opacity: 1; }
-    }
-    @keyframes colorTransform {
-      0%, 75% { fill: #DEB887; stroke: #B48E5D; stroke-width: 1px; }
-      78%, 82% { fill: #FFFFFF; stroke: #FFFFFF; stroke-width: 2px; filter: drop-shadow(0 0 15px #5BA3D9); }
-      85%, 100% { fill: #2A5D8F; stroke: #2A5D8F; stroke-width: 0px; filter: drop-shadow(0 0 0px transparent); }
-    }
-    @keyframes tapeFade {
-      0%, 75% { opacity: 1; fill: #E6C280; }
-      78%, 100% { opacity: 0; }
-    }
-    .b-h-left { animation: hLeftRun 8s ease-in-out forwards; }
-    .b-h-right { animation: hRightRun 8s ease-in-out forwards; }
-    .b-box1 { animation: box1Toss 8s linear forwards; }
-    .b-box2 { animation: box2Toss 8s linear forwards; }
-    .b-box3 { animation: box3Toss 8s linear forwards; }
-    .b-box4 { animation: box4Toss 8s linear forwards; }
-    .b-box5 { animation: box5Toss 8s linear forwards; }
-    .anim-color { animation: colorTransform 8s ease-out forwards; }
-    .anim-tape { animation: tapeFade 8s ease-out forwards; }
-    .leg-anim { animation: scissor 0.3s infinite alternate linear; transform-origin: top; }
-    .leg-anim-rev { animation: scissor 0.3s infinite alternate-reverse linear; transform-origin: top; }
-    @keyframes scissor { from { transform: rotate(-25deg); } to { transform: rotate(25deg); } }
-    @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-  `;
+  // Generador de CSS dinámico para sincronizar los 4 robots y 8 cajas
+  const getDynamicCss = () => {
+    let boxCss = '';
+    trips.forEach((trip, i) => {
+      const tStart = trip.s;
+      const tThrow = trip.t;
+      const tLand = trip.t + 0.5;
+      const tReach = trip.t - 0.2;
+      const startX = trip.side === 'L' ? -40 : 340;
+      
+      boxCss += `
+        @keyframes box${i}Anim {
+          0%, ${p(tStart)} { transform: translate(${startX}px, 160px); opacity: 0; }
+          ${p(tStart + 0.05)} { opacity: 1; }
+          ${p(tReach)}, ${p(tThrow)} { transform: translate(${trip.tx + (trip.side === 'L' ? 12 : -12)}px, 150px); opacity: 1; }
+          ${p((tThrow + tLand) / 2)} { transform: translate(${(trip.tx + trip.bx) / 2}px, ${trip.by - 40}px) rotate(${trip.side === 'L' ? 180 : -180}deg); }
+          ${p(tLand)}, 100% { transform: translate(${trip.bx}px, ${trip.by}px) rotate(${trip.side === 'L' ? 360 : -360}deg); opacity: 1; }
+        }
+        .b-box${i} { animation: box${i}Anim ${TOTAL_TIME}s linear forwards; transform-origin: 10px 10px; }
+      `;
+    });
 
-  const cssLoop = `
-    @keyframes runAc {
-      0% { transform: translate(-80px, 135px); }
-      100% { transform: translate(350px, 135px); }
+    let robotCss = '';
+    for (let r = 1; r <= 4; r++) {
+      const rTrips = trips.filter(t => t.r === r);
+      if (rTrips.length === 0) continue;
+      
+      const side = rTrips[0].side;
+      const startX = side === 'L' ? -40 : 340;
+      const scale = side === 'L' ? 1 : -1;
+      
+      let kf = `@keyframes robot${r}Anim {`;
+      kf += `0% { transform: translate(${startX}px, 160px) scaleX(${scale}); }`;
+      
+      rTrips.forEach(trip => {
+        const tReach = trip.t - 0.2;
+        kf += `
+          ${p(trip.s)} { transform: translate(${startX}px, 160px) scaleX(${scale}); }
+          ${p(tReach)}, ${p(trip.t)} { transform: translate(${trip.tx}px, 160px) scaleX(${scale}); }
+          ${p(trip.e)} { transform: translate(${startX}px, 160px) scaleX(${scale}); }
+        `;
+      });
+      
+      kf += `100% { transform: translate(${startX}px, 160px) scaleX(${scale}); } }`;
+      robotCss += `${kf}\n.b-robot${r} { animation: robot${r}Anim ${TOTAL_TIME}s linear forwards; }`;
     }
-    @keyframes runAcRev {
-      0% { transform: translate(350px, 135px) scaleX(-1); }
-      100% { transform: translate(-80px, 135px) scaleX(-1); }
+
+    const colorCss = `
+      @keyframes colorTransform {
+        0%, ${p(13.5)} { fill: #DEB887; stroke: #B48E5D; stroke-width: 1px; }
+        ${p(13.8)}, ${p(14.2)} { fill: #FFFFFF; stroke: #FFFFFF; stroke-width: 2px; filter: drop-shadow(0 0 10px #5BA3D9); }
+        ${p(14.5)}, 100% { fill: #2A5D8F; stroke: none; filter: drop-shadow(0 0 0px transparent); }
+      }
+      @keyframes tapeFade {
+        0%, ${p(13.5)} { opacity: 1; fill: #E6C280; }
+        ${p(13.8)}, 100% { opacity: 0; }
+      }
+      .anim-color { animation: colorTransform ${TOTAL_TIME}s ease-out forwards; }
+      .anim-tape { animation: tapeFade ${TOTAL_TIME}s ease-out forwards; }
+    `;
+
+    return boxCss + robotCss + colorCss;
+  };
+
+  const cssStaticLoop = `
+    @keyframes runAcL {
+      0% { transform: translate(-50px, 160px) scaleX(1); }
+      49.9% { transform: translate(350px, 160px) scaleX(1); }
+      50% { transform: translate(350px, 160px) scaleX(-1); }
+      99.9% { transform: translate(-50px, 160px) scaleX(-1); }
+      100% { transform: translate(-50px, 160px) scaleX(1); }
     }
-    .l-human1 { animation: runAc 4s linear infinite; }
-    .l-human2 { animation: runAcRev 5s linear infinite 1s backwards; }
-    .l-human3 { animation: runAc 3.5s linear infinite 2.5s backwards; }
-    .leg-anim { animation: scissor 0.2s infinite alternate linear; transform-origin: top; }
-    .leg-anim-rev { animation: scissor 0.2s infinite alternate-reverse linear; transform-origin: top; }
-    @keyframes scissor { from { transform: rotate(-35deg); } to { transform: rotate(35deg); } }
+    @keyframes runAcR {
+      0% { transform: translate(350px, 160px) scaleX(-1); }
+      49.9% { transform: translate(-50px, 160px) scaleX(-1); }
+      50% { transform: translate(-50px, 160px) scaleX(1); }
+      99.9% { transform: translate(350px, 160px) scaleX(1); }
+      100% { transform: translate(350px, 160px) scaleX(-1); }
+    }
+    .l-robot1 { animation: runAcL 7s linear infinite; }
+    .l-robot2 { animation: runAcR 6s linear infinite 1s backwards; }
+    .l-robot3 { animation: runAcL 8s linear infinite 2s backwards; }
+    .l-robot4 { animation: runAcR 5.5s linear infinite 3s backwards; }
     .static-box { fill: #2A5D8F; stroke: none; }
     .static-tape { opacity: 0; display: none; }
+  `;
+
+  const cssCommon = `
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+    @keyframes scissor { from { transform: rotate(-30deg); } to { transform: rotate(30deg); } }
+    .anim-bob { animation: bob 0.25s infinite; }
+    .leg-l { animation: scissor 0.25s infinite alternate linear; transform-origin: top; }
+    .leg-r { animation: scissor 0.25s infinite alternate-reverse linear; transform-origin: top; }
+    @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
   `;
 
   return (
@@ -170,75 +206,70 @@ export function AnimatedLogoContainer() {
         onTouchMove={handleMouseMove}
         className="mx-auto w-full max-w-[320px] h-52 mb-8 relative cursor-crosshair group"
       >
-        <style>{phase === 'build' ? cssBuild : cssLoop}</style>
+        <style>
+          {cssCommon}
+          {phase === 'build' ? getDynamicCss() : cssStaticLoop}
+        </style>
         
         <div className="w-full h-full bg-white rounded-3xl flex items-center justify-center shadow-2xl relative overflow-hidden animate-pop-in transition-transform duration-300 group-hover:scale-[1.02]">
           <svg viewBox="0 0 320 200" className="w-full h-full">
             <defs>
-              <g id="human">
-                <line x1="0" y1="20" x2="0" y2="45" stroke="#475569" strokeWidth="6" strokeLinecap="round" className="leg-anim" />
-                <line x1="0" y1="20" x2="0" y2="45" stroke="#1E293B" strokeWidth="6" strokeLinecap="round" className="leg-anim-rev" />
-                <rect x="-12" y="0" width="24" height="25" rx="6" fill="#EAB308" />
-                <rect x="-6" y="5" width="12" height="10" rx="2" fill="#0F172A" />
-                <rect x="-10" y="-18" width="20" height="16" rx="4" fill="#EAB308" />
-                <rect x="-8" y="-14" width="16" height="6" rx="2" fill="#0F172A" />
-                <circle cx="-3" cy="-11" r="2" fill="#06B6D4" />
-                <circle cx="3" cy="-11" r="2" fill="#06B6D4" />
-                <path d="M -12 5 L -20 20" stroke="#475569" strokeWidth="4" strokeLinecap="round" />
-                <path d="M 12 5 L 20 20" stroke="#1E293B" strokeWidth="4" strokeLinecap="round" />
+              <g id="worker">
+                <g className="anim-bob">
+                  <rect x="-8" y="-14" width="16" height="18" rx="4" fill="#EAB308" />
+                  <rect x="-6" y="-10" width="12" height="6" rx="2" fill="#0F172A" />
+                  <circle cx="-2" cy="-7" r="1.5" fill="#06B6D4" />
+                  <circle cx="2" cy="-7" r="1.5" fill="#06B6D4" />
+                  <path d="M -8 -4 L -12 2 L -8 2" fill="none" stroke="#334155" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M 8 -4 L 12 2 L 8 2" fill="none" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </g>
+                <path d="M -3 4 L -3 10" stroke="#475569" strokeWidth="3" strokeLinecap="round" className="leg-l" />
+                <path d="M 3 4 L 3 10" stroke="#1E293B" strokeWidth="3" strokeLinecap="round" className="leg-r" />
               </g>
-              <g id="human-carry">
-                <use href="#human" />
-                <rect x="8" y="0" width="20" height="20" rx="2" fill="#DEB887" />
-                <path d="M 0 10 L 15 15" stroke="#475569" strokeWidth="4" strokeLinecap="round" />
+              <g id="worker-carry">
+                <use href="#worker" />
+                <g className="anim-bob">
+                  <rect x="6" y="-10" width="12" height="12" rx="2" fill="#DEB887" />
+                  <path d="M 6 -4 L 18 -4" stroke="#B48E5D" strokeWidth="1" />
+                  <path d="M 4 -4 L 10 2" fill="none" stroke="#1E293B" strokeWidth="2" strokeLinecap="round" />
+                </g>
               </g>
               <g id="box-svg">
-                <rect width="40" height="40" rx="3" className={phase === 'build' ? 'anim-color' : 'static-box'} />
-                <rect x="10" y="16" width="20" height="8" rx="1" className={phase === 'build' ? 'anim-tape' : 'static-tape'} />
-                <path d="M 0 20 L 40 20" stroke="#B48E5D" strokeWidth="1" className={phase === 'build' ? 'anim-tape' : 'static-tape'} opacity="0.5" />
+                <rect width="20" height="20" rx="2" className={phase === 'build' ? 'anim-color' : 'static-box'} />
+                <rect x="4" y="8" width="12" height="4" rx="1" className={phase === 'build' ? 'anim-tape' : 'static-tape'} />
+                <path d="M 0 10 L 20 10" stroke="#B48E5D" strokeWidth="1" className={phase === 'build' ? 'anim-tape' : 'static-tape'} opacity="0.5" />
               </g>
             </defs>
 
-            {/* Suelo */}
-            <line x1="0" y1="182" x2="320" y2="182" stroke="#E2E8F0" strokeWidth="3" strokeDasharray="8 8" strokeLinecap="round" />
+            {/* Suelo punteado industrial */}
+            <line x1="0" y1="170" x2="320" y2="170" stroke="#E2E8F0" strokeWidth="3" strokeDasharray="6 6" strokeLinecap="round" />
 
             {/* Cajas (La Letra T) */}
             {phase === 'build' ? (
               <g>
-                <g className="b-box1"><use href="#box-svg" /></g>
-                <g className="b-box2"><use href="#box-svg" /></g>
-                <g className="b-box3"><use href="#box-svg" /></g>
-                <g className="b-box4"><use href="#box-svg" /></g>
-                <g className="b-box5"><use href="#box-svg" /></g>
+                {trips.map((_, i) => <g key={`box-${i}`} className={`b-box${i}`}><use href="#box-svg" /></g>)}
               </g>
             ) : (
               <g>
-                <g transform="translate(140, 140)"><use href="#box-svg" /></g>
-                <g transform="translate(140, 100)"><use href="#box-svg" /></g>
-                <g transform="translate(140, 60)"><use href="#box-svg" /></g>
-                <g transform="translate(100, 60)"><use href="#box-svg" /></g>
-                <g transform="translate(180, 60)"><use href="#box-svg" /></g>
+                {trips.map((t, i) => <g key={`sbox-${i}`} transform={`translate(${t.bx}, ${t.by})`}><use href="#box-svg" /></g>)}
               </g>
             )}
 
             {/* Robots Animados */}
             {phase === 'build' ? (
               <g>
-                <g className="b-h-left"><use href="#human" /></g>
-                <g className="b-h-right"><use href="#human" /></g>
+                {[1, 2, 3, 4].map(r => <g key={`r-${r}`} id={`robot-${r}`} className={`b-robot${r}`}><use href="#worker" /></g>)}
               </g>
             ) : (
               <g>
-                <g className="l-human1"><use href="#human-carry" /></g>
-                <g className="l-human2"><use href="#human-carry" /></g>
-                <g className="l-human3"><use href="#human-carry" /></g>
+                {[1, 2, 3, 4].map(r => <g key={`lr-${r}`} id={`robot-${r}`} className={`l-robot${r}`}><use href="#worker-carry" /></g>)}
               </g>
             )}
           </svg>
         </div>
       </div>
 
-      {/* Physics Overlay (Renderizado sobre toda la pantalla) */}
+      {/* Physics Overlay */}
       {typeof document !== 'undefined' && createPortal(
         <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 99999, overflow: 'hidden' }}>
           {physicsBoxes.map(b => (
@@ -247,14 +278,14 @@ export function AnimatedLogoContainer() {
               left: b.x,
               top: b.y,
               transform: `translate(-50%, -50%) rotate(${b.rot}deg)`,
-              width: '32px',
-              height: '32px',
+              width: '24px',
+              height: '24px',
               backgroundColor: b.color,
-              borderRadius: '3px',
+              borderRadius: '2px',
               border: '1px solid rgba(0,0,0,0.15)',
-              boxShadow: '0 8px 16px rgba(0,0,0,0.3)'
+              boxShadow: '0 6px 12px rgba(0,0,0,0.3)'
             }}>
-              <div style={{ position: 'absolute', top: '14px', left: 0, width: '100%', height: '4px', backgroundColor: 'rgba(0,0,0,0.15)' }} />
+              <div style={{ position: 'absolute', top: '10px', left: 0, width: '100%', height: '3px', backgroundColor: 'rgba(0,0,0,0.15)' }} />
             </div>
           ))}
         </div>,
