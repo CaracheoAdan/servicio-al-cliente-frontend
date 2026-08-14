@@ -138,7 +138,7 @@ export function UsersPage() {
     <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] min-h-[500px] flex flex-col font-body animate-fade-in-up">
       <div className="p-6 border-b border-[#E2E8F0] flex flex-col md:flex-row justify-between items-center bg-white rounded-t-2xl gap-4">
         {/* Quick Filters / Tabs */}
-        <div className="flex items-center space-x-2 w-full lg:w-auto overflow-x-auto pb-2 md:pb-0">
+        <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
           <button
             onClick={() => setActiveTab('users')}
             className={`px-4 py-2 rounded-xl font-display font-bold text-sm whitespace-nowrap transition-colors flex items-center gap-2 ${

@@ -123,7 +123,7 @@ export function CatalogsPage() {
       <div className="p-6 border-b border-[#E2E8F0] flex flex-col md:flex-row justify-between items-center bg-white rounded-t-2xl gap-4">
         
         {/* Quick Filters */}
-        <div className="flex items-center space-x-2 w-full lg:w-auto overflow-x-auto pb-2 md:pb-0">
+        <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
           <button 
             onClick={() => setFilterStatus('all')}
             className={`px-4 py-2 rounded-xl font-display font-bold text-sm whitespace-nowrap transition-colors ${filterStatus === 'all' ? 'bg-[#2A5D8F] text-white shadow-[0_3px_0_#1B3D5C]' : 'bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#0F172A]'}`}
