@@ -271,8 +271,8 @@ export function ReportsPage() {
                     <p className="text-xs text-[#94A3B8] font-medium mt-0.5">Surtido x Tiempo</p>
                   </div>
                 </div>
-                <div className={`w-20 h-20 md:w-24 md:h-24 rounded-3xl border flex items-center justify-center ${faceConfig.bg} ${faceConfig.border} shadow-sm transition-transform hover:scale-110 cursor-default select-none`}>
-                  <span className="text-5xl md:text-6xl drop-shadow-md" role="img" aria-label="Status Face">
+                <div className={`w-28 h-28 md:w-36 md:h-36 rounded-[2rem] border flex items-center justify-center ${faceConfig.bg} ${faceConfig.border} shadow-sm transition-transform hover:scale-110 cursor-default select-none`}>
+                  <span className="text-7xl md:text-8xl drop-shadow-lg" role="img" aria-label="Status Face">
                     {faceConfig.emoji}
                   </span>
                 </div>
