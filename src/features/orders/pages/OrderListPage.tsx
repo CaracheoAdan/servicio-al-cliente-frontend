@@ -5,6 +5,7 @@ import { orderService } from '../../../shared/api/orderService';
 import toast from 'react-hot-toast';
 import { api } from '../../../shared/api/axiosInstance';
 import { KPICard } from '../../../shared/components/KPICard';
+import { SkeletonLoader } from '../../../shared/components/SkeletonLoader';
 
 export function OrderListPage() {
   const navigate = useNavigate();
