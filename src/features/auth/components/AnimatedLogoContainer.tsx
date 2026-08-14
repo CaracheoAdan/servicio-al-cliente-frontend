@@ -246,7 +246,7 @@ export function AnimatedLogoContainer() {
               position: 'absolute',
               left: b.x,
               top: b.y,
-              transform: \`translate(-50%, -50%) rotate(\${b.rot}deg)\`,
+              transform: `translate(-50%, -50%) rotate(${b.rot}deg)`,
               width: '32px',
               height: '32px',
               backgroundColor: b.color,
