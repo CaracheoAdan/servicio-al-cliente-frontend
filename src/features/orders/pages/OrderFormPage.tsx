@@ -126,8 +126,8 @@ export function OrderFormPage() {
       {/* Cabecera */}
       <div className="px-8 py-8 border-b border-[#E2E8F0] bg-white flex justify-between items-start">
         <div className="flex items-center space-x-4">
-          <div className="w-14 h-14 rounded-2xl bg-[#EFF6FF] flex items-center justify-center border border-[#E2E8F0] shrink-0">
-            <FileText className="w-7 h-7 text-[#2A5D8F]" />
+          <div className="w-16 h-16 rounded-xl bg-[#2A5D8F] flex items-center justify-center shrink-0 shadow-sm">
+            <FileText className="w-8 h-8 text-white" />
           </div>
           <div>
             <span className="font-mono uppercase tracking-[0.15em] text-[#2A5D8F] text-[11px] font-bold block mb-1">
@@ -141,7 +141,7 @@ export function OrderFormPage() {
         <button 
           type="button"
           onClick={() => navigate('/orders')} 
-          className="bg-[#F8FAFC] hover:bg-[#E2E8F0] text-[#0F172A] px-4 py-2.5 rounded-xl font-display font-bold text-sm transition-colors flex items-center gap-2"
+          className="bg-transparent border border-[#E2E8F0] hover:border-[#2A5D8F] text-[#64748B] hover:text-[#2A5D8F] px-5 py-2.5 rounded-xl font-display font-bold text-sm transition-all flex items-center gap-2 shadow-sm"
         >
           <ArrowLeft className="w-4 h-4" /> Regresar
         </button>
@@ -158,7 +158,7 @@ export function OrderFormPage() {
               value={orderKey}
               onChange={(e) => setOrderKey(e.target.value)}
               placeholder="Ej: 12515"
-              className="block w-full border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F172A] outline-none"
+              className="block w-full border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F172A] placeholder:text-[#94A3B8] outline-none"
             />
           </div>
           <div>
@@ -168,7 +168,7 @@ export function OrderFormPage() {
               required
               value={scheduledDeliveryDate}
               onChange={(e) => setScheduledDeliveryDate(e.target.value)}
-              className="block w-full border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F172A] outline-none"
+              className="block w-full border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F172A] placeholder:text-[#94A3B8] outline-none"
             />
           </div>
         </div>
@@ -188,8 +188,8 @@ export function OrderFormPage() {
 
           <div className="space-y-4">
             {items.map((item, index) => (
-              <div key={index} className="flex flex-col md:flex-row items-end gap-4 p-5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0]">
-                <div className="w-full md:w-2/5">
+              <div key={index} className="flex flex-col md:flex-row items-end gap-4 p-5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] even:bg-white dark:even:bg-[#1E1E1E]">
+                <div className="w-full md:w-2/5 flex flex-col justify-end">
                   <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#64748B] mb-2">Producto</label>
                   <select
                     value={item.productId}
@@ -203,7 +203,7 @@ export function OrderFormPage() {
                     ))}
                   </select>
                 </div>
-                <div className="w-full md:w-1/4">
+                <div className="w-full md:w-1/4 flex flex-col justify-end">
                   <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#64748B] mb-2">Cant. Pedida</label>
                   <input
                     type="number"
@@ -214,7 +214,7 @@ export function OrderFormPage() {
                     required
                   />
                 </div>
-                <div className="w-full md:w-1/4">
+                <div className="w-full md:w-1/4 flex flex-col justify-end">
                   <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#64748B] mb-2">Cant. Surtida</label>
                   <input
                     type="number"
@@ -231,7 +231,7 @@ export function OrderFormPage() {
                     newItems.splice(index, 1);
                     setItems(newItems);
                   }}
-                  className="p-3.5 bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#DC2626] rounded-xl transition-colors shrink-0 disabled:opacity-50"
+                  className="p-3.5 bg-white border border-[#E2E8F0] hover:border-[#DC2626] text-[#64748B] hover:text-[#DC2626] hover:bg-[#FEF2F2] rounded-xl transition-all shrink-0 disabled:opacity-50 dark:bg-[#121212] dark:border-[#333333] dark:hover:border-[#DC2626]"
                   title="Eliminar fila"
                   disabled={items.length === 1}
                 >
@@ -247,18 +247,18 @@ export function OrderFormPage() {
           {/* Pedido ya esta producido */}
           <div className="bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] p-5">
             <h5 className="font-display font-bold text-[#0F172A] mb-4">Pedido ya está producido</h5>
-            <div className="inline-flex rounded-xl bg-white border border-[#E2E8F0] p-1">
+            <div className="inline-flex rounded-xl bg-[#E2E8F0] dark:bg-[#121212] p-1">
               <button 
                 type="button" 
                 onClick={() => handleStatusToggle('produced')} 
-                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${isProduced ? 'bg-[#2A5D8F] text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]'}`}
+                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${isProduced ? 'bg-white dark:bg-[#333333] text-[#0F172A] dark:text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
               >
                 Sí
               </button>
               <button 
                 type="button" 
                 onClick={() => handleStatusToggle('open')} 
-                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isProduced ? 'bg-[#DC2626] text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]'}`}
+                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isProduced ? 'bg-white dark:bg-[#333333] text-[#0F172A] dark:text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
               >
                 No
               </button>
@@ -268,21 +268,21 @@ export function OrderFormPage() {
           {/* Salida de transporte */}
           <div className="bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] p-5">
             <h5 className="font-display font-bold text-[#0F172A] mb-4">Salida de transporte para entrega</h5>
-            <div className="inline-flex rounded-xl bg-white border border-[#E2E8F0] p-1 mb-6 block">
+            <div className="inline-flex rounded-xl bg-[#E2E8F0] dark:bg-[#121212] p-1 mb-6 block">
               <button 
                 type="button" 
                 onClick={() => {
                   handleStatusToggle('in_delivery');
                   if (!shippingDate) setShippingDate(new Date().toISOString().split('T')[0]);
                 }} 
-                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${isDelivered ? 'bg-[#2A5D8F] text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]'}`}
+                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${isDelivered ? 'bg-white dark:bg-[#333333] text-[#0F172A] dark:text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
               >
                 Sí
               </button>
               <button 
                 type="button" 
                 onClick={() => handleStatusToggle('produced')} 
-                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isDelivered ? 'bg-[#DC2626] text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]'}`}
+                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isDelivered ? 'bg-white dark:bg-[#333333] text-[#0F172A] dark:text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
               >
                 No
               </button>
@@ -303,19 +303,19 @@ export function OrderFormPage() {
         </div>
 
         {/* Acciones */}
-        <div className="flex justify-between items-center pt-8 border-t border-[#E2E8F0]">
+        <div className="flex justify-between items-center pt-8 px-2 border-t border-[#E2E8F0] mt-8">
           <button
             type="button"
             onClick={() => handleStatusToggle('closed')}
             disabled={status === 'closed'}
-            className={`flex items-center px-5 py-3 rounded-xl font-display font-bold border transition-all ${status === 'closed' ? 'bg-[#F8FAFC] text-[#94A3B8] border-[#E2E8F0] cursor-not-allowed' : 'bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#DC2626] border-[#FCA5A5]/40 shadow-sm'}`}
+            className={`flex items-center px-6 py-3.5 rounded-xl font-display font-bold border-2 transition-all h-[52px] ${status === 'closed' ? 'bg-[#F8FAFC] text-[#94A3B8] border-[#E2E8F0] cursor-not-allowed dark:bg-[#18181B] dark:border-[#333333]' : 'bg-transparent text-[#64748B] border-[#E2E8F0] hover:border-[#2A5D8F] hover:text-[#2A5D8F] dark:border-[#333333] dark:hover:border-[#5BA3D9] dark:hover:text-[#5BA3D9]'}`}
           >
             <CheckCircle2 className="w-5 h-5 mr-2" /> Cerrar pedido
           </button>
 
           <button 
             type="submit"
-            className="bg-[#2A5D8F] hover:bg-[#1E4D73] disabled:opacity-60 text-white px-6 py-3.5 rounded-2xl font-display font-bold shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all flex items-center"
+            className="bg-[#2A5D8F] hover:bg-[#1E4D73] disabled:opacity-60 text-white px-8 py-3.5 rounded-xl font-display font-bold shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all flex items-center h-[52px]"
           >
             <Save className="w-5 h-5 mr-2" />
             {isEditing ? 'Guardar Cambios' : 'Crear Orden'}

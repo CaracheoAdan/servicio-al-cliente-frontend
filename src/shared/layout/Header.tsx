@@ -44,7 +44,7 @@ export function Header() {
         <div className="flex items-center space-x-4">
           <button 
             onClick={handleLogout}
-            className="header-logout-btn bg-[#F1F5F9] hover:bg-[#FEF2F2] text-[#475569] hover:text-[#DC2626] px-4 py-2.5 rounded-lg font-display font-bold text-sm transition-colors flex items-center gap-2"
+            className="header-logout-btn bg-transparent border border-[#E2E8F0] hover:border-[#DC2626] text-[#64748B] hover:text-[#DC2626] px-5 py-2.5 rounded-xl font-display font-bold text-sm transition-all flex items-center gap-2 shadow-sm"
           >
             Salir <LogOut className="w-4 h-4" />
           </button>

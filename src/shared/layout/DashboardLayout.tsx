@@ -8,8 +8,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden relative z-10">
         <Header />
-        <main className="dashboard-main flex-1 overflow-y-auto p-6 md:p-8">
-          {children}
+        <main className="dashboard-main flex-1 overflow-y-auto p-6 md:p-10 lg:p-12">
+          <div className="max-w-[1440px] mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>
