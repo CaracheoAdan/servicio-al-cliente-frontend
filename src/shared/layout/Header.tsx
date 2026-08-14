@@ -30,15 +30,13 @@ export function Header() {
   }
 
   return (
-    <header className="dashboard-header bg-gradient-to-r from-[#BFDBFE] to-white border-b border-[#DBEAFE] relative shrink-0 overflow-hidden">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-white/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-      <div className="absolute top-0 left-0 w-32 h-32 bg-white/40 rounded-full blur-2xl -translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
-
-      <div className="flex items-center justify-between px-8 py-5 relative z-10">
+    <header className="dashboard-header bg-white border-b border-[#E2E8F0] relative shrink-0">
+      
+      <div className="flex items-center justify-between px-8 py-5">
         <div>
           <span className="header-breadcrumb font-mono text-[11px] uppercase tracking-[0.15em] text-[#2A5D8F] font-bold block mb-1">{meta.breadcrumb}</span>
           <h1 className="header-title text-xl font-display font-extrabold text-[#0F172A] tracking-tight">{meta.title}</h1>
-          <p className="header-subtitle text-sm text-[#475569] mt-0.5 font-medium">{meta.subtitle}</p>
+          <p className="header-subtitle text-sm text-[#64748B] mt-0.5 font-medium">{meta.subtitle}</p>
         </div>
 
         <div className="flex items-center space-x-4">
