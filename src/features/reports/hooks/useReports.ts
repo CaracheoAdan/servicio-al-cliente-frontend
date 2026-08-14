@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { orderService, CombinedOrder, OrderStatus } from '../../../shared/api/orderService';
 
 export interface TransportDataPoint {
@@ -61,25 +62,10 @@ export const calculateDecimalTime = (dateString: string): number | null => {
  * Hook to fetch and compute reports data
  */
 export const useReports = () => {
-  const [orders, setOrders] = useState<CombinedOrder[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        const data = await orderService.getAllCombinedOrders();
-        setOrders(data);
-      } catch (err: any) {
-        setError(err.message || 'Error fetching orders');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, []);
+  const { data: orders = [], isLoading: loading, error } = useQuery<CombinedOrder[], Error>({
+    queryKey: ['combinedOrders'],
+    queryFn: () => orderService.getAllCombinedOrders()
+  });
 
   // useMemo used to optimize heavy client-side processing
   const { transportData, fulfillmentData, latestOrder, generalMetrics } = useMemo(() => {

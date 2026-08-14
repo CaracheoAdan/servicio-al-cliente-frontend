@@ -15,3 +15,46 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Interceptor global para manejo de errores
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Only import toast dynamically if we want to avoid circular deps or just statically if possible,
+    // but axiosInstance is pure so we can statically import toast.
+    // wait, we can't import toast directly here if it causes a circular dependency, but usually it doesn't.
+    // Let's import it at the top.
+    
+    let message = 'Ocurrió un error inesperado';
+    if (error.response) {
+      switch (error.response.status) {
+        case 400:
+          message = 'Petición inválida. Verifica los datos.';
+          break;
+        case 401:
+          message = 'Sesión expirada. Por favor, inicia sesión nuevamente.';
+          localStorage.removeItem('totebin_token');
+          window.location.href = '/login';
+          break;
+        case 403:
+          message = 'No tienes permisos para realizar esta acción.';
+          break;
+        case 404:
+          message = 'Recurso no encontrado.';
+          break;
+        case 500:
+          message = 'Error interno del servidor. Contacta a soporte.';
+          break;
+      }
+    } else if (error.request) {
+      message = 'No hay conexión con el servidor. Revisa tu red.';
+    }
+    
+    // We import toast dynamically to avoid breaking tests or pure Node contexts
+    import('react-hot-toast').then(({ toast }) => {
+      toast.error(message, { id: 'global-axios-error' }); // Use id to prevent duplicate toasts
+    });
+
+    return Promise.reject(error);
+  }
+);
