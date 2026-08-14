@@ -31,8 +31,6 @@ export function Header() {
 
   return (
     <header className="dashboard-header bg-white border-b border-[#E2E8F0] relative shrink-0">
-      {/* Top accent bar */}
-      <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#2A5D8F] via-[#5BA3D9] to-[#2A5D8F]" />
       
       <div className="flex items-center justify-between px-8 py-5">
         <div>

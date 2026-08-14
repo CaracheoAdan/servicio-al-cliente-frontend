@@ -4,7 +4,10 @@ import { Header } from './Header'
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden font-body text-[#0F172A] relative">
+    <div className="flex h-screen bg-[#F8FAFC] dark:bg-[#0F172A] overflow-hidden font-body text-[#0F172A] relative pt-[4px]">
+      {/* Global Top Accent Bar */}
+      <div className="absolute top-0 left-0 right-0 h-[4px] bg-[#2A5D8F] z-50"></div>
+      
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden relative z-10">
         <Header />
