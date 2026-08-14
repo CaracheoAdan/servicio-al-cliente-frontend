@@ -55,8 +55,8 @@ export function Sidebar() {
   ]
 
   return (
-    <aside className={`${collapsed ? 'w-24' : 'w-72'} flex-shrink-0 py-0 transition-all duration-300 ease-in-out h-screen`}>
-      <div className="sidebar-card bg-white border-y border-y-[#E2E8F0] flex flex-col h-full overflow-hidden">
+    <aside className={`${collapsed ? 'w-24' : 'w-72'} flex-shrink-0 transition-all duration-300 ease-in-out pt-[15px] pb-3 pl-3 pr-3`}>
+      <div className="sidebar-card bg-white rounded-2xl shadow-[0_4px_24px_-4px_rgba(15,23,42,0.08)] flex flex-col h-full overflow-hidden">
         {/* Top controls: Collapse + Dark Mode */}
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
           <button
@@ -87,7 +87,7 @@ export function Sidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
+        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
           {menuSections.map((section) => (
             <div key={section.label}>
               {!collapsed && (
@@ -95,7 +95,7 @@ export function Sidebar() {
                   <span className="sidebar-section-label font-mono text-[10px] text-[#94A3B8] uppercase tracking-[0.15em] font-bold">{section.label}</span>
                 </div>
               )}
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {section.items.map((item) => {
                   const Icon = item.icon
                   return (
@@ -106,8 +106,8 @@ export function Sidebar() {
                       className={({ isActive }) =>
                         `sidebar-menu-item flex items-center ${collapsed ? 'justify-center px-3' : 'px-3'} py-3 text-sm font-display font-bold rounded-xl transition-all duration-200 group ${
                           isActive
-                            ? 'bg-[#2A5D8F] text-white shadow-card-brand'
-                            : 'text-[#475569] hover:bg-[#EFF6FF] hover:text-[#2A5D8F]'
+                            ? 'sidebar-item-active text-white'
+                            : 'text-[#475569] hover:bg-[#EFF6FF] hover:text-[#2A5D8F] hover:shadow-[0_2px_8px_-2px_rgba(42,93,143,0.1)]'
                         }`
                       }
                       title={collapsed ? item.name : undefined}
