@@ -55,8 +55,8 @@ export function Sidebar() {
   ]
 
   return (
-    <aside className={`${collapsed ? 'w-24' : 'w-72'} flex-shrink-0 py-0 pr-3 transition-all duration-300 ease-in-out h-screen`}>
-      <div className="sidebar-card bg-white border-y border-r border-y-[#E2E8F0] border-r-[4px] border-r-[#2A5D8F] shadow-[12px_0_28px_-6px_rgba(42,93,143,0.12)] rounded-r-[24px] flex flex-col h-full overflow-hidden">
+    <aside className={`${collapsed ? 'w-24' : 'w-72'} flex-shrink-0 py-0 transition-all duration-300 ease-in-out h-screen`}>
+      <div className="sidebar-card bg-white border-y border-y-[#E2E8F0] flex flex-col h-full overflow-hidden">
         {/* Top controls: Collapse + Dark Mode */}
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
           <button
