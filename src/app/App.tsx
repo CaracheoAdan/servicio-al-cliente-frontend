@@ -32,60 +32,42 @@ function App() {
         
         <Route path="/orders" element={
           <PrivateRoute>
-            <div className="max-w-7xl mx-auto">
-              <OrderListPage />
-            </div>
+            <OrderListPage />
           </PrivateRoute>
         } />
 
         <Route path="/orders/new" element={
           <PrivateRoute>
-            <div className="max-w-7xl mx-auto">
-              <OrderFormPage />
-            </div>
+            <OrderFormPage />
           </PrivateRoute>
         } />
 
         <Route path="/orders/:id" element={
           <PrivateRoute>
-            <div className="max-w-7xl mx-auto">
-              <OrderFormPage />
-            </div>
+            <OrderFormPage />
           </PrivateRoute>
         } />
 
         <Route path="/catalogs" element={
           <PrivateRoute>
-            <div className="max-w-7xl mx-auto">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Catálogos Maestros</h2>
-                <p className="text-gray-600">Administra los datos base del sistema</p>
-              </div>
-              <CatalogsPage />
-            </div>
+            <CatalogsPage />
           </PrivateRoute>
         } />
 
         <Route path="/reports" element={
           <PrivateRoute>
-            <div className="max-w-7xl mx-auto">
-              <ReportsPage />
-            </div>
+            <ReportsPage />
           </PrivateRoute>
         } />
 
         <Route path="/master-table" element={
           <PrivateRoute>
-            <div className="max-w-[95%] mx-auto">
-              <MasterTablePage />
-            </div>
+            <MasterTablePage />
           </PrivateRoute>
         } />
         <Route path="/users" element={
           <PrivateRoute>
-            <div className="max-w-7xl mx-auto">
-              <UsersPage />
-            </div>
+            <UsersPage />
           </PrivateRoute>
         } />
       </Routes>
