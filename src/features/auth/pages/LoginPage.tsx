@@ -33,11 +33,11 @@ export function LoginPage() {
         const serverDetail = error.response.data?.detail || error.response.data?.title || error.response.data?.message;
 
         if (status === 401) {
-          errorMsg = 'Correo electrónico no registrado o contraseña incorrecta.';
+          errorMsg = 'El correo o la contraseña están equivocados.';
         } else if (status === 404) {
           errorMsg = 'No existe ninguna cuenta registrada con este correo.';
         } else if (status === 400) {
-          errorMsg = serverDetail || 'Datos inválidos. Por favor, revisa el correo y la contraseña.';
+          errorMsg = serverDetail || 'Faltan datos o tienen un formato incorrecto.';
         } else if (status === 403) {
           errorMsg = 'Tu cuenta no tiene permisos para acceder o está suspendida.';
         } else if (status >= 500) {
@@ -58,8 +58,8 @@ export function LoginPage() {
       }
 
       toast.error(errorMsg, {
-        style: { borderRadius: '10px', background: '#EF4444', color: '#fff' },
-        duration: 4000,
+        style: { borderRadius: '10px', background: '#EF4444', color: '#fff', fontWeight: 'bold' },
+        duration: 5000,
       });
     } finally {
       setIsLoading(false);
