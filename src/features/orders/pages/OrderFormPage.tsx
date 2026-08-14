@@ -84,6 +84,11 @@ export function OrderFormPage() {
       return;
     }
 
+    if (!/^\d+$/.test(orderKey.trim())) {
+      toast.error('El No. de Orden debe contener únicamente números.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+      return;
+    }
+
     if (!scheduledDeliveryDate) {
       toast.error('La fecha compromiso de entrega es requerida.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
       return;
@@ -175,9 +180,11 @@ export function OrderFormPage() {
             <label className="block font-display font-bold text-sm text-[#0F172A] mb-2">No. Orden</label>
             <input
               type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               required
               value={orderKey}
-              onChange={(e) => setOrderKey(e.target.value)}
+              onChange={(e) => setOrderKey(e.target.value.replace(/\D/g, ''))}
               placeholder="Ej: 12515"
               className="block w-full border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F172A] placeholder:text-[#94A3B8] outline-none"
             />
