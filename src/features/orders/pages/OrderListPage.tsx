@@ -287,7 +287,7 @@ export function OrderListPage() {
                       <div className="text-sm font-mono text-[#475569] font-medium">{formatDate(order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || order.scheduled_delivery_date)}</div>
                     </td>
                     <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
-                      {order.status !== 'in_delivery' && order.status !== 'delivered' && order.status !== 'closed' && (
+                      {order.status !== 'in_delivery' && order.status !== 'delivered' && order.status !== 'closed' ? (
                         <button 
                           onClick={() => handleLiberarCamion(order)}
                           className="flex items-center text-[#D97706] bg-[#FFFBEB] hover:bg-[#FEF3C7] px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs"
@@ -295,6 +295,13 @@ export function OrderListPage() {
                         >
                           <Truck className="w-4 h-4 mr-1.5" /> Liberar
                         </button>
+                      ) : (
+                        <span 
+                          className="flex items-center text-[#10B981] bg-[#ECFDF5] px-3 py-2 rounded-lg font-display font-bold text-xs cursor-default"
+                          title="El transporte ya ha salido"
+                        >
+                          <CheckCircle2 className="w-4 h-4 mr-1.5" /> Liberado
+                        </span>
                       )}
                       <button 
                         onClick={() => navigate(`/orders/${order.id}`)}
