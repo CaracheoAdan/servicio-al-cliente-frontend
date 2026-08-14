@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, Clock, TrendingUp, Truck, CheckCircle2 } from 'lucide-react';
+import { BarChart3, Clock, TrendingUp, Truck, CheckCircle2, Smile, Meh, Frown, Activity } from 'lucide-react';
 import { api } from '../../../shared/api/axiosInstance';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, ReferenceArea, Cell
@@ -144,6 +144,31 @@ export function ReportsPage() {
     fetchAndComputeReports();
   }, []);
 
+  const getGeneralMetrics = () => {
+    if (transportData.length === 0 || fulfillmentData.length === 0) return { onTimePct: 0, fulfillPct: 0, general: 0 };
+    
+    // Punto 3: % Cumplimiento a entregas (salieron <= 11:30 AM = 11.5 decimal)
+    const onTimeCount = transportData.filter(t => t.time <= 11.5).length;
+    const onTimePct = Math.round((onTimeCount / transportData.length) * 100);
+
+    // Punto 5: % Cumplimiento de entregas (promedio de surtido)
+    const fulfillPct = Math.round(fulfillmentData.reduce((acc, curr) => acc + curr.fulfillment, 0) / fulfillmentData.length);
+
+    const general = Math.round((onTimePct * fulfillPct) / 100);
+    return { onTimePct, fulfillPct, general };
+  };
+
+  const { onTimePct, fulfillPct, general } = getGeneralMetrics();
+
+  const getFaceConfig = (score: number) => {
+    if (score >= 75) return { icon: Smile, color: 'text-[#10B981]', bg: 'bg-[#ECFDF5]', border: 'border-[#D1FAE5]' };
+    if (score >= 60) return { icon: Meh, color: 'text-[#F59E0B]', bg: 'bg-[#FFFBEB]', border: 'border-[#FEF3C7]' };
+    return { icon: Frown, color: 'text-[#EF4444]', bg: 'bg-[#FEF2F2]', border: 'border-[#FEE2E2]' };
+  };
+
+  const faceConfig = getFaceConfig(general);
+  const FaceIcon = faceConfig.icon;
+
   return (
     <div className="space-y-8 animate-fade-in-up font-body">
       <div className="flex flex-col lg:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-card-base border border-[#E2E8F0] relative overflow-hidden gap-4">
@@ -168,8 +193,9 @@ export function ReportsPage() {
         </div>
       ) : (
         <>
-          {/* KPI Cards: Última Orden Salida */}
-          <div className="mb-8">
+          {/* Top Cards Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Última Orden Salida */}
             {latestOrder ? (
               <div className="bg-white p-6 md:p-8 rounded-2xl shadow-card-base border border-[#E2E8F0] card-glow transition-all relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#10B981]/10 to-transparent rounded-bl-full pointer-events-none"></div>
@@ -231,6 +257,43 @@ export function ReportsPage() {
                 <p className="text-[#64748B] text-sm mt-1">Cuando liberes una orden, aparecerá aquí como la última salida.</p>
               </div>
             )}
+
+            {/* Cumplimiento General */}
+            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-card-base border border-[#E2E8F0] card-glow transition-all relative overflow-hidden flex flex-col justify-between">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#2A5D8F]/5 to-transparent rounded-bl-full pointer-events-none"></div>
+              
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-[#EFF6FF] p-3 rounded-2xl border border-[#DBEAFE]">
+                    <Activity className="w-6 h-6 text-[#2A5D8F]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-display font-bold text-[#64748B] uppercase tracking-wide">Cumplimiento General</h3>
+                    <p className="text-xs text-[#94A3B8] font-medium mt-0.5">Surtido x Tiempo</p>
+                  </div>
+                </div>
+                <div className={`p-3 rounded-2xl border ${faceConfig.bg} ${faceConfig.border}`}>
+                  <FaceIcon className={`w-8 h-8 ${faceConfig.color}`} />
+                </div>
+              </div>
+
+              <div className="flex items-end gap-3 mb-6">
+                <p className={`text-6xl font-mono font-bold leading-none tracking-tight ${faceConfig.color}`}>
+                  {general}%
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4">
+                <div>
+                  <p className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide mb-1">Cump. de Entregas (Cant.)</p>
+                  <p className="font-mono font-bold text-[#0F172A] text-lg">{fulfillPct}%</p>
+                </div>
+                <div className="border-l border-[#E2E8F0] pl-4">
+                  <p className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide mb-1">Cump. a Entregas (Tiempo)</p>
+                  <p className="font-mono font-bold text-[#0F172A] text-lg">{onTimePct}%</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
