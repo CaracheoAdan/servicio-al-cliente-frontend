@@ -196,57 +196,57 @@ export function UsersPage() {
                   </div>
                 </div>
               ) : (
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
-                      <th className="px-8 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Nombre / Correo</th>
-                      <th className="px-8 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Rol</th>
-                      <th className="px-8 py-4 text-right text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#E2E8F0] dark:divide-gray-800">
-                    {users.map(user => {
-                      const role = roles.find(r => r.id === (user.roleId || user.role_id));
-                      return (
-                        <tr key={user.id} className="hover:bg-[#EFF6FF] dark:hover:bg-gray-800/50 transition-colors group relative border-l-4 border-l-[#2A5D8F] dark:text-gray-300">
-                          <td className="px-8 py-5">
-                            <div className="font-display font-bold text-[#0F172A] dark:text-white text-sm">{user.firstName || user.first_name} {user.lastName || user.last_name}</div>
-                            <div className="text-xs text-[#64748B] dark:text-gray-400 font-mono mt-0.5">{user.email}</div>
-                          </td>
-                          <td className="px-8 py-5">
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-display font-bold text-[#2A5D8F] bg-[#EFF6FF] dark:bg-blue-900/30 border border-[#BFDBFE] dark:border-blue-800/50">
-                              <Shield className="w-3 h-3 mr-1.5" /> {role ? role.name : 'Sin rol'}
-                            </span>
-                          </td>
-                          <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium overflow-hidden">
-                            <div className="flex justify-end space-x-2 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-                              <button 
-                                onClick={() => handleOpenUserModal(user)}
-                                className="flex items-center text-[#2A5D8F] bg-[#EFF6FF] dark:bg-blue-900/30 hover:bg-[#DBEAFE] dark:hover:bg-blue-900/50 px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
-                              >
-                                <Edit2 className="w-4 h-4 mr-1.5" /> Editar
-                              </button>
-                              <button 
-                                onClick={() => setConfirmDelete({ id: user.id, type: 'user' })}
-                                className="flex items-center text-[#DC2626] bg-[#FEF2F2] dark:bg-red-900/30 hover:bg-[#FEE2E2] dark:hover:bg-red-900/50 px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
-                              >
-                                <Trash2 className="w-4 h-4 mr-1.5" /> Eliminar
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-                <div className="px-8 py-4 border-t border-[#E2E8F0] dark:border-gray-800 bg-[#F8FAFC] dark:bg-gray-800 flex justify-between items-center text-sm font-medium text-[#64748B] dark:text-gray-400">
-                  <div className="flex items-center">
-                    <span className="w-2 h-2 rounded-full bg-[#2A5D8F] mr-2"></span>
-                    Mostrando {users.length} usuarios
+                <>
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+                        <th className="px-8 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Nombre / Correo</th>
+                        <th className="px-8 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Rol</th>
+                        <th className="px-8 py-4 text-right text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#E2E8F0] dark:divide-gray-800">
+                      {users.map(user => {
+                        const role = roles.find(r => r.id === (user.roleId || user.role_id));
+                        return (
+                          <tr key={user.id} className="hover:bg-[#EFF6FF] dark:hover:bg-gray-800/50 transition-colors group relative border-l-4 border-l-[#2A5D8F] dark:text-gray-300">
+                            <td className="px-8 py-5">
+                              <div className="font-display font-bold text-[#0F172A] dark:text-white text-sm">{user.firstName || user.first_name} {user.lastName || user.last_name}</div>
+                              <div className="text-xs text-[#64748B] dark:text-gray-400 font-mono mt-0.5">{user.email}</div>
+                            </td>
+                            <td className="px-8 py-5">
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-display font-bold text-[#2A5D8F] bg-[#EFF6FF] dark:bg-blue-900/30 border border-[#BFDBFE] dark:border-blue-800/50">
+                                <Shield className="w-3 h-3 mr-1.5" /> {role ? role.name : 'Sin rol'}
+                              </span>
+                            </td>
+                            <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium overflow-hidden">
+                              <div className="flex justify-end space-x-2 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+                                <button 
+                                  onClick={() => handleOpenUserModal(user)}
+                                  className="flex items-center text-[#2A5D8F] bg-[#EFF6FF] dark:bg-blue-900/30 hover:bg-[#DBEAFE] dark:hover:bg-blue-900/50 px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
+                                >
+                                  <Edit2 className="w-4 h-4 mr-1.5" /> Editar
+                                </button>
+                                <button 
+                                  onClick={() => setConfirmDelete({ id: user.id, type: 'user' })}
+                                  className="flex items-center text-[#DC2626] bg-[#FEF2F2] dark:bg-red-900/30 hover:bg-[#FEE2E2] dark:hover:bg-red-900/50 px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
+                                >
+                                  <Trash2 className="w-4 h-4 mr-1.5" /> Eliminar
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  <div className="px-8 py-4 border-t border-[#E2E8F0] dark:border-gray-800 bg-[#F8FAFC] dark:bg-gray-800 flex justify-between items-center text-sm font-medium text-[#64748B] dark:text-gray-400">
+                    <div className="flex items-center">
+                      <span className="w-2 h-2 rounded-full bg-[#2A5D8F] mr-2"></span>
+                      Mostrando {users.length} usuarios
+                    </div>
                   </div>
-                </div>
-              </div>
-              )
+                </>
             ) : (
               roles.length === 0 ? (
                 <div className="p-8">
@@ -295,7 +295,7 @@ export function UsersPage() {
                             <div className="flex justify-end space-x-2 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 ease-out">
                               <button 
                                 onClick={() => handleOpenRoleModal(role)}
-                                className="flex items-center text-[#2A5D8F] bg-[#EFF6FF] dark:bg-blue-900/30 hover:bg-[#DBEAFE] dark:hover:bg-blue-900/50 px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
+                                className="flex items-center text-[#D97706] bg-[#FEF3C7] dark:bg-yellow-900/30 hover:bg-[#FDE68A] dark:hover:bg-yellow-900/50 px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
                               >
                                 <Edit2 className="w-4 h-4 mr-1.5" /> Editar
                               </button>
@@ -308,17 +308,16 @@ export function UsersPage() {
                             </div>
                           </td>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-                <div className="px-8 py-4 border-t border-[#E2E8F0] dark:border-gray-800 bg-[#F8FAFC] dark:bg-gray-800 flex justify-between items-center text-sm font-medium text-[#64748B] dark:text-gray-400">
-                  <div className="flex items-center">
-                    <span className="w-2 h-2 rounded-full bg-[#D97706] mr-2"></span>
-                    Mostrando {roles.length} roles
+                      ))}
+                    </tbody>
+                  </table>
+                  <div className="px-8 py-4 border-t border-[#E2E8F0] dark:border-gray-800 bg-[#F8FAFC] dark:bg-gray-800 flex justify-between items-center text-sm font-medium text-[#64748B] dark:text-gray-400">
+                    <div className="flex items-center">
+                      <span className="w-2 h-2 rounded-full bg-[#D97706] mr-2"></span>
+                      Mostrando {roles.length} roles
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
               )
             )}
           </div>
