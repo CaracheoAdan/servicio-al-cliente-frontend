@@ -9,20 +9,20 @@ const DUR = 8;
 // Stem is 5 rows x 2 cols. Top bar is 2 rows x 6 cols.
 const BOXES = [
   // Stem (bottom up, 5 rows, 2 cols, width 40, centered at 160)
-  { x: 140, y: 130, side: 'L' as const }, { x: 160, y: 130, side: 'R' as const },
-  { x: 140, y: 110, side: 'L' as const }, { x: 160, y: 110, side: 'R' as const },
-  { x: 140, y: 90, side: 'L' as const }, { x: 160, y: 90, side: 'R' as const },
-  { x: 140, y: 70, side: 'L' as const }, { x: 160, y: 70, side: 'R' as const },
-  { x: 140, y: 50, side: 'L' as const }, { x: 160, y: 50, side: 'R' as const },
+  { x: 140, y: 146, side: 'L' as const }, { x: 160, y: 146, side: 'R' as const },
+  { x: 140, y: 126, side: 'L' as const }, { x: 160, y: 126, side: 'R' as const },
+  { x: 140, y: 106, side: 'L' as const }, { x: 160, y: 106, side: 'R' as const },
+  { x: 140, y: 86, side: 'L' as const }, { x: 160, y: 86, side: 'R' as const },
+  { x: 140, y: 66, side: 'L' as const }, { x: 160, y: 66, side: 'R' as const },
   
   // Top bar (bottom up, 2 rows, center out, width 120, centered at 160)
-  { x: 140, y: 30, side: 'L' as const }, { x: 160, y: 30, side: 'R' as const },
-  { x: 120, y: 30, side: 'L' as const }, { x: 180, y: 30, side: 'R' as const },
-  { x: 100, y: 30, side: 'L' as const }, { x: 200, y: 30, side: 'R' as const },
+  { x: 140, y: 46, side: 'L' as const }, { x: 160, y: 46, side: 'R' as const },
+  { x: 120, y: 46, side: 'L' as const }, { x: 180, y: 46, side: 'R' as const },
+  { x: 100, y: 46, side: 'L' as const }, { x: 200, y: 46, side: 'R' as const },
   
-  { x: 140, y: 10, side: 'L' as const }, { x: 160, y: 10, side: 'R' as const },
-  { x: 120, y: 10, side: 'L' as const }, { x: 180, y: 10, side: 'R' as const },
-  { x: 100, y: 10, side: 'L' as const }, { x: 200, y: 10, side: 'R' as const },
+  { x: 140, y: 26, side: 'L' as const }, { x: 160, y: 26, side: 'R' as const },
+  { x: 120, y: 26, side: 'L' as const }, { x: 180, y: 26, side: 'R' as const },
+  { x: 100, y: 26, side: 'L' as const }, { x: 200, y: 26, side: 'R' as const },
 ];
 
 const pct = (t: number): string => ((t / DUR) * 100).toFixed(2) + '%';
@@ -44,7 +44,7 @@ export function AnimatedLogoContainer() {
   // ─── CSS Generation (string concat to avoid escape issues) ───
   const buildCss = useMemo(() => {
     let css = '';
-    const gY = 155;
+    const gY = 171;
 
     // Box keyframes
     BOXES.forEach((box, i) => {
@@ -156,7 +156,8 @@ export function AnimatedLogoContainer() {
   // ─── Common CSS ───────────────────────────────────────
   const commonCss = [
     '@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}',
-    '@keyframes fadeIn{0%{opacity:0;transform:scale(0.95)}100%{opacity:1;transform:scale(1)}}',
+    '@keyframes magicalReveal{0%{opacity:0;filter:brightness(2) blur(8px);transform:scale(0.95)}50%{opacity:1;filter:brightness(1.5) blur(2px);transform:scale(1.02)}100%{opacity:1;filter:brightness(1) blur(0);transform:scale(1)}}',
+    '.magicalReveal{animation:magicalReveal 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) both}',
   ].join('\n');
 
   // ─── Robot SVG ────────────────────────────────────────
@@ -254,7 +255,7 @@ export function AnimatedLogoContainer() {
 
             {/* Ground line for walking variants */}
             {mode === 'ground' && (
-              <line x1="0" y1="168" x2="320" y2="168" stroke="#E2E8F0" strokeWidth="3" strokeDasharray="8 8" />
+              <line x1="0" y1="184" x2="320" y2="184" stroke="#E2E8F0" strokeWidth="3" strokeDasharray="8 8" />
             )}
 
             {/* Crane rail */}
@@ -288,10 +289,10 @@ export function AnimatedLogoContainer() {
             )}
           </svg>
         ) : (
-          <svg viewBox="0 0 320 200" className="w-full h-full fadeIn">
+          <svg viewBox="0 0 320 200" className="w-full h-full magicalReveal">
             <text
               x="160"
-              y="150"
+              y="166"
               textAnchor="middle"
               fontFamily="'Inter', sans-serif"
               fontWeight="800"
