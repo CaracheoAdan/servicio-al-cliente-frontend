@@ -84,17 +84,7 @@ export function ReportsPage() {
 
   return (
     <div className="space-y-8 animate-fade-in-up font-body">
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white p-8 rounded-2xl shadow-card-base border border-[#E2E8F0] relative overflow-hidden gap-6">
-        <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-[#2A5D8F]/[0.05] blur-3xl pointer-events-none blob-breathe" />
-        <div className="flex items-center space-x-4 relative z-10">
-          <div className="bg-[#EFF6FF] p-3 rounded-xl border border-[#E2E8F0]">
-            <BarChart3 className="w-8 h-8 text-[#2A5D8F]" />
-          </div>
-          <div>
-            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-[#0F172A] tracking-tight">Gráficas y Estadísticas</h3>
-            <p className="text-sm text-[#64748B] mt-1 font-medium">Análisis de rendimiento, producción y entregas</p>
-          </div>
-        </div>
+      <div className="flex flex-col lg:flex-row justify-end items-center bg-white p-6 rounded-2xl shadow-card-base border border-[#E2E8F0] relative overflow-hidden gap-4">
         <div className="bg-[#F8FAFC] border border-[#E2E8F0] px-5 py-2.5 rounded-2xl flex items-center shadow-sm relative z-10">
           <Clock className="w-4 h-4 text-[#2A5D8F] mr-2" />
           <span className="text-sm font-display font-bold text-[#0F172A]">

@@ -123,21 +123,8 @@ export function OrderFormPage() {
 
   return (
     <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] overflow-hidden font-body animate-fade-in-up w-full mx-auto">
-      {/* Cabecera */}
-      <div className="px-10 md:px-12 py-10 border-b border-[#E2E8F0] bg-white flex justify-between items-start">
-        <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 rounded-xl bg-[#2A5D8F] flex items-center justify-center shrink-0 shadow-sm">
-            <FileText className="w-8 h-8 text-white" />
-          </div>
-          <div>
-            <span className="font-mono uppercase tracking-[0.15em] text-[#2A5D8F] text-[11px] font-bold block mb-1">
-              {isEditing ? 'Producción · Gestión de orden' : 'Producción · Nueva orden'}
-            </span>
-            <h3 className="text-2xl font-display font-extrabold text-[#0F172A] tracking-tight">
-              {isEditing ? `Orden No. ${id}` : 'Nueva Orden de Producción'}
-            </h3>
-          </div>
-        </div>
+      {/* Toolbar */}
+      <div className="px-10 md:px-12 py-6 border-b border-[#E2E8F0] bg-[#F8FAFC] flex justify-end items-center rounded-t-2xl">
         <button 
           type="button"
           onClick={() => navigate('/orders')} 

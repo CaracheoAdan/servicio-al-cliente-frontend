@@ -113,16 +113,7 @@ export function OrderListPage() {
 
   return (
     <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] min-h-[500px] flex flex-col font-body animate-fade-in-up">
-      <div className="p-8 border-b border-[#E2E8F0] flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-t-2xl relative overflow-hidden gap-6">
-        <div className="flex items-center space-x-4 relative z-10">
-          <div className="bg-[#EFF6FF] p-3 rounded-xl border border-[#E2E8F0]">
-            <ClipboardList className="w-8 h-8 text-[#2A5D8F]" />
-          </div>
-          <div>
-            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-[#0F172A] tracking-tight">Listado de Órdenes</h3>
-            <p className="text-sm text-[#64748B] mt-1 font-medium">Control visual del avance y estatus en el piso de producción</p>
-          </div>
-        </div>
+      <div className="p-6 border-b border-[#E2E8F0] flex flex-col md:flex-row justify-end items-center bg-white rounded-t-2xl gap-4">
         
         <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 z-10 w-full lg:w-auto">
           <div>

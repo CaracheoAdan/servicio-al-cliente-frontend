@@ -136,16 +136,7 @@ export function UsersPage() {
 
   return (
     <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] min-h-[500px] flex flex-col font-body animate-fade-in-up">
-      <div className="p-8 border-b border-[#E2E8F0] flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-t-2xl relative overflow-hidden gap-6">
-        <div className="flex items-center space-x-4 relative z-10">
-          <div className="bg-[#EFF6FF] p-3 rounded-xl border border-[#E2E8F0]">
-            <Settings className="w-8 h-8 text-[#2A5D8F]" />
-          </div>
-          <div>
-            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-[#0F172A] tracking-tight">Administración</h3>
-            <p className="text-sm text-[#64748B] mt-1 font-medium">Gestión de usuarios y roles del sistema Totebin.</p>
-          </div>
-        </div>
+      <div className="p-6 border-b border-[#E2E8F0] flex flex-col md:flex-row justify-end items-center bg-white rounded-t-2xl gap-4">
         <div className="z-10">
           <button 
             onClick={() => activeTab === 'users' ? handleOpenUserModal() : handleOpenRoleModal()}
