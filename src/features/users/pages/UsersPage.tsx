@@ -136,7 +136,26 @@ export function UsersPage() {
 
   return (
     <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] min-h-[500px] flex flex-col font-body animate-fade-in-up">
-      <div className="p-6 border-b border-[#E2E8F0] flex flex-col md:flex-row justify-end items-center bg-white rounded-t-2xl gap-4">
+      <div className="p-6 border-b border-[#E2E8F0] flex flex-col md:flex-row justify-between items-center bg-white rounded-t-2xl gap-4">
+        {/* Quick Filters / Tabs */}
+        <div className="flex items-center space-x-2 w-full lg:w-auto overflow-x-auto pb-2 md:pb-0">
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`px-4 py-2 rounded-xl font-display font-bold text-sm whitespace-nowrap transition-colors flex items-center gap-2 ${
+              activeTab === 'users' ? 'bg-[#2A5D8F] text-white shadow-[0_3px_0_#1B3D5C]' : 'bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#0F172A]'
+            }`}
+          >
+            <User className="w-4 h-4" /> Usuarios
+          </button>
+          <button
+            onClick={() => setActiveTab('roles')}
+            className={`px-4 py-2 rounded-xl font-display font-bold text-sm whitespace-nowrap transition-colors flex items-center gap-2 ${
+              activeTab === 'roles' ? 'bg-[#2A5D8F] text-white shadow-[0_3px_0_#1B3D5C]' : 'bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#0F172A]'
+            }`}
+          >
+            <Shield className="w-4 h-4" /> Roles y Permisos
+          </button>
+        </div>
         <div className="z-10">
           <button 
             onClick={() => activeTab === 'users' ? handleOpenUserModal() : handleOpenRoleModal()}
@@ -145,27 +164,6 @@ export function UsersPage() {
             <Plus className="w-5 h-5" /> Nuevo {activeTab === 'users' ? 'Usuario' : 'Rol'}
           </button>
         </div>
-      </div>
-
-      <div className="border-b border-[#E2E8F0] bg-[#F8FAFC]">
-        <nav className="flex px-8" aria-label="Tabs">
-          <button
-            onClick={() => setActiveTab('users')}
-            className={`py-4 px-6 font-display font-bold text-sm transition-all border-b-2 flex items-center gap-2 ${
-              activeTab === 'users' ? 'border-[#2A5D8F] text-[#2A5D8F]' : 'border-transparent text-[#64748B] hover:text-[#0F172A] hover:bg-[#E2E8F0]/30'
-            }`}
-          >
-            <User className="w-4 h-4" /> Usuarios
-          </button>
-          <button
-            onClick={() => setActiveTab('roles')}
-            className={`py-4 px-6 font-display font-bold text-sm transition-all border-b-2 flex items-center gap-2 ${
-              activeTab === 'roles' ? 'border-[#2A5D8F] text-[#2A5D8F]' : 'border-transparent text-[#64748B] hover:text-[#0F172A] hover:bg-[#E2E8F0]/30'
-            }`}
-          >
-            <Shield className="w-4 h-4" /> Roles y Permisos
-          </button>
-        </nav>
       </div>
       
       <div className="flex-1 bg-white rounded-b-2xl overflow-hidden">

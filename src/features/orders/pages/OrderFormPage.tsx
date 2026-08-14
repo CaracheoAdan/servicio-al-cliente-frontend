@@ -124,7 +124,11 @@ export function OrderFormPage() {
   return (
     <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] overflow-hidden font-body animate-fade-in-up w-full mx-auto">
       {/* Toolbar */}
-      <div className="px-10 md:px-12 py-6 border-b border-[#E2E8F0] bg-[#F8FAFC] flex justify-end items-center rounded-t-2xl">
+      <div className="px-10 md:px-12 py-6 border-b border-[#E2E8F0] bg-[#F8FAFC] flex justify-between items-center rounded-t-2xl gap-4">
+        <div className="font-display font-bold text-[#0F172A] text-lg flex items-center gap-2">
+          <FileText className="w-5 h-5 text-[#2A5D8F]" />
+          {isEditing ? `Gestión de Orden No. ${id}` : 'Nueva Orden de Producción'}
+        </div>
         <button 
           type="button"
           onClick={() => navigate('/orders')} 

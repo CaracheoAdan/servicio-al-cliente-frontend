@@ -84,7 +84,11 @@ export function ReportsPage() {
 
   return (
     <div className="space-y-8 animate-fade-in-up font-body">
-      <div className="flex flex-col lg:flex-row justify-end items-center bg-white p-6 rounded-2xl shadow-card-base border border-[#E2E8F0] relative overflow-hidden gap-4">
+      <div className="flex flex-col lg:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-card-base border border-[#E2E8F0] relative overflow-hidden gap-4">
+        <div className="font-display font-bold text-[#0F172A] text-lg flex items-center gap-2">
+          <BarChart3 className="w-5 h-5 text-[#2A5D8F]" />
+          Métricas en Tiempo Real
+        </div>
         <div className="bg-[#F8FAFC] border border-[#E2E8F0] px-5 py-2.5 rounded-2xl flex items-center shadow-sm relative z-10">
           <Clock className="w-4 h-4 text-[#2A5D8F] mr-2" />
           <span className="text-sm font-display font-bold text-[#0F172A]">

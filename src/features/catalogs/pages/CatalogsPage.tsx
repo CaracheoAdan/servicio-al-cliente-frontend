@@ -8,6 +8,7 @@ export function CatalogsPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
   
   // Estado del formulario
   const [editId, setEditId] = useState<number | null>(null);
@@ -104,9 +105,14 @@ export function CatalogsPage() {
     }
   };
 
-  const filteredProducts = products.filter(p => 
-    p.key.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = products.filter(p => {
+    const matchesSearch = p.key.toLowerCase().includes(searchTerm.toLowerCase());
+    const isActiveState = p.isActive !== undefined ? p.isActive : p.is_active;
+    if (filterStatus === 'all') return matchesSearch;
+    if (filterStatus === 'active') return matchesSearch && isActiveState;
+    if (filterStatus === 'inactive') return matchesSearch && !isActiveState;
+    return matchesSearch;
+  });
 
   const totalProducts = products.length;
   const activeProducts = products.filter(p => p.isActive === true || p.is_active === true).length;
@@ -114,7 +120,29 @@ export function CatalogsPage() {
 
   return (
     <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] min-h-[500px] flex flex-col font-body animate-fade-in-up">
-      <div className="p-6 border-b border-[#E2E8F0] flex flex-col md:flex-row justify-end items-center bg-white rounded-t-2xl gap-4">
+      <div className="p-6 border-b border-[#E2E8F0] flex flex-col md:flex-row justify-between items-center bg-white rounded-t-2xl gap-4">
+        
+        {/* Quick Filters */}
+        <div className="flex items-center space-x-2 w-full lg:w-auto overflow-x-auto pb-2 md:pb-0">
+          <button 
+            onClick={() => setFilterStatus('all')}
+            className={`px-4 py-2 rounded-xl font-display font-bold text-sm whitespace-nowrap transition-colors ${filterStatus === 'all' ? 'bg-[#2A5D8F] text-white shadow-[0_3px_0_#1B3D5C]' : 'bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#0F172A]'}`}
+          >
+            Todos
+          </button>
+          <button 
+            onClick={() => setFilterStatus('active')}
+            className={`px-4 py-2 rounded-xl font-display font-bold text-sm whitespace-nowrap transition-colors ${filterStatus === 'active' ? 'bg-[#2A5D8F] text-white shadow-[0_3px_0_#1B3D5C]' : 'bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#0F172A]'}`}
+          >
+            Activos
+          </button>
+          <button 
+            onClick={() => setFilterStatus('inactive')}
+            className={`px-4 py-2 rounded-xl font-display font-bold text-sm whitespace-nowrap transition-colors ${filterStatus === 'inactive' ? 'bg-[#2A5D8F] text-white shadow-[0_3px_0_#1B3D5C]' : 'bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#0F172A]'}`}
+          >
+            Inactivos
+          </button>
+        </div>
         <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 z-10 w-full lg:w-auto">
           <div>
             <div className="relative">

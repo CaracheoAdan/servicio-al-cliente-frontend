@@ -124,7 +124,11 @@ export function MasterTablePage() {
 
   return (
     <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] overflow-hidden font-body animate-fade-in-up">
-      <div className="p-6 border-b border-[#E2E8F0] flex flex-col md:flex-row justify-end items-center bg-white rounded-t-2xl gap-4">
+      <div className="p-6 border-b border-[#E2E8F0] flex flex-col md:flex-row justify-between items-center bg-white rounded-t-2xl gap-4">
+        <div className="font-display font-bold text-[#0F172A] text-lg flex items-center gap-2">
+          <TableIcon className="w-5 h-5 text-[#2A5D8F]" />
+          Exportación de Datos
+        </div>
         <button 
           onClick={handleExportExcel}
           disabled={loading || data.length === 0}

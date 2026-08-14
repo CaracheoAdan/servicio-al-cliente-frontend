@@ -10,6 +10,7 @@ export function OrderListPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
 
   const fetchOrders = async () => {
     try {
@@ -103,9 +104,13 @@ export function OrderListPage() {
     }
   };
 
-  const filteredOrders = orders.filter(o => 
-    (o.key || '').toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredOrders = orders.filter(o => {
+    const matchesSearch = (o.key || '').toLowerCase().includes(searchTerm.toLowerCase());
+    if (filterStatus === 'all') return matchesSearch;
+    if (filterStatus === 'active') return matchesSearch && o.status !== 'closed' && o.status !== 'delivered';
+    if (filterStatus === 'completed') return matchesSearch && (o.status === 'closed' || o.status === 'delivered');
+    return matchesSearch;
+  });
 
   const totalOrders = orders.length;
   const activeOrders = orders.filter(o => o.status !== 'closed' && o.status !== 'delivered').length;
@@ -113,8 +118,31 @@ export function OrderListPage() {
 
   return (
     <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] min-h-[500px] flex flex-col font-body animate-fade-in-up">
-      <div className="p-6 border-b border-[#E2E8F0] flex flex-col md:flex-row justify-end items-center bg-white rounded-t-2xl gap-4">
+      <div className="p-6 border-b border-[#E2E8F0] flex flex-col md:flex-row justify-between items-center bg-white rounded-t-2xl gap-4">
         
+        {/* Quick Filters */}
+        <div className="flex items-center space-x-2 w-full lg:w-auto overflow-x-auto pb-2 md:pb-0">
+          <button 
+            onClick={() => setFilterStatus('all')}
+            className={`px-4 py-2 rounded-xl font-display font-bold text-sm whitespace-nowrap transition-colors ${filterStatus === 'all' ? 'bg-[#2A5D8F] text-white shadow-[0_3px_0_#1B3D5C]' : 'bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#0F172A]'}`}
+          >
+            Todas
+          </button>
+          <button 
+            onClick={() => setFilterStatus('active')}
+            className={`px-4 py-2 rounded-xl font-display font-bold text-sm whitespace-nowrap transition-colors ${filterStatus === 'active' ? 'bg-[#2A5D8F] text-white shadow-[0_3px_0_#1B3D5C]' : 'bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#0F172A]'}`}
+          >
+            En Proceso
+          </button>
+          <button 
+            onClick={() => setFilterStatus('completed')}
+            className={`px-4 py-2 rounded-xl font-display font-bold text-sm whitespace-nowrap transition-colors ${filterStatus === 'completed' ? 'bg-[#2A5D8F] text-white shadow-[0_3px_0_#1B3D5C]' : 'bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0] hover:text-[#0F172A]'}`}
+          >
+            Completadas
+          </button>
+        </div>
+        
+        {/* Search */}
         <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 z-10 w-full lg:w-auto">
           <div>
             <div className="relative">
