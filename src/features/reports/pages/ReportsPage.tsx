@@ -16,6 +16,7 @@ import { orderService } from '../../../shared/api/orderService';
 export function ReportsPage() {
   const [transportData, setTransportData] = useState<any[]>([]);
   const [fulfillmentData, setFulfillmentData] = useState<any[]>([]);
+  const [latestOrder, setLatestOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,6 +28,8 @@ export function ReportsPage() {
 
         const transport: any[] = [];
         const fulfillment: any[] = [];
+        let mostRecentOrder: any = null;
+        let latestTime = 0;
 
         orders.forEach((order: any) => {
           // --- Cálculo de Picos de Transporte ---
@@ -39,6 +42,30 @@ export function ReportsPage() {
             const hours = date.getHours();
             const minutes = date.getMinutes();
             const decimalTime = hours + (minutes / 60);
+            const timeMs = date.getTime();
+
+            // Track latest dispatched order
+            if (timeMs > latestTime) {
+              latestTime = timeMs;
+              
+              let totalOrdered = 0;
+              let totalDelivered = 0;
+              if (order.items && order.items.length > 0) {
+                order.items.forEach((item: any) => {
+                  totalOrdered += (item.ordered_quantity || item.orderedQuantity || 0);
+                  totalDelivered += (item.delivered_quantity || item.deliveredQuantity || 0);
+                });
+              }
+
+              mostRecentOrder = {
+                key: order.key,
+                status: order.status,
+                shippingDate: date,
+                totalOrdered,
+                totalDelivered,
+                fulfillment: totalOrdered > 0 ? Math.round((totalDelivered / totalOrdered) * 100) : 0
+              };
+            }
             
             // Solo lo incluimos si es una hora razonable de envío (por ej, descartar las de 00:00 por defecto)
             if (hours > 0) {
@@ -72,6 +99,7 @@ export function ReportsPage() {
 
         setTransportData(transport);
         setFulfillmentData(fulfillment);
+        setLatestOrder(mostRecentOrder);
 
       } catch (error) {
         console.error("Error al generar reportes", error);
@@ -107,43 +135,69 @@ export function ReportsPage() {
         </div>
       ) : (
         <>
-          {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* KPI 1: Eficiencia (Ejemplo) */}
-            <div className="bg-white p-6 rounded-2xl shadow-card-base border border-[#E2E8F0] flex items-center space-x-4 card-glow transition-all">
-              <div className="bg-[#EFF6FF] p-4 rounded-2xl">
-                <TrendingUp className="w-8 h-8 text-[#2A5D8F]" />
-              </div>
-              <div>
-                <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Eficiencia OEE</p>
-                <p className="text-3xl font-mono font-bold text-[#0F172A] mt-1">92<span className="text-lg text-[#94A3B8]">%</span></p>
-              </div>
-            </div>
+          {/* KPI Cards: Última Orden Salida */}
+          <div className="mb-8">
+            {latestOrder ? (
+              <div className="bg-white p-6 md:p-8 rounded-2xl shadow-card-base border border-[#E2E8F0] card-glow transition-all relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#10B981]/10 to-transparent rounded-bl-full pointer-events-none"></div>
+                
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                  <div className="flex items-center gap-3 mb-4 md:mb-0">
+                    <div className="bg-[#ECFDF5] p-3 rounded-2xl border border-[#D1FAE5]">
+                      <Truck className="w-6 h-6 text-[#10B981]" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-display font-bold text-[#64748B] uppercase tracking-wide">Último Camión Lanzado</h3>
+                      <p className="text-2xl font-mono font-bold text-[#0F172A]">Orden <span className="text-[#2A5D8F]">#{latestOrder.key}</span></p>
+                    </div>
+                  </div>
+                  <div className="bg-[#ECFDF5] px-4 py-2 rounded-xl border border-[#A7F3D0] flex items-center">
+                    <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse mr-2"></div>
+                    <span className="font-display font-bold text-sm text-[#065F46] uppercase tracking-wider">
+                      {latestOrder.status?.toLowerCase() === 'delivered' ? 'Entregado' : latestOrder.status?.toLowerCase() === 'closed' ? 'Cerrado' : 'En Tránsito'}
+                    </span>
+                  </div>
+                </div>
 
-            {/* KPI 2: Ordenes Entregadas */}
-            <div className="bg-white p-6 rounded-2xl shadow-card-base border border-[#E2E8F0] flex items-center space-x-4 card-glow transition-all">
-              <div className="bg-[#FFFBEB] p-4 rounded-2xl">
-                <Truck className="w-8 h-8 text-[#D97706]" />
-              </div>
-              <div>
-                <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Órdenes Procesadas</p>
-                <p className="text-3xl font-mono font-bold text-[#0F172A] mt-1">{transportData.length} <span className="text-lg text-[#94A3B8]">órdenes</span></p>
-              </div>
-            </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-white rounded-xl shadow-sm border border-[#E2E8F0]">
+                      <Clock className="w-5 h-5 text-[#64748B]" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Hora de Salida</p>
+                      <p className="font-mono font-bold text-[#0F172A] text-lg">{latestOrder.shippingDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-white rounded-xl shadow-sm border border-[#E2E8F0]">
+                      <CheckCircle2 className="w-5 h-5 text-[#2A5D8F]" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Cumplimiento</p>
+                      <p className="font-mono font-bold text-[#0F172A] text-lg">{latestOrder.fulfillment}%</p>
+                    </div>
+                  </div>
 
-            {/* KPI 3: Promedio Cumplimiento */}
-            <div className="bg-white p-6 rounded-2xl shadow-card-base border border-[#E2E8F0] flex items-center space-x-4 card-glow transition-all">
-              <div className="bg-[#EFF6FF] p-4 rounded-2xl">
-                <CheckCircle2 className="w-8 h-8 text-[#2A5D8F]" />
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-white rounded-xl shadow-sm border border-[#E2E8F0]">
+                      <TrendingUp className="w-5 h-5 text-[#D97706]" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Productos Surtidos</p>
+                      <p className="font-mono font-bold text-[#0F172A] text-lg">{latestOrder.totalDelivered} <span className="text-sm font-medium text-[#64748B]">de {latestOrder.totalOrdered} ped.</span></p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Cumplimiento Global</p>
-                <p className="text-3xl font-mono font-bold text-[#0F172A] mt-1">
-                  {fulfillmentData.length > 0 ? Math.round(fulfillmentData.reduce((acc, curr) => acc + curr.fulfillment, 0) / fulfillmentData.length) : 0}
-                  <span className="text-lg text-[#94A3B8]">%</span>
-                </p>
+            ) : (
+              <div className="bg-white p-8 rounded-2xl shadow-card-base border border-[#E2E8F0] flex flex-col items-center justify-center text-center">
+                <Truck className="w-10 h-10 text-[#94A3B8] mb-3" />
+                <h3 className="font-display font-bold text-[#0F172A] text-lg">No hay camiones en ruta</h3>
+                <p className="text-[#64748B] text-sm mt-1">Cuando liberes una orden, aparecerá aquí como la última salida.</p>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
