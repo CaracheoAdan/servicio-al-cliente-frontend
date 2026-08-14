@@ -8,21 +8,22 @@ const DUR = 8;
 // 15 box positions forming the T (28x28 boxes)
 // Build order: stem bottom-up, then top bar center-out
 const BOXES = [
-  { x: 146, y: 132, side: 'L' as const },
-  { x: 174, y: 132, side: 'R' as const },
-  { x: 146, y: 104, side: 'L' as const },
-  { x: 174, y: 104, side: 'R' as const },
-  { x: 146, y: 76, side: 'L' as const },
-  { x: 174, y: 76, side: 'R' as const },
-  { x: 146, y: 48, side: 'L' as const },
-  { x: 174, y: 48, side: 'R' as const },
-  { x: 118, y: 48, side: 'L' as const },
-  { x: 202, y: 48, side: 'R' as const },
-  { x: 90, y: 48, side: 'L' as const },
-  { x: 230, y: 48, side: 'R' as const },
-  { x: 62, y: 48, side: 'L' as const },
-  { x: 258, y: 48, side: 'R' as const },
-  { x: 34, y: 48, side: 'L' as const },
+  // Stem bottom-up (centered at x=160: cols at 132, 160)
+  { x: 132, y: 132, side: 'L' as const },
+  { x: 160, y: 132, side: 'R' as const },
+  { x: 132, y: 104, side: 'L' as const },
+  { x: 160, y: 104, side: 'R' as const },
+  { x: 132, y: 76, side: 'L' as const },
+  { x: 160, y: 76, side: 'R' as const },
+  // Top bar center-out (8 cols symmetric around x=160)
+  { x: 132, y: 48, side: 'L' as const },
+  { x: 160, y: 48, side: 'R' as const },
+  { x: 104, y: 48, side: 'L' as const },
+  { x: 188, y: 48, side: 'R' as const },
+  { x: 76, y: 48, side: 'L' as const },
+  { x: 216, y: 48, side: 'R' as const },
+  { x: 48, y: 48, side: 'L' as const },
+  { x: 244, y: 48, side: 'R' as const },
 ];
 
 const pct = (t: number): string => ((t / DUR) * 100).toFixed(2) + '%';
@@ -309,8 +310,8 @@ export function AnimatedLogoContainer() {
               </filter>
             </defs>
             <g filter="url(#tS)">
-              <rect x="34" y="48" width="252" height="28" rx="5" fill="url(#tG)" />
-              <rect x="146" y="48" width="56" height="112" rx="5" fill="url(#tG)" />
+              <rect x="48" y="48" width="224" height="28" rx="5" fill="url(#tG)" />
+              <rect x="132" y="48" width="56" height="112" rx="5" fill="url(#tG)" />
             </g>
           </svg>
         )}
