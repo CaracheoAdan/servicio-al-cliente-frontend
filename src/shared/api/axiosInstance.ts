@@ -26,21 +26,33 @@ api.interceptors.response.use(
     // Let's import it at the top.
     
     let message = 'Ocurrió un error inesperado';
+    const isLoginEndpoint = error.config?.url?.includes('/auth/login');
+    let shouldShowToast = true;
+
     if (error.response) {
       switch (error.response.status) {
         case 400:
           message = 'Petición inválida. Verifica los datos.';
+          if (isLoginEndpoint) shouldShowToast = false; // Manejado en LoginPage
           break;
         case 401:
-          message = 'Sesión expirada. Por favor, inicia sesión nuevamente.';
-          localStorage.removeItem('totebin_token');
-          window.location.href = '/login';
+          if (isLoginEndpoint) {
+            shouldShowToast = false; // Manejado en LoginPage
+          } else {
+            message = 'Sesión expirada. Por favor, inicia sesión nuevamente.';
+            localStorage.removeItem('totebin_token');
+            if (window.location.pathname !== '/login') {
+              window.location.href = '/login';
+            }
+          }
           break;
         case 403:
           message = 'No tienes permisos para realizar esta acción.';
+          if (isLoginEndpoint) shouldShowToast = false;
           break;
         case 404:
           message = 'Recurso no encontrado.';
+          if (isLoginEndpoint) shouldShowToast = false;
           break;
         case 500:
           message = 'Error interno del servidor. Contacta a soporte.';
@@ -48,12 +60,15 @@ api.interceptors.response.use(
       }
     } else if (error.request) {
       message = 'No hay conexión con el servidor. Revisa tu red.';
+      if (isLoginEndpoint) shouldShowToast = false;
     }
     
     // We import toast dynamically to avoid breaking tests or pure Node contexts
-    import('react-hot-toast').then(({ toast }) => {
-      toast.error(message, { id: 'global-axios-error' }); // Use id to prevent duplicate toasts
-    });
+    if (shouldShowToast) {
+      import('react-hot-toast').then(({ toast }) => {
+        toast.error(message, { id: 'global-axios-error' }); // Use id to prevent duplicate toasts
+      });
+    }
 
     return Promise.reject(error);
   }
