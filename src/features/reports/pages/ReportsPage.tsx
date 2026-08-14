@@ -44,123 +44,10 @@ const CustomFulfillmentTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
+import { useReports } from '../hooks/useReports';
+
 export function ReportsPage() {
-  const [transportData, setTransportData] = useState<any[]>([]);
-  const [fulfillmentData, setFulfillmentData] = useState<any[]>([]);
-  const [latestOrder, setLatestOrder] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAndComputeReports = async () => {
-      try {
-        setLoading(true);
-        // Pedimos todas las órdenes reales al servidor, completamente hidratadas
-        const orders = await orderService.getAllCombinedOrders();
-
-        const transport: any[] = [];
-        const fulfillment: any[] = [];
-        let mostRecentOrder: any = null;
-        let latestTime = 0;
-
-        orders.forEach((order: any) => {
-          // --- Cálculo de Picos de Transporte ---
-          // Usar la relación detail y validar estatus
-          const isDelivered = ['in_delivery', 'delivered', 'closed'].includes(order.status?.toLowerCase());
-          const shippingDateStr = order.detail?.shippingDate || order.detail?.shipping_date || order.detail?.scheduledDeliveryDate;
-          
-          if (isDelivered && shippingDateStr) {
-            const date = new Date(shippingDateStr);
-            const hours = date.getHours();
-            const minutes = date.getMinutes();
-            const decimalTime = hours + (minutes / 60);
-            const timeMs = date.getTime();
-
-            // Track latest dispatched order
-            if (timeMs > latestTime) {
-              latestTime = timeMs;
-              
-              let totalOrdered = 0;
-              let totalDelivered = 0;
-              if (order.items && order.items.length > 0) {
-                order.items.forEach((item: any) => {
-                  totalOrdered += (item.ordered_quantity || item.orderedQuantity || 0);
-                  totalDelivered += (item.delivered_quantity || item.deliveredQuantity || 0);
-                });
-              }
-
-              mostRecentOrder = {
-                key: order.key,
-                status: order.status,
-                shippingDate: date,
-                totalOrdered,
-                totalDelivered,
-                fulfillment: totalOrdered > 0 ? Math.round((totalDelivered / totalOrdered) * 100) : 0
-              };
-            }
-            
-            // Solo lo incluimos si es una hora razonable de envío (por ej, descartar las de 00:00 por defecto)
-            if (hours > 0) {
-              transport.push({
-                order: order.key,
-                time: decimalTime,
-                label: formatTimeAxis(decimalTime)
-              });
-            }
-          }
-
-          // --- Cálculo de Cumplimiento ---
-          if (order.items && order.items.length > 0) {
-            let totalOrdered = 0;
-            let totalDelivered = 0;
-
-            order.items.forEach((item: any) => {
-              const oq = item.ordered_quantity || item.orderedQuantity || 0;
-              const dq = item.delivered_quantity || item.deliveredQuantity || 0;
-              totalOrdered += oq;
-              totalDelivered += dq;
-            });
-
-            if (totalOrdered > 0) {
-              const percentage = Math.round((totalDelivered / totalOrdered) * 100);
-              fulfillment.push({
-                order: order.key,
-                fulfillment: percentage,
-                totalOrdered,
-                totalDelivered
-              });
-            }
-          }
-        });
-
-        setTransportData(transport);
-        setFulfillmentData(fulfillment);
-        setLatestOrder(mostRecentOrder);
-
-      } catch (error) {
-        console.error("Error al generar reportes", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAndComputeReports();
-  }, []);
-
-  const getGeneralMetrics = () => {
-    if (transportData.length === 0 || fulfillmentData.length === 0) return { onTimePct: 0, fulfillPct: 0, general: 0 };
-    
-    // Punto 3: % Cumplimiento a entregas (salieron <= 11:30 AM = 11.5 decimal)
-    const onTimeCount = transportData.filter(t => t.time <= 11.5).length;
-    const onTimePct = Math.round((onTimeCount / transportData.length) * 100);
-
-    // Punto 5: % Cumplimiento de entregas (promedio de surtido)
-    const fulfillPct = Math.round(fulfillmentData.reduce((acc, curr) => acc + curr.fulfillment, 0) / fulfillmentData.length);
-
-    const general = Math.round((onTimePct * fulfillPct) / 100);
-    return { onTimePct, fulfillPct, general };
-  };
-
-  const { onTimePct, fulfillPct, general } = getGeneralMetrics();
+  const { loading, error, transportData, fulfillmentData, latestOrder, generalMetrics } = useReports();
 
   const getFaceConfig = (score: number) => {
     if (score >= 75) return { emoji: '😃', color: 'text-[#10B981]', bg: 'bg-[#ECFDF5]', border: 'border-[#D1FAE5]' };
@@ -168,7 +55,15 @@ export function ReportsPage() {
     return { emoji: '😞', color: 'text-[#EF4444]', bg: 'bg-[#FEF2F2]', border: 'border-[#FEE2E2]' };
   };
 
-  const faceConfig = getFaceConfig(general);
+  const faceConfig = getFaceConfig(generalMetrics?.general || 0);
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-64 bg-white rounded-2xl shadow-card-base border border-red-200">
+        <p className="text-red-500 font-bold">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fade-in-up font-body">
@@ -282,18 +177,18 @@ export function ReportsPage() {
 
               <div className="flex items-end gap-3 mb-6">
                 <p className={`text-6xl font-mono font-bold leading-none tracking-tight ${faceConfig.color}`}>
-                  {general}%
+                  {generalMetrics.general}%
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4">
                 <div>
                   <p className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide mb-1">Cump. de Entregas (Cant.)</p>
-                  <p className="font-mono font-bold text-[#0F172A] text-lg">{fulfillPct}%</p>
+                  <p className="font-mono font-bold text-[#0F172A] text-lg">{generalMetrics.fulfillPct}%</p>
                 </div>
                 <div className="border-l border-[#E2E8F0] pl-4">
                   <p className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide mb-1">Cump. a Entregas (Tiempo)</p>
-                  <p className="font-mono font-bold text-[#0F172A] text-lg">{onTimePct}%</p>
+                  <p className="font-mono font-bold text-[#0F172A] text-lg">{generalMetrics.onTimePct}%</p>
                 </div>
               </div>
             </div>

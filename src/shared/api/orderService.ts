@@ -1,39 +1,128 @@
 import { api } from './axiosInstance';
 
+// Enums y Tipos Base
+export enum OrderStatus {
+  NONE = 'NONE',
+  OPEN = 'OPEN',
+  CLOSED = 'CLOSED',
+  IN_PRODUCTION = 'IN_PRODUCTION',
+  IN_DELIVERY = 'IN_DELIVERY',
+  DELIVERED = 'DELIVERED',
+  IN_PROCESS = 'IN_PROCESS',
+  PRODUCED = 'PRODUCED',
+  PROCESSED = 'PROCESSED'
+}
+
+export interface RawOrder {
+  id: number;
+  key: string;
+  status: OrderStatus;
+}
+
+export interface RawOrderDetail {
+  id: number;
+  orderId?: number;
+  order_id?: number;
+  scheduledDeliveryDate?: string;
+  scheduled_delivery_date?: string;
+  shippingDate?: string;
+  shipping_date?: string;
+}
+
+export interface RawOrderItem {
+  id: number;
+  orderId?: number;
+  order_id?: number;
+  productId?: number;
+  product_id?: number;
+  orderedQuantity?: number;
+  ordered_quantity?: number;
+  deliveredQuantity?: number;
+  delivered_quantity?: number;
+  product?: {
+    id: number;
+    name: string;
+  };
+  product_name?: string;
+}
+
+export interface CombinedOrderItem {
+  id: number;
+  productId: number;
+  productName: string;
+  orderedQuantity: number;
+  deliveredQuantity: number;
+}
+
+export interface CombinedOrderDetail {
+  id: number;
+  scheduledDeliveryDate: string;
+  shippingDate: string;
+}
+
+export interface CombinedOrder {
+  id: number;
+  key: string;
+  status: OrderStatus;
+  detail: CombinedOrderDetail | null;
+  items: CombinedOrderItem[];
+}
+
+export interface CreateOrderPayload {
+  key: string;
+  status: OrderStatus;
+  scheduledDeliveryDate?: string;
+  shippingDate?: string;
+  items: Omit<CombinedOrderItem, 'id' | 'productName'>[];
+}
+
 export const orderService = {
-  async getAllCombinedOrders() {
-    // 1. Fetch todo por separado
+  /**
+   * Obtiene todas las ordenes, detalles e items, y los combina en objetos hidratados.
+   */
+  async getAllCombinedOrders(): Promise<CombinedOrder[]> {
     const [ordersRes, detailsRes, itemsRes] = await Promise.all([
       api.get('/orders'),
       api.get('/orderDetails'),
       api.get('/order_items')
     ]);
 
-    const orders = Array.isArray(ordersRes.data) ? ordersRes.data : (ordersRes.data.items || ordersRes.data.data || []);
-    const details = Array.isArray(detailsRes.data) ? detailsRes.data : (detailsRes.data.items || detailsRes.data.data || []);
-    const items = Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data.items || itemsRes.data.data || []);
+    const orders: RawOrder[] = Array.isArray(ordersRes.data) ? ordersRes.data : (ordersRes.data.items || ordersRes.data.data || []);
+    const details: RawOrderDetail[] = Array.isArray(detailsRes.data) ? detailsRes.data : (detailsRes.data.items || detailsRes.data.data || []);
+    const items: RawOrderItem[] = Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data.items || itemsRes.data.data || []);
 
-    // 2. Combinar en memoria
-    return orders.map((order: any) => {
-      const orderDetail = details.find((d: any) => d.orderId === order.id || d.order_id === order.id);
-      const orderItemsList = items.filter((i: any) => i.orderId === order.id || i.order_id === order.id);
+    return orders.map((order) => {
+      const orderDetail = details.find(d => d.orderId === order.id || d.order_id === order.id);
+      const orderItemsList = items.filter(i => i.orderId === order.id || i.order_id === order.id);
 
       return {
-        ...order,
-        detail: orderDetail || {},
-        items: orderItemsList
+        id: order.id,
+        key: order.key,
+        status: (order.status?.toString().toUpperCase() as OrderStatus) || OrderStatus.NONE,
+        detail: orderDetail ? {
+          id: orderDetail.id,
+          scheduledDeliveryDate: orderDetail.scheduledDeliveryDate || orderDetail.scheduled_delivery_date || '',
+          shippingDate: orderDetail.shippingDate || orderDetail.shipping_date || ''
+        } : null,
+        items: orderItemsList.map(i => ({
+          id: i.id,
+          productId: i.productId || i.product_id || 0,
+          productName: i.product?.name || i.product_name || `Producto #${i.productId || i.product_id}`,
+          orderedQuantity: i.orderedQuantity || i.ordered_quantity || 0,
+          deliveredQuantity: i.deliveredQuantity || i.delivered_quantity || 0
+        }))
       };
     });
   },
 
-  async getOrderById(id: string | number) {
+  async getOrderById(id: string | number): Promise<CombinedOrder | undefined> {
     const combinedOrders = await this.getAllCombinedOrders();
-    return combinedOrders.find((o: any) => o.id.toString() === id.toString());
+    return combinedOrders.find(o => o.id.toString() === id.toString());
   },
 
-  async createOrder(payload: any) {
-    // 1. Crear Orden base
-    const orderRes = await api.post('/orders', { key: payload.key, status: payload.status });
+  async createOrder(payload: CreateOrderPayload): Promise<number> {
+    const statusUpper = payload.status.toUpperCase();
+    const orderRes = await api.post('/orders', { key: payload.key, status: statusUpper });
     
     let orderId: number;
     if (typeof orderRes.data === 'number') {
@@ -43,21 +132,19 @@ export const orderService = {
       orderId = order.id;
     }
 
-    // 2. Crear Detalle
-    if (payload.scheduledDeliveryDate || payload.shippingDate || payload.comments) {
+    if (payload.scheduledDeliveryDate || payload.shippingDate) {
       await api.post('/orderDetails', {
-        orderId: orderId,
+        orderId,
         scheduledDeliveryDate: payload.scheduledDeliveryDate ? new Date(payload.scheduledDeliveryDate).toISOString() : new Date().toISOString(),
         shippingDate: payload.shippingDate ? new Date(payload.shippingDate).toISOString() : new Date().toISOString()
       });
     }
 
-    // 3. Crear Items
     if (payload.items && payload.items.length > 0) {
       await Promise.all(
-        payload.items.map((item: any) => 
+        payload.items.map(item => 
           api.post('/order_items', {
-            orderId: orderId,
+            orderId,
             productId: item.productId,
             orderedQuantity: item.orderedQuantity,
             deliveredQuantity: item.deliveredQuantity
@@ -69,14 +156,14 @@ export const orderService = {
     return orderId;
   },
 
-  async updateOrder(id: string | number, payload: any, currentDetailId?: number, currentItemIds?: number[]) {
-    // 1. Actualizar Orden base
-    await api.put(`/orders/${id}`, { key: payload.key, status: payload.status });
+  async updateOrder(id: string | number, payload: CreateOrderPayload): Promise<void> {
+    const statusUpper = payload.status.toUpperCase();
+    // PUT sin id en el payload, solo en la URL
+    await api.put(`/orders/${id}`, { key: payload.key, status: statusUpper });
 
-    // 2. Actualizar o Crear Detalle (para simplificar, crearemos un wrapper, si no hay detail lo creamos)
     const detailsRes = await api.get('/orderDetails');
-    const details = Array.isArray(detailsRes.data) ? detailsRes.data : (detailsRes.data.items || detailsRes.data.data || []);
-    const existingDetail = details.find((d: any) => d.orderId.toString() === id.toString() || d.order_id?.toString() === id.toString());
+    const details: RawOrderDetail[] = Array.isArray(detailsRes.data) ? detailsRes.data : (detailsRes.data.items || detailsRes.data.data || []);
+    const existingDetail = details.find(d => d.orderId?.toString() === id.toString() || d.order_id?.toString() === id.toString());
 
     const detailPayload = {
       orderId: Number(id),
@@ -90,18 +177,15 @@ export const orderService = {
       await api.post('/orderDetails', detailPayload);
     }
 
-    // 3. Recrear Items (eliminar existentes y crear nuevos es la forma mas segura si no tenemos tracking de IDs en UI)
     const itemsRes = await api.get('/order_items');
-    const items = Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data.items || itemsRes.data.data || []);
-    const existingItems = items.filter((i: any) => i.orderId.toString() === id.toString() || i.order_id?.toString() === id.toString());
+    const items: RawOrderItem[] = Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data.items || itemsRes.data.data || []);
+    const existingItems = items.filter(i => i.orderId?.toString() === id.toString() || i.order_id?.toString() === id.toString());
 
-    // Borramos los viejos
-    await Promise.all(existingItems.map((i: any) => api.delete(`/order_items/${i.id}`).catch(() => {})));
+    await Promise.all(existingItems.map(i => api.delete(`/order_items/${i.id}`).catch(() => {})));
 
-    // Insertamos los nuevos
     if (payload.items && payload.items.length > 0) {
       await Promise.all(
-        payload.items.map((item: any) => 
+        payload.items.map(item => 
           api.post('/order_items', {
             orderId: Number(id),
             productId: item.productId,
