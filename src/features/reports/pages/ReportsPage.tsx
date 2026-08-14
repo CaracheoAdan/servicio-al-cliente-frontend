@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, Clock, TrendingUp, Truck, CheckCircle2, Smile, Meh, Frown, Activity } from 'lucide-react';
+import { BarChart3, Clock, TrendingUp, Truck, CheckCircle2, Smile, Meh, Frown, Activity, Trophy, AlertOctagon } from 'lucide-react';
 import { api } from '../../../shared/api/axiosInstance';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, ReferenceArea, Cell
@@ -48,6 +48,7 @@ export function ReportsPage() {
   const [transportData, setTransportData] = useState<any[]>([]);
   const [fulfillmentData, setFulfillmentData] = useState<any[]>([]);
   const [latestOrder, setLatestOrder] = useState<any>(null);
+  const [productInsights, setProductInsights] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -114,8 +115,10 @@ export function ReportsPage() {
             let totalDelivered = 0;
 
             order.items.forEach((item: any) => {
-              totalOrdered += (item.ordered_quantity || item.orderedQuantity || 0);
-              totalDelivered += (item.delivered_quantity || item.deliveredQuantity || 0);
+              const oq = item.ordered_quantity || item.orderedQuantity || 0;
+              const dq = item.delivered_quantity || item.deliveredQuantity || 0;
+              totalOrdered += oq;
+              totalDelivered += dq;
             });
 
             if (totalOrdered > 0) {
@@ -130,9 +133,43 @@ export function ReportsPage() {
           }
         });
 
+        // --- Insights de Productos ---
+        const prodStats: Record<string, { ordered: number, delivered: number }> = {};
+        orders.forEach((order: any) => {
+           if (order.items) {
+             order.items.forEach((item: any) => {
+               const name = item.product?.name || item.product_name || `Producto #${item.product_id}`;
+               if (!prodStats[name]) prodStats[name] = { ordered: 0, delivered: 0 };
+               prodStats[name].ordered += (item.ordered_quantity || item.orderedQuantity || 0);
+               prodStats[name].delivered += (item.delivered_quantity || item.deliveredQuantity || 0);
+             });
+           }
+        });
+
+        let mostPopular = null;
+        let worstFulfillment = null;
+        let maxOrdered = -1;
+        let lowestRate = 101;
+
+        Object.keys(prodStats).forEach((name) => {
+          const stat = prodStats[name];
+          if (stat.ordered > maxOrdered) {
+            maxOrdered = stat.ordered;
+            mostPopular = { name, ...stat };
+          }
+          if (stat.ordered > 0) {
+            const rate = Math.round((stat.delivered / stat.ordered) * 100);
+            if (rate < lowestRate) {
+              lowestRate = rate;
+              worstFulfillment = { name, rate, ...stat };
+            }
+          }
+        });
+
         setTransportData(transport);
         setFulfillmentData(fulfillment);
         setLatestOrder(mostRecentOrder);
+        setProductInsights({ popular: mostPopular, worst: worstFulfillment });
 
       } catch (error) {
         console.error("Error al generar reportes", error);
@@ -389,6 +426,45 @@ export function ReportsPage() {
               </div>
             </div>
           </div>
+
+          {/* Product Insights Row */}
+          {productInsights && productInsights.popular && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+              <div className="bg-white p-6 rounded-2xl shadow-card-base border border-[#E2E8F0] card-glow flex items-center gap-6 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-2 h-full bg-[#D97706]"></div>
+                <div className="bg-[#FFFBEB] p-4 rounded-full border border-[#FEF3C7] flex-shrink-0">
+                  <Trophy className="w-10 h-10 text-[#D97706]" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide mb-1">El Más Popular</p>
+                  <h4 className="text-xl font-display font-bold text-[#0F172A] leading-tight mb-2 truncate max-w-[250px]">{productInsights.popular.name}</h4>
+                  <div className="flex gap-4">
+                    <div>
+                      <span className="text-[10px] text-[#94A3B8] font-bold uppercase tracking-wider block">Total Pedido</span>
+                      <span className="font-mono font-bold text-[#D97706] text-lg">{productInsights.popular.ordered} <span className="text-sm font-normal">unds</span></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-2xl shadow-card-base border border-[#E2E8F0] card-glow flex items-center gap-6 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-2 h-full bg-[#DC2626]"></div>
+                <div className="bg-[#FEF2F2] p-4 rounded-full border border-[#FEE2E2] flex-shrink-0">
+                  <AlertOctagon className="w-10 h-10 text-[#DC2626]" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide mb-1">Mayor Riesgo Faltante</p>
+                  <h4 className="text-xl font-display font-bold text-[#0F172A] leading-tight mb-2 truncate max-w-[250px]">{productInsights.worst.name}</h4>
+                  <div className="flex gap-4 items-center">
+                    <div className="bg-[#FEF2F2] px-3 py-1 rounded-lg border border-[#FEE2E2]">
+                      <span className="font-mono font-bold text-[#DC2626] text-lg">{productInsights.worst.rate}% <span className="text-xs font-bold uppercase tracking-wider ml-1">Surtido</span></span>
+                    </div>
+                    <span className="text-sm font-medium text-[#64748B]">{productInsights.worst.ordered - productInsights.worst.delivered} unds faltantes</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
