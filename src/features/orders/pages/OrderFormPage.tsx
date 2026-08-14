@@ -78,8 +78,43 @@ export function OrderFormPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!orderKey.trim()) {
+      toast.error('El No. de Orden es requerido y no puede estar vacío.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+      return;
+    }
+
+    if (!scheduledDeliveryDate) {
+      toast.error('La fecha compromiso de entrega es requerida.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+      return;
+    }
+
+    if (items.length === 0) {
+      toast.error('Debe agregar al menos un producto a la orden.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+      return;
+    }
+
     if (items.some(item => !item.productId)) {
       toast.error('Por favor selecciona un producto en todas las filas.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+      return;
+    }
+
+    // Check duplicate products
+    const productIds = items.map(i => i.productId);
+    const uniqueProductIds = new Set(productIds);
+    if (uniqueProductIds.size !== productIds.length) {
+      toast.error('No puedes duplicar el mismo producto en diferentes filas.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+      return;
+    }
+
+    // Check for valid quantities
+    if (items.some(item => Number(item.orderedQuantity) < 1 || isNaN(Number(item.orderedQuantity)))) {
+      toast.error('La cantidad pedida debe ser un número entero mayor o igual a 1.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+      return;
+    }
+
+    if (items.some(item => Number(item.deliveredQuantity) < 0 || isNaN(Number(item.deliveredQuantity)))) {
+      toast.error('La cantidad surtida no puede ser negativa.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
       return;
     }
 
@@ -91,8 +126,8 @@ export function OrderFormPage() {
         comments: comments, // Enviamos el comentario al backend
         items: items.map(item => ({
           productId: parseInt(item.productId as string, 10),
-          orderedQuantity: item.orderedQuantity,
-          deliveredQuantity: item.deliveredQuantity
+          orderedQuantity: parseInt(item.orderedQuantity as string, 10),
+          deliveredQuantity: parseInt(item.deliveredQuantity as string, 10) || 0
         }))
       };
 
@@ -195,7 +230,7 @@ export function OrderFormPage() {
                     type="number"
                     min="1"
                     value={item.orderedQuantity}
-                    onChange={(e) => handleItemChange(index, 'orderedQuantity', parseInt(e.target.value) || 1)}
+                    onChange={(e) => handleItemChange(index, 'orderedQuantity', e.target.value)}
                     className="w-full p-3.5 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-mono font-bold transition-all bg-white"
                     required
                   />
@@ -206,7 +241,7 @@ export function OrderFormPage() {
                     type="number"
                     min="0"
                     value={item.deliveredQuantity}
-                    onChange={(e) => handleItemChange(index, 'deliveredQuantity', parseInt(e.target.value) || 0)}
+                    onChange={(e) => handleItemChange(index, 'deliveredQuantity', e.target.value)}
                     className="w-full p-3.5 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-mono font-bold transition-all bg-white"
                   />
                 </div>
