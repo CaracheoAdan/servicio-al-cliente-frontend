@@ -122,9 +122,9 @@ export function OrderFormPage() {
   const isDelivered = status === 'in_delivery' || status === 'delivered' || status === 'closed';
 
   return (
-    <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] overflow-hidden font-body animate-fade-in-up max-w-5xl mx-auto">
+    <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] overflow-hidden font-body animate-fade-in-up w-full mx-auto">
       {/* Cabecera */}
-      <div className="px-8 py-8 border-b border-[#E2E8F0] bg-white flex justify-between items-start">
+      <div className="px-10 md:px-12 py-10 border-b border-[#E2E8F0] bg-white flex justify-between items-start">
         <div className="flex items-center space-x-4">
           <div className="w-16 h-16 rounded-xl bg-[#2A5D8F] flex items-center justify-center shrink-0 shadow-sm">
             <FileText className="w-8 h-8 text-white" />
@@ -147,9 +147,9 @@ export function OrderFormPage() {
         </button>
       </div>
 
-      <form onSubmit={handleSave} className="p-8 space-y-10">
+      <form onSubmit={handleSave} className="p-10 md:p-12 space-y-14">
         {/* Datos Principales */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-[#F8FAFC] p-6 rounded-2xl border border-[#E2E8F0]">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-[#F8FAFC] p-8 md:p-10 rounded-2xl border border-[#E2E8F0]">
           <div>
             <label className="block font-display font-bold text-sm text-[#0F172A] mb-2">No. Orden</label>
             <input
@@ -186,9 +186,9 @@ export function OrderFormPage() {
             </button>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             {items.map((item, index) => (
-              <div key={index} className="flex flex-col md:flex-row items-end gap-4 p-5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] even:bg-white dark:even:bg-[#1E1E1E]">
+              <div key={index} className="flex flex-col md:flex-row items-end gap-6 p-6 md:p-8 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] even:bg-white dark:even:bg-[#1E1E1E]">
                 <div className="w-full md:w-2/5 flex flex-col justify-end">
                   <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#64748B] mb-2">Producto</label>
                   <select
@@ -243,10 +243,10 @@ export function OrderFormPage() {
         </div>
 
         {/* Estatus */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Pedido ya esta producido */}
-          <div className="bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] p-5">
-            <h5 className="font-display font-bold text-[#0F172A] mb-4">Pedido ya está producido</h5>
+          <div className="bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] p-8 md:p-10">
+            <h5 className="font-display font-bold text-[#0F172A] mb-6">Pedido ya está producido</h5>
             <div className="inline-flex rounded-xl bg-[#E2E8F0] dark:bg-[#121212] p-1">
               <button 
                 type="button" 
@@ -266,8 +266,8 @@ export function OrderFormPage() {
           </div>
 
           {/* Salida de transporte */}
-          <div className="bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] p-5">
-            <h5 className="font-display font-bold text-[#0F172A] mb-4">Salida de transporte para entrega</h5>
+          <div className="bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] p-8 md:p-10">
+            <h5 className="font-display font-bold text-[#0F172A] mb-6">Salida de transporte para entrega</h5>
             <div className="inline-flex rounded-xl bg-[#E2E8F0] dark:bg-[#121212] p-1 mb-6 block">
               <button 
                 type="button" 
@@ -303,7 +303,7 @@ export function OrderFormPage() {
         </div>
 
         {/* Acciones */}
-        <div className="flex justify-between items-center pt-8 px-2 border-t border-[#E2E8F0] mt-8">
+        <div className="flex justify-between items-center pt-10 px-2 border-t border-[#E2E8F0] mt-10">
           <button
             type="button"
             onClick={() => handleStatusToggle('closed')}
