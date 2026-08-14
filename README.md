@@ -1,117 +1,132 @@
-# Servicio al Cliente & Logística - Frontend Empresarial
+# Sistema de Logística y Servicio al Cliente (Frontend)
 
-Este repositorio contiene la Single Page Application (SPA) encargada de la gestión operativa, control de producción y logística de envíos para la planta. El código ha sido diseñado bajo estándares corporativos estrictos de **Clean Code, Arquitectura Resiliente y Optimización de Rendimiento**.
+Este repositorio contiene la arquitectura Frontend (Single Page Application) diseñada a nivel corporativo para la **Gestión Operativa, Control de Producción y Logística de Envíos**. 
+
+El sistema actúa como la torre de control de la planta: permite a los operadores crear y monitorear transacciones de pedidos, gestionar la salida física (liberación) de camiones de entrega, y proyectar un Dashboard de Inteligencia de Negocios en tiempo real para gerencia, calculando métricas de rendimiento logístico y cumplimiento de productos.
 
 ---
 
-## 1. Diagrama de Arquitectura Global
+## 1. Topología y Arquitectura del Proyecto
 
-La aplicación sigue el patrón **"Heavy Client"** y **"Anti-Corruption Layer"**. En lugar de que la interfaz visual hable directamente con el backend y sufra por su estricto formato, existe una capa intermedia (`orderService.ts`) que orquesta y traduce todo.
+Para garantizar resiliencia, rendimiento y escalabilidad paralela, la aplicación emplea tres patrones de diseño críticos: **Frontend-Heavy Delegation**, **Feature-Sliced Design**, y un **Anti-Corruption Layer**.
+
+### A. Delegación Computacional (Frontend-Heavy)
+El servidor backend es tratado exclusivamente como un almacén de datos (Data Provider). La matemática pesada ocurre en el cliente:
+* El cálculo de la **Métrica de Cumplimiento General** (Surtido vs Tiempo).
+* La agregación de horas para detectar **Picos de Transporte**.
+* La consolidación de órdenes maestras.
+
+*Estrategia de Rendimiento:* Todo procesamiento masivo está aislado en *Custom Hooks* protegidos por Memoización (`useMemo`), impidiendo que el motor de renderizado de React (Main Thread) colapse o degrade los fotogramas por segundo (FPS).
+
+### B. Anti-Corruption Layer (Capa de Traducción API)
+El backend impone restricciones drásticas bajo el estándar OpenAPI 3.1.1 (ej. no permite incluir IDs en peticiones PUT, exige que todos los enumeradores de estado logístico viajen en UPPERCASE absoluto, y mantiene las cabeceras de orden separadas de sus ítems).
 
 ```mermaid
 sequenceDiagram
     participant UI as 🖥️ UI (React Components)
-    participant Hook as ⚡ Custom Hooks (React Query)
-    participant ACL as 🛡️ Anti-Corruption Layer (orderService)
-    participant API as 🗄️ Backend API (JSON/REST)
+    participant RQ as ⚡ React Query (Caché)
+    participant ACL as 🛡️ orderService (Anti-Corruption Layer)
+    participant API as 🗄️ Backend API (REST)
 
-    UI->>Hook: Solicita datos (ej. useReports)
-    Hook->>ACL: Llama a getAllCombinedOrders()
-    ACL->>API: Ejecuta peticiones en paralelo (/orders, /orderDetails, /order_items)
-    API-->>ACL: Retorna datos separados y en formato estricto
-    Note over ACL: Transforma a UPPERCASE, remueve IDs,<br>y combina los 3 endpoints en un solo objeto.
-    ACL-->>Hook: Retorna `CombinedOrder[]` hidratado y tipado
-    Hook-->>UI: Cachea datos y provee métricas para gráficas
+    UI->>RQ: useReports() solicita datos
+    RQ->>ACL: Llama a getAllCombinedOrders()
+    ACL->>API: Fetch paralelo (/orders, /orderDetails, /order_items)
+    API-->>ACL: JSON fragmentado y estricto
+    Note over ACL: El servicio limpia, formatea a UPPERCASE,<br/>y une la orden con sus items.
+    ACL-->>RQ: Retorna DTO hidratado y limpio
+    RQ-->>UI: Proveé métricas en caché a las gráficas
 ```
 
 ---
 
-## 2. Decisiones Arquitectónicas
+## 2. Árbol de Directorios y Silos de Negocio
 
-### A. Delegación Computacional (Frontend-Heavy)
-El servidor es exclusivamente un proveedor de datos crudos. **Toda la lógica de negocio secundaria se computa en el cliente**.
-* *Rendimiento:* Los cálculos ocurren dentro de Custom Hooks puros protegidos por `useMemo` para no bloquear el Main Thread.
-
-### B. Diseño Feature-Sliced (Orientado a Dominios)
-El código fuente está segregado por "Dominios de Negocio". Un dominio vive en su propio silo aislado.
+La base de código rechaza la estructura tradicional por tipo de archivo y abraza el **Diseño Orientado a Dominios (Feature-Sliced)**. A continuación, el mapa visual del ecosistema y su diccionario de responsabilidades:
 
 ```mermaid
 graph TD
-    A[src/app] --> B(Enrutador y Contextos Globales)
-    C[src/features] --> D(Dominios de Negocio)
-    D --> E[orders]
-    D --> F[reports]
-    D --> G[auth]
-    H[src/shared] --> I(Componentes Genéricos y ACL)
-    
-    E -.->|Consume UI y API| H
-    F -.->|Consume UI y API| H
-    E -.x|Prohibido Importar| F
+    %% Nodos Principales
+    Root((Raíz del Proyecto)) --> App[📁 app /]
+    Root --> Feat[📁 features /]
+    Root --> Shared[📁 shared /]
+
+    %% Detalles de App
+    App --> AppFile[📄 App.tsx: Orquestador Maestro, Enrutador, Lazy Loading]
+
+    %% Detalles de Features (Silos)
+    Feat --> FOrders[📦 orders: Gestión de Transacciones]
+    Feat --> FReports[📊 reports: Inteligencia de Negocios]
+    Feat --> FAuth[🔐 auth: Control de Accesos]
+
+    %% Detalles de Shared
+    Shared --> SApi[🌐 api: Interceptores y orderService]
+    Shared --> SComp[🧩 components: Design System Base]
+
+    %% Relaciones
+    FOrders -.->|Importación Permitida| Shared
+    FReports -.->|Importación Permitida| Shared
+    FOrders -.->|❌ Prohibido Cruzar| FReports
+
+    classDef silo fill:#f9f2f4,stroke:#333,stroke-width:2px;
+    class FOrders,FReports,FAuth silo;
 ```
 
----
+### Diccionario Detallado del Proyecto
 
-## 3. Diccionario de Archivos y Estructura Explicada
+#### 📁 `src/app/` (El Motor de Arranque)
+Es el punto de entrada de React. 
+* **`App.tsx`**: Contiene la definición de todas las rutas de la aplicación. Configura herramientas globales críticas: el `QueryClientProvider` para manejar la caché de datos asíncronos, el `ErrorBoundary` global para atrapar crashes, y `React.lazy` con `Suspense` para dividir el código (Code Splitting) y asegurar que el navegador solo descargue los módulos que el usuario realmente visita.
 
-A continuación, se detalla exactamente qué guarda cada carpeta y archivo clave del sistema:
+#### 📁 `src/features/` (Los Dominios de Negocio Aislados)
+* **`orders/`**: Maneja la vida de un pedido. Contiene `OrderFormPage` (formulario con blindaje de inputs) y `OrderListPage` (tabla de control donde los operadores ejecutan la acción logística de "Liberar Camión").
+* **`reports/`**: El motor analítico. Separa su lógica en `hooks/useReports.ts` (descarga en caché y procesa cálculos matemáticos sin tocar la UI) y `pages/ReportsPage.tsx` (una UI que únicamente "dibuja" gráficas de SVG usando Recharts y alertas visuales de Emojis).
+* **`catalogs/` & `users/` & `auth/`**: Módulos encargados de la administración maestra de la plataforma.
 
-### 📁 `src/app/` (El Orquestador)
-Contiene la configuración de nivel superior que envuelve a toda la app.
-* **`App.tsx`**: Es el enrutador maestro. Define todas las URLs (`/orders`, `/reports`). Configura el `QueryClientProvider` para caché, el `ErrorBoundary` global y utiliza `React.lazy` para fragmentar el código (Code Splitting).
-
-### 📁 `src/features/` (Los Silos de Negocio)
-Aquí vive la lógica dividida por módulos:
-* **`orders/pages/OrderFormPage.tsx`**: Formulario con validaciones estrictas para crear/editar transacciones de logística.
-* **`orders/pages/OrderListPage.tsx`**: Tabla interactiva donde los operadores gestionan los camiones y los "Liberan" para envío.
-* **`reports/hooks/useReports.ts`**: El "cerebro" matemático. Un Hook que descarga la data en caché y procesa cálculos de rendimiento (`onTimePct`, `fulfillPct`) para no sobrecargar la UI visual.
-* **`reports/pages/ReportsPage.tsx`**: Un componente visual "tonto" (dumb) que simplemente se suscribe a `useReports.ts` y dibuja gráficas SVG mediante Recharts y medidores con Emojis.
-
-### 📁 `src/shared/` (Recursos Compartidos)
-Código promovido para ser usado por cualquier *feature*.
-* **`api/axiosInstance.ts`**: El interceptor HTTP. Captura respuestas `401/500`, oculta las trazas de error y lanza alertas Toast globales en la UI. Inyecta el JWT en cada petición.
-* **`api/orderService.ts`**: La **Capa Anti-Corrupción**. Intercepta objetos tipados de React y los destruye/formatea para cumplir el capricho estricto del backend (remueve campos `id` en PUTs, pasa estados a `UPPERCASE`). Es el orquestador absoluto.
-* **`components/ErrorBoundary.tsx`**: Atrapa quiebres (crashes) de JavaScript y dibuja una tarjeta de error elegante en lugar de una pantalla blanca.
-* **`components/Button.tsx` & `Card.tsx`**: El Design System interno. Centralizan clases repetitivas de Tailwind para botones y tarjetas.
-
-### 📁 Archivos Raíz
-* **`vitest.config.ts`**: Configuración corporativa del motor de pruebas unitarias.
-* **`package.json`**: Administrador de dependencias. Contiene scripts como `npm run test` y usa la librería ultrarrápida `oxlint`.
+#### 📁 `src/shared/` (El Núcleo Reutilizable)
+* **`api/axiosInstance.ts`**: El guardián de la red. Contiene un interceptor global que captura respuestas fallidas (400, 401, 500) y lanza notificaciones emergentes amigables (`react-hot-toast`), ocultando el terror técnico al usuario y cerrando sesiones expiradas automáticamente.
+* **`api/orderService.ts`**: El cerebro de orquestación. Intercepta los objetos de la interfaz y los moldea obligatoriamente a los caprichos del backend antes de enviarlos a la red.
+* **`components/`**: El "Design System" de la empresa. Contiene componentes de infraestructura UI pura como `Button.tsx`, `Card.tsx` y el `ErrorBoundary.tsx`.
 
 ---
 
-## 4. Guía de Contribución (Agregando un Nuevo Módulo)
+## 3. Resiliencia y Control de Calidad (DX)
 
-Si deseas agregar un nuevo módulo (Ejemplo: **Facturación**), debes seguir este flujo estricto:
-
-1. Crea el dominio en features: `mkdir src/features/billing`
-2. Divide el dominio internamente:
-   - `components/` (UI exclusiva de facturación)
-   - `hooks/` (Custom Hooks atados a React Query)
-   - `pages/` (Vistas enrutables)
-   - `types/` (Interfaces TypeScript exclusivas)
-3. **Regla de Aislamiento:** Un archivo dentro de `billing` NO DEBE importar lógica desde `features/orders`. Si ambos dominios necesitan lo mismo, se extrae a `src/shared/`.
-4. Añade la ruta de tu vista en `src/app/App.tsx` usando `React.lazy`.
+* **Zero White Screens:** El sistema está protegido por Error Boundaries. Si un componente de terceros falla al renderizar, la aplicación aislará el error en una tarjeta visual elegante sin colapsar el resto de la interfaz.
+* **Tipado Estricto (TypeScript):** El proyecto aplica una filosofía de "cero tolerance to any". Las interfaces del modelo de datos (`CombinedOrder`, `CreateOrderPayload`) garantizan la integridad de la información en tiempo de compilación.
+* **Linter de Alta Velocidad:** Se emplea `oxlint` para garantizar de forma ultrarrápida que el código se apegue a estándares profesionales antes de llegar a producción.
 
 ---
 
-## 5. Comandos de Operación
+## 4. Guía de Contribución (Agregando Módulos)
 
-**Instalación:**
+Si el equipo de ingeniería necesita incorporar un nuevo dominio (por ejemplo, **Facturación / Billing**), los pasos inquebrantables son:
+
+1. **Crear el Silo:** Construir la carpeta en `src/features/billing`.
+2. **Sub-división Interna:** Establecer carpetas exclusivas para `components`, `hooks`, `pages` y `types`.
+3. **Restricción de Aislamiento:** Bajo ninguna circunstancia el módulo de facturación puede importar la lógica de botones o hooks pertenecientes a `src/features/orders`. Si ambos requieren un mismo recurso, el código debe ser promovido al directorio maestro `src/shared/`.
+4. **Registro Perezoso:** Agregar la nueva ruta en `src/app/App.tsx` utilizando obligatoriamente la sintaxis `lazy(() => import(...))`.
+
+---
+
+## 5. Instrucciones de Despliegue y Operación
+
+**Clonar e Instalar:**
 ```bash
 npm install
 ```
 
-**Desarrollo Local:**
+**Entorno de Desarrollo:**
 ```bash
 npm run dev
 ```
 
-**Testing Unitario (Validación de Matemáticas y ACL):**
+**Auditoría y Pruebas Unitarias (Vitest):**
+Ejecuta la suite de pruebas aislando las funciones matemáticas y validando la efectividad de la Capa Anti-Corrupción (Mocking).
 ```bash
 npm run test
 ```
 
-**Construcción para Producción:**
+**Compilación Final Optimizada:**
 ```bash
 npm run build
 ```
