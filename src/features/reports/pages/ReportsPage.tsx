@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, Clock, TrendingUp, Truck, CheckCircle2, Smile, Meh, Frown, Activity } from 'lucide-react';
+import { BarChart3, Clock, TrendingUp, Truck, CheckCircle2, Smile, Meh, Frown, Activity, Sun, Moon } from 'lucide-react';
 import { api } from '../../../shared/api/axiosInstance';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, ReferenceArea, Cell
@@ -54,21 +54,43 @@ const RealTimeClock = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const hours = time.getHours();
+  const isDay = hours >= 6 && hours < 18; // 6am to 6pm
+  
+  let shiftName = "TURNO NOCTURNO";
+  if (hours >= 6 && hours < 14) shiftName = "TURNO MATUTINO";
+  else if (hours >= 14 && hours < 22) shiftName = "TURNO VESPERTINO";
+
+  // Using specific options for Mexico locale to ensure correct AM/PM and formatting
+  const timeString = time.toLocaleTimeString('es-MX', { hour12: true, hour: '2-digit', minute: '2-digit' });
+  const [timeVal, ampmRaw] = timeString.split(' ');
+  const ampm = (ampmRaw || '').replace(/\./g, '').toUpperCase();
+  const seconds = time.getSeconds().toString().padStart(2, '0');
+  
+  const dateOptions: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'long' };
+  const dateString = time.toLocaleDateString('es-MX', dateOptions);
+  const formattedDate = dateString.charAt(0).toUpperCase() + dateString.slice(1);
+
   return (
-    <div className="bg-[#0F172A] border border-[#1E293B] px-5 py-2.5 rounded-2xl flex items-center shadow-lg relative z-10 overflow-hidden group transition-all duration-300 hover:shadow-[#2A5D8F]/20 hover:border-[#2A5D8F]">
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#2A5D8F]/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-      
-      {/* Animated glowing dot */}
-      <div className="relative flex h-3 w-3 mr-3">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#38BDF8] opacity-75"></span>
-        <span className="relative inline-flex rounded-full h-3 w-3 bg-[#0EA5E9] shadow-[0_0_8px_#38BDF8]"></span>
+    <div className="bg-gradient-to-r from-[#10B981] to-[#ECFDF5] rounded-3xl p-6 shadow-card-brand relative overflow-hidden flex items-center justify-between w-full lg:w-auto">
+      <div className="flex items-center">
+        <div className="flex-shrink-0 bg-white/80 backdrop-blur-md w-16 h-16 rounded-full flex items-center justify-center shadow-sm border border-white/60 mr-6 z-10">
+          {isDay ? <Sun className="w-8 h-8 text-[#F59E0B]" /> : <Moon className="w-8 h-8 text-[#6366F1]" />}
+        </div>
+        <div className="flex flex-col z-10">
+          <div className="flex items-baseline">
+            <span className="text-6xl font-mono font-bold text-[#064E3B] tracking-tighter leading-none">{timeVal.replace(/^0/, '')}</span>
+            <span className="text-2xl font-mono text-[#047857] opacity-60 ml-1">:{seconds}</span>
+            <span className="text-base font-display font-bold text-[#065F46] ml-3">{ampm}</span>
+          </div>
+          <div className="flex items-center mt-3 gap-3">
+            <span className="text-base font-display font-medium text-[#064E3B]">{formattedDate}</span>
+            <span className="bg-[#059669] text-white text-xs px-3 py-1.5 rounded-lg font-bold tracking-wider shadow-sm uppercase">{shiftName}</span>
+          </div>
+        </div>
       </div>
-      
-      <span className="text-sm font-display font-bold text-[#94A3B8]">
-        En vivo: <span className="font-mono ml-1 text-[#38BDF8] tracking-wider text-base tabular-nums drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]">
-          {time.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-        </span>
-      </span>
+      {/* Decorative background elements */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
     </div>
   );
 };
@@ -94,10 +116,15 @@ export function ReportsPage() {
 
   return (
     <div className="space-y-8 animate-fade-in-up font-body">
-      <div className="flex flex-col lg:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-card-base border border-[#E2E8F0] relative overflow-hidden gap-4">
-        <div className="font-display font-bold text-[#0F172A] text-lg flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-[#2A5D8F]" />
-          Métricas en Tiempo Real
+      <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
+        <div className="bg-white p-6 rounded-3xl shadow-card-base border border-[#E2E8F0] flex-1 w-full h-full flex flex-col justify-center">
+          <div className="font-display font-bold text-[#0F172A] text-xl flex items-center gap-3 mb-2">
+            <div className="bg-[#EFF6FF] p-2.5 rounded-xl border border-[#DBEAFE]">
+              <BarChart3 className="w-6 h-6 text-[#2A5D8F]" />
+            </div>
+            Inteligencia de Negocios
+          </div>
+          <p className="text-[#64748B] text-sm max-w-md">Monitoreo en tiempo real de operaciones, nivel de cumplimiento de surtido y picos de distribución de camiones.</p>
         </div>
         <RealTimeClock />
       </div>
