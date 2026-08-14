@@ -161,13 +161,12 @@ export function ReportsPage() {
   const { onTimePct, fulfillPct, general } = getGeneralMetrics();
 
   const getFaceConfig = (score: number) => {
-    if (score >= 75) return { icon: Smile, color: 'text-[#10B981]', bg: 'bg-[#ECFDF5]', border: 'border-[#D1FAE5]' };
-    if (score >= 60) return { icon: Meh, color: 'text-[#F59E0B]', bg: 'bg-[#FFFBEB]', border: 'border-[#FEF3C7]' };
-    return { icon: Frown, color: 'text-[#EF4444]', bg: 'bg-[#FEF2F2]', border: 'border-[#FEE2E2]' };
+    if (score >= 75) return { emoji: '😃', color: 'text-[#10B981]', bg: 'bg-[#ECFDF5]', border: 'border-[#D1FAE5]' };
+    if (score >= 60) return { emoji: '😐', color: 'text-[#F59E0B]', bg: 'bg-[#FFFBEB]', border: 'border-[#FEF3C7]' };
+    return { emoji: '😞', color: 'text-[#EF4444]', bg: 'bg-[#FEF2F2]', border: 'border-[#FEE2E2]' };
   };
 
   const faceConfig = getFaceConfig(general);
-  const FaceIcon = faceConfig.icon;
 
   return (
     <div className="space-y-8 animate-fade-in-up font-body">
@@ -272,8 +271,10 @@ export function ReportsPage() {
                     <p className="text-xs text-[#94A3B8] font-medium mt-0.5">Surtido x Tiempo</p>
                   </div>
                 </div>
-                <div className={`p-3 rounded-2xl border ${faceConfig.bg} ${faceConfig.border}`}>
-                  <FaceIcon className={`w-8 h-8 ${faceConfig.color}`} />
+                <div className={`w-20 h-20 md:w-24 md:h-24 rounded-3xl border flex items-center justify-center ${faceConfig.bg} ${faceConfig.border} shadow-sm transition-transform hover:scale-110 cursor-default select-none`}>
+                  <span className="text-5xl md:text-6xl drop-shadow-md" role="img" aria-label="Status Face">
+                    {faceConfig.emoji}
+                  </span>
                 </div>
               </div>
 
