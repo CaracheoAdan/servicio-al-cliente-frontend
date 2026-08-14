@@ -26,9 +26,40 @@ export function LoginPage() {
       navigate('/');
     } catch (error: any) {
       console.error("Login error:", error);
-      const msg = error.response?.data?.detail || error.message || 'Error al intentar acceder.';
-      toast.error(msg, {
-        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      let errorMsg = 'Error inesperado al intentar acceder al sistema.';
+      
+      if (error.response) {
+        const status = error.response.status;
+        const serverDetail = error.response.data?.detail || error.response.data?.title || error.response.data?.message;
+
+        if (status === 401) {
+          errorMsg = 'Correo electrónico no registrado o contraseña incorrecta.';
+        } else if (status === 404) {
+          errorMsg = 'No existe ninguna cuenta registrada con este correo.';
+        } else if (status === 400) {
+          errorMsg = serverDetail || 'Datos inválidos. Por favor, revisa el correo y la contraseña.';
+        } else if (status === 403) {
+          errorMsg = 'Tu cuenta no tiene permisos para acceder o está suspendida.';
+        } else if (status >= 500) {
+          errorMsg = 'Problemas con el servidor. Intenta nuevamente más tarde.';
+        } else if (serverDetail) {
+          errorMsg = serverDetail;
+        }
+
+        // Si el backend manda un mensaje específico en 400/401, intentamos traducirlo o dar más contexto
+        const lowerDetail = serverDetail?.toLowerCase() || '';
+        if (lowerDetail.includes('not found') || lowerDetail.includes('no existe')) {
+            errorMsg = 'No existe ninguna cuenta registrada con este correo.';
+        } else if (lowerDetail.includes('password') || lowerDetail.includes('contraseña')) {
+            errorMsg = 'La contraseña ingresada es incorrecta.';
+        }
+      } else if (error.request) {
+        errorMsg = 'No se pudo conectar con el servidor. Revisa tu conexión a internet o intenta de nuevo.';
+      }
+
+      toast.error(errorMsg, {
+        style: { borderRadius: '10px', background: '#EF4444', color: '#fff' },
+        duration: 4000,
       });
     } finally {
       setIsLoading(false);
