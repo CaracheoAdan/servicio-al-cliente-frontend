@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, Clock, TrendingUp, Truck, CheckCircle2, Smile, Meh, Frown, Activity, Sun, Moon } from 'lucide-react';
+import { BarChart3, Clock, TrendingUp, Truck, CheckCircle2, Smile, Meh, Frown, Activity, Sun, Moon, Target } from 'lucide-react';
 import { api } from '../../../shared/api/axiosInstance';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, ReferenceArea, Cell
@@ -144,55 +144,55 @@ export function ReportsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Última Orden Salida */}
             {latestOrder ? (
-              <div className="bg-gradient-to-br from-[#BFDBFE] to-white p-6 md:p-8 rounded-3xl shadow-card-brand border border-[#DBEAFE] card-glow transition-all relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-white/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+              <div className="bg-white p-6 md:p-8 rounded-3xl shadow-card-base border border-[#E2E8F0] card-glow transition-all relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-[#2A5D8F]"></div>
                 
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 relative z-10">
-                  <div className="flex items-center gap-3 mb-4 md:mb-0">
-                    <div className="flex-shrink-0 bg-white/80 backdrop-blur-md w-14 h-14 rounded-full flex items-center justify-center shadow-sm border border-white/60">
-                      <Truck className="w-7 h-7 text-[#2A5D8F]" />
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 relative z-10 pl-2">
+                  <div className="flex items-center gap-4 mb-4 md:mb-0">
+                    <div className="flex-shrink-0 bg-[#EFF6FF] w-12 h-12 rounded-xl flex items-center justify-center shadow-sm border border-[#DBEAFE]">
+                      <Truck className="w-6 h-6 text-[#2A5D8F]" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-display font-bold text-[#475569] uppercase tracking-wide">Último Camión Lanzado</h3>
+                      <h3 className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wider mb-1">Último Camión Lanzado</h3>
                       <p className="text-2xl font-mono font-bold text-[#0F172A]">Orden <span className="text-[#2A5D8F]">#{latestOrder.key}</span></p>
                     </div>
                   </div>
                   <div className="bg-[#2A5D8F] px-4 py-2 rounded-xl shadow-sm flex items-center">
                     <div className="w-2 h-2 rounded-full bg-[#60A5FA] animate-pulse mr-2"></div>
-                    <span className="font-display font-bold text-sm text-white uppercase tracking-wider">
+                    <span className="font-display font-bold text-xs text-white uppercase tracking-wider">
                       {latestOrder.status?.toLowerCase() === 'delivered' ? 'ENTREGADO' : latestOrder.status?.toLowerCase() === 'closed' ? 'CERRADO' : 'EN TRÁNSITO'}
                     </span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white/60 backdrop-blur-sm border border-white/50 rounded-2xl p-6 relative z-10 shadow-sm">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-6 relative z-10 ml-2">
                   <div className="flex items-center gap-4">
-                    <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-[#E2E8F0]">
+                    <div className="flex-shrink-0 w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-[#E2E8F0]">
                       <Clock className="w-5 h-5 text-[#64748B]" />
                     </div>
                     <div>
-                      <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Hora de Salida</p>
-                      <p className="font-mono font-bold text-[#2A5D8F] text-lg">{latestOrder.shippingDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                      <p className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide mb-0.5">Hora de Salida</p>
+                      <p className="font-mono font-bold text-[#2A5D8F] text-lg leading-none">{latestOrder.shippingDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-4 border-l-0 md:border-l border-white/50 md:pl-4">
-                    <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-[#E2E8F0]">
+                  <div className="flex items-center gap-4 border-l-0 md:border-l border-[#E2E8F0] md:pl-6">
+                    <div className="flex-shrink-0 w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-[#E2E8F0]">
                       <CheckCircle2 className="w-5 h-5 text-[#2A5D8F]" />
                     </div>
                     <div>
-                      <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Cumplimiento</p>
-                      <p className="font-mono font-bold text-[#2A5D8F] text-lg">{latestOrder.fulfillment}%</p>
+                      <p className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide mb-0.5">Cumplimiento</p>
+                      <p className="font-mono font-bold text-[#2A5D8F] text-lg leading-none">{latestOrder.fulfillment}%</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 border-l-0 md:border-l border-white/50 md:pl-4">
-                    <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-[#E2E8F0]">
+                  <div className="flex items-center gap-4 border-l-0 md:border-l border-[#E2E8F0] md:pl-6">
+                    <div className="flex-shrink-0 w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-[#E2E8F0]">
                       <TrendingUp className="w-5 h-5 text-[#D97706]" />
                     </div>
                     <div>
-                      <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Prods. Surtidos</p>
-                      <p className="font-mono font-bold text-[#2A5D8F] text-lg">{latestOrder.totalDelivered} <span className="text-sm font-medium text-[#64748B]">de {latestOrder.totalOrdered}</span></p>
+                      <p className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide mb-0.5">Prods. Surtidos</p>
+                      <p className="font-mono font-bold text-[#2A5D8F] text-lg leading-none">{latestOrder.totalDelivered} <span className="text-xs font-medium text-[#64748B]">de {latestOrder.totalOrdered}</span></p>
                     </div>
                   </div>
                 </div>
@@ -205,41 +205,38 @@ export function ReportsPage() {
               </div>
             )}
 
-            {/* Cumplimiento General */}
-            <div className="bg-gradient-to-bl from-[#BFDBFE] to-white p-6 md:p-8 rounded-3xl shadow-card-brand border border-[#DBEAFE] card-glow transition-all relative overflow-hidden flex flex-col justify-between">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-white/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+            <div className="bg-white p-6 md:p-8 rounded-3xl shadow-card-base border border-[#E2E8F0] card-glow transition-all relative overflow-hidden flex flex-col justify-between">
+              <div className="absolute top-0 left-0 w-1.5 h-full bg-[#2A5D8F]"></div>
               
-              <div className="flex justify-between items-start mb-4 relative z-10">
-                <div className="flex items-center gap-3">
-                  <div className="flex-shrink-0 bg-white/80 backdrop-blur-md w-14 h-14 rounded-full flex items-center justify-center shadow-sm border border-white/60">
-                    <Activity className="w-7 h-7 text-[#2A5D8F]" />
+              <div className="flex justify-between items-start mb-6 relative z-10 pl-2">
+                <div className="flex items-center gap-4">
+                  <div className="flex-shrink-0 bg-[#EFF6FF] w-12 h-12 rounded-xl flex items-center justify-center shadow-sm border border-[#DBEAFE]">
+                    <Activity className="w-6 h-6 text-[#2A5D8F]" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-display font-bold text-[#475569] uppercase tracking-wide">Cumplimiento General</h3>
-                    <p className="text-xs text-[#64748B] font-medium mt-0.5">Surtido x Tiempo</p>
+                    <h3 className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wider mb-1">Cumplimiento General</h3>
+                    <p className="text-sm text-[#94A3B8] font-medium leading-none">Surtido x Tiempo</p>
                   </div>
                 </div>
-                <div className={`w-28 h-28 md:w-36 md:h-36 rounded-full border-4 flex items-center justify-center bg-white/80 backdrop-blur-sm shadow-sm transition-transform hover:scale-110 cursor-default select-none ${faceConfig.border}`}>
-                  <span className="text-7xl md:text-8xl drop-shadow-sm" role="img" aria-label="Status Face">
-                    {faceConfig.emoji}
-                  </span>
+                <div className={`w-16 h-16 rounded-full border-4 flex items-center justify-center bg-white shadow-sm transition-transform hover:scale-105 cursor-default select-none ${faceConfig.border}`}>
+                  <Target className={`w-8 h-8 ${faceConfig.color}`} />
                 </div>
               </div>
 
-              <div className="flex items-end gap-3 mb-6 relative z-10">
+              <div className="flex items-end gap-3 mb-8 relative z-10 pl-2">
                 <p className={`text-6xl font-mono font-bold leading-none tracking-tight ${faceConfig.color}`}>
                   {generalMetrics.general}%
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 bg-white/60 backdrop-blur-sm border border-white/50 rounded-2xl p-4 relative z-10 shadow-sm">
+              <div className="grid grid-cols-2 gap-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-5 relative z-10 ml-2">
                 <div>
                   <p className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide mb-1">Cump. de Entregas (Cant.)</p>
-                  <p className="font-mono font-bold text-[#2A5D8F] text-lg">{generalMetrics.fulfillPct}%</p>
+                  <p className="font-mono font-bold text-[#2A5D8F] text-xl leading-none">{generalMetrics.fulfillPct}%</p>
                 </div>
-                <div className="border-l border-white/50 pl-4">
+                <div className="border-l border-[#E2E8F0] pl-5">
                   <p className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide mb-1">Cump. a Entregas (Tiempo)</p>
-                  <p className="font-mono font-bold text-[#2A5D8F] text-lg">{generalMetrics.onTimePct}%</p>
+                  <p className="font-mono font-bold text-[#2A5D8F] text-xl leading-none">{generalMetrics.onTimePct}%</p>
                 </div>
               </div>
             </div>
