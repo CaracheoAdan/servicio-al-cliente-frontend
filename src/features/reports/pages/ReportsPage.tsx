@@ -13,6 +13,37 @@ const formatTimeAxis = (val: number) => {
 
 import { orderService } from '../../../shared/api/orderService';
 
+const CustomFulfillmentTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    const isPerfect = data.fulfillment === 100;
+    const isWarning = data.fulfillment >= 80 && data.fulfillment < 100;
+    const isDanger = data.fulfillment < 80;
+    
+    return (
+      <div className="bg-[#0F172A] p-5 rounded-2xl shadow-2xl border border-[#334155] font-body text-white min-w-[200px] animate-fade-in-up">
+        <p className="font-display font-bold text-[#94A3B8] mb-2 uppercase tracking-wide text-[10px]">Orden <span className="text-white text-xs ml-1">#{label}</span></p>
+        <div className="flex items-end gap-2 mb-4">
+          <p className={`text-4xl font-mono font-bold leading-none ${isPerfect ? 'text-[#10B981]' : isWarning ? 'text-[#F59E0B]' : 'text-[#EF4444]'}`}>
+            {data.fulfillment}%
+          </p>
+        </div>
+        <div className="pt-3 border-t border-[#334155] flex justify-between gap-6 text-xs">
+           <div>
+             <p className="text-[#64748B] uppercase tracking-wide text-[10px] mb-1">Pedido</p>
+             <p className="font-mono font-bold text-white">{data.totalOrdered} <span className="text-[#64748B] font-normal">unds</span></p>
+           </div>
+           <div className="text-right">
+             <p className="text-[#64748B] uppercase tracking-wide text-[10px] mb-1">Entregado</p>
+             <p className="font-mono font-bold text-white">{data.totalDelivered} <span className="text-[#64748B] font-normal">unds</span></p>
+           </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export function ReportsPage() {
   const [transportData, setTransportData] = useState<any[]>([]);
   const [fulfillmentData, setFulfillmentData] = useState<any[]>([]);
@@ -91,7 +122,9 @@ export function ReportsPage() {
               const percentage = Math.round((totalDelivered / totalOrdered) * 100);
               fulfillment.push({
                 order: order.key,
-                fulfillment: percentage
+                fulfillment: percentage,
+                totalOrdered,
+                totalDelivered
               });
             }
           }
@@ -250,22 +283,42 @@ export function ReportsPage() {
                   <div className="absolute inset-0 flex items-center justify-center font-display font-bold text-[#94A3B8]">No hay productos en las órdenes actuales.</div>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={fulfillmentData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                    <BarChart data={fulfillmentData} margin={{ top: 30, right: 30, left: 0, bottom: 5 }}>
+                      <defs>
+                        <linearGradient id="colorHigh" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#10B981" stopOpacity={1}/>
+                          <stop offset="100%" stopColor="#059669" stopOpacity={0.8}/>
+                        </linearGradient>
+                        <linearGradient id="colorMid" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#F59E0B" stopOpacity={1}/>
+                          <stop offset="100%" stopColor="#D97706" stopOpacity={0.8}/>
+                        </linearGradient>
+                        <linearGradient id="colorLow" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#EF4444" stopOpacity={1}/>
+                          <stop offset="100%" stopColor="#DC2626" stopOpacity={0.8}/>
+                        </linearGradient>
+                      </defs>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
                       <XAxis dataKey="order" tick={{fill: '#64748B', fontSize: 12, fontFamily: 'IBM Plex Mono'}} axisLine={false} tickLine={false} />
                       <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} tick={{fill: '#64748B', fontSize: 12, fontFamily: 'IBM Plex Mono'}} axisLine={false} tickLine={false} />
                       <Tooltip 
-                        formatter={(val) => [`${val}%`, 'Cumplimiento']}
-                        contentStyle={{ borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', fontWeight: 'bold', fontFamily: 'IBM Plex Mono' }}
+                        content={<CustomFulfillmentTooltip />}
                         cursor={{fill: '#F8FAFC'}}
                       />
                       <Bar 
                         dataKey="fulfillment" 
-                        fill="#2A5D8F" 
                         radius={[8, 8, 0, 0]}
-                        barSize={40}
+                        barSize={48}
                         animationDuration={1500}
-                      />
+                        label={{ position: 'top', fill: '#0F172A', fontSize: 12, fontWeight: 'bold', fontFamily: 'IBM Plex Mono', formatter: (val: number) => `${val}%` }}
+                      >
+                        {fulfillmentData.map((entry, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={entry.fulfillment === 100 ? "url(#colorHigh)" : entry.fulfillment >= 80 ? "url(#colorMid)" : "url(#colorLow)"} 
+                          />
+                        ))}
+                      </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 )}
