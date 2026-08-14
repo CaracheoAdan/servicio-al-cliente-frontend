@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Edit2, Trash2, Search, X, CheckCircle2, Clock, Inbox, Tag } from 'lucide-react';
+import { ClipboardList, Edit2, Trash2, Search, X, CheckCircle2, Clock, Inbox, Tag, Truck } from 'lucide-react';
 import { orderService } from '../../../shared/api/orderService';
 import toast from 'react-hot-toast';
 import { api } from '../../../shared/api/axiosInstance';
@@ -41,6 +41,29 @@ export function OrderListPage() {
         fetchOrders();
       } catch (error) {
         toast.error('Error al eliminar la orden.', {
+          style: { borderRadius: '10px', background: '#333', color: '#fff' }
+        });
+      }
+    }
+  };
+
+  const handleLiberarCamion = async (order: any) => {
+    if (confirm(`¿Confirmar la salida del transporte para la Orden ${order.key}?`)) {
+      try {
+        const payload = {
+          key: order.key,
+          status: 'in_delivery',
+          scheduledDeliveryDate: order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || new Date().toISOString(),
+          shippingDate: new Date().toISOString(),
+          items: order.items || []
+        };
+        await orderService.updateOrder(order.id, payload);
+        toast.success('Camión liberado. Se ha registrado la hora de salida.', {
+          style: { borderRadius: '10px', background: '#333', color: '#fff' }
+        });
+        fetchOrders();
+      } catch (error) {
+        toast.error('Error al liberar el camión.', {
           style: { borderRadius: '10px', background: '#333', color: '#fff' }
         });
       }
@@ -256,6 +279,15 @@ export function OrderListPage() {
                       <div className="text-sm font-mono text-[#475569] font-medium">{formatDate(order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || order.scheduled_delivery_date)}</div>
                     </td>
                     <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
+                      {order.status !== 'in_delivery' && order.status !== 'delivered' && order.status !== 'closed' && (
+                        <button 
+                          onClick={() => handleLiberarCamion(order)}
+                          className="flex items-center text-[#D97706] bg-[#FFFBEB] hover:bg-[#FEF3C7] px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs"
+                          title="Liberar Camión"
+                        >
+                          <Truck className="w-4 h-4 mr-1.5" /> Liberar
+                        </button>
+                      )}
                       <button 
                         onClick={() => navigate(`/orders/${order.id}`)}
                         className="flex items-center text-[#2A5D8F] bg-[#EFF6FF] hover:bg-[#DBEAFE] px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs"

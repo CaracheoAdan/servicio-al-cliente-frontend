@@ -30,10 +30,11 @@ export function ReportsPage() {
 
         orders.forEach((order: any) => {
           // --- Cálculo de Picos de Transporte ---
-          // Usar la relación detail
+          // Usar la relación detail y validar estatus
+          const isDelivered = ['in_delivery', 'delivered', 'closed'].includes(order.status?.toLowerCase());
           const shippingDateStr = order.detail?.shippingDate || order.detail?.shipping_date || order.detail?.scheduledDeliveryDate;
           
-          if (shippingDateStr) {
+          if (isDelivered && shippingDateStr) {
             const date = new Date(shippingDateStr);
             const hours = date.getHours();
             const minutes = date.getMinutes();
