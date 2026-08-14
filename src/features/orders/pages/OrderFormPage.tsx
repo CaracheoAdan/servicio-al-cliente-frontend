@@ -13,7 +13,6 @@ export function OrderFormPage() {
 
   const [orderKey, setOrderKey] = useState('');
   const [scheduledDeliveryDate, setScheduledDeliveryDate] = useState('');
-  const [shippingDate, setShippingDate] = useState('');
   const [items, setItems] = useState([{ productId: '', orderedQuantity: 1, deliveredQuantity: 0 }]);
   const [status, setStatus] = useState<OrderStatus>('open');
   const [comments, setComments] = useState('');
@@ -35,9 +34,6 @@ export function OrderFormPage() {
             setOrderKey(orderData.key || '');
             if (orderData.detail?.scheduledDeliveryDate || orderData.detail?.scheduled_delivery_date) {
               setScheduledDeliveryDate((orderData.detail.scheduledDeliveryDate || orderData.detail.scheduled_delivery_date).split('T')[0]);
-            }
-            if (orderData.detail?.shippingDate || orderData.detail?.shipping_date) {
-              setShippingDate((orderData.detail.shippingDate || orderData.detail.shipping_date).split('T')[0]);
             }
             setStatus(orderData.status || 'open');
             setComments(orderData.detail?.comments || '');
@@ -92,7 +88,6 @@ export function OrderFormPage() {
         key: orderKey,
         status: status,
         scheduledDeliveryDate: scheduledDeliveryDate,
-        shippingDate: shippingDate || undefined,
         comments: comments, // Enviamos el comentario al backend
         items: items.map(item => ({
           productId: parseInt(item.productId as string, 10),
@@ -262,10 +257,7 @@ export function OrderFormPage() {
             <div className="inline-flex rounded-xl bg-[#E2E8F0] dark:bg-[#121212] p-1 mb-6 block">
               <button 
                 type="button" 
-                onClick={() => {
-                  handleStatusToggle('in_delivery');
-                  if (!shippingDate) setShippingDate(new Date().toISOString().split('T')[0]);
-                }} 
+                onClick={() => handleStatusToggle('in_delivery')} 
                 className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${isDelivered ? 'bg-white dark:bg-[#333333] text-[#0F172A] dark:text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
               >
                 Sí
@@ -278,18 +270,6 @@ export function OrderFormPage() {
                 No
               </button>
             </div>
-
-            {isDelivered && (
-              <div className="animate-fade-in-up">
-                <label className="block font-display font-bold text-xs uppercase tracking-wide text-[#64748B] mb-2">Fecha de envío</label>
-                <input
-                  type="date"
-                  value={shippingDate}
-                  onChange={(e) => setShippingDate(e.target.value)}
-                  className="block w-full border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F172A] outline-none"
-                />
-              </div>
-            )}
           </div>
         </div>
 
