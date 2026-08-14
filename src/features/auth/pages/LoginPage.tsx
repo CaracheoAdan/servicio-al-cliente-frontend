@@ -4,29 +4,37 @@ import toast from 'react-hot-toast';
 import { Button } from '../../../shared/components/Button';
 
 import { AnimatedLogoContainer } from '../components/AnimatedLogoContainer';
+import { authApi } from '../api/auth.api';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      localStorage.setItem('totebin_token', 'mock_token_temporal');
-      toast.success('Bypass de Login activado.', {
+      const response = await authApi.login({ email, password });
+      localStorage.setItem('totebin_token', response.accessToken);
+      toast.success(`Bienvenido, ${response.user.firstName}!`, {
         style: { borderRadius: '10px', background: '#333', color: '#fff' }
       });
       navigate('/');
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      toast.error('Error al intentar acceder.', {
+      const msg = error.response?.data?.detail || error.message || 'Error al intentar acceder.';
+      toast.error(msg, {
         style: { borderRadius: '10px', background: '#333', color: '#fff' }
       });
+    } finally {
+      setIsLoading(false);
     }
   };
+
 
   const isEmailValid = email.includes('@') && email.includes('.');
   const isPasswordValid = password.length >= 6;
@@ -136,8 +144,8 @@ export function LoginPage() {
             </div>
 
             <div className="animate-fade-in-up" style={{ animationDelay: '0.5s', animationFillMode: 'both' }}>
-              <Button type="submit" className="w-full flex justify-center py-3.5 text-base font-bold shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all">
-                Entrar al Sistema
+              <Button type="submit" isLoading={isLoading} disabled={isLoading} className="w-full flex justify-center py-3.5 text-base font-bold shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all">
+                {isLoading ? 'Conectando...' : 'Entrar al Sistema'}
               </Button>
             </div>
             
