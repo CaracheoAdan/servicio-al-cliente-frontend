@@ -72,20 +72,20 @@ const RealTimeClock = () => {
   const formattedDate = dateString.charAt(0).toUpperCase() + dateString.slice(1);
 
   return (
-    <div className="bg-gradient-to-r from-[#10B981] to-[#ECFDF5] rounded-3xl p-6 shadow-card-brand relative overflow-hidden flex items-center justify-between w-full lg:w-auto">
+    <div className="bg-gradient-to-br from-[#BFDBFE] to-white border border-[#DBEAFE] rounded-3xl p-6 shadow-card-brand relative overflow-hidden flex items-center justify-between w-full lg:w-auto">
       <div className="flex items-center">
         <div className="flex-shrink-0 bg-white/80 backdrop-blur-md w-16 h-16 rounded-full flex items-center justify-center shadow-sm border border-white/60 mr-6 z-10">
           {isDay ? <Sun className="w-8 h-8 text-[#F59E0B]" /> : <Moon className="w-8 h-8 text-[#6366F1]" />}
         </div>
         <div className="flex flex-col z-10">
           <div className="flex items-baseline">
-            <span className="text-6xl font-mono font-bold text-[#064E3B] tracking-tighter leading-none">{timeVal.replace(/^0/, '')}</span>
-            <span className="text-2xl font-mono text-[#047857] opacity-60 ml-1">:{seconds}</span>
-            <span className="text-base font-display font-bold text-[#065F46] ml-3">{ampm}</span>
+            <span className="text-6xl font-mono font-bold text-[#0F172A] tracking-tighter leading-none">{timeVal.replace(/^0/, '')}</span>
+            <span className="text-2xl font-mono text-[#2A5D8F] opacity-60 ml-1">:{seconds}</span>
+            <span className="text-base font-display font-bold text-[#2A5D8F] ml-3">{ampm}</span>
           </div>
           <div className="flex items-center mt-3 gap-3">
-            <span className="text-base font-display font-medium text-[#064E3B]">{formattedDate}</span>
-            <span className="bg-[#059669] text-white text-xs px-3 py-1.5 rounded-lg font-bold tracking-wider shadow-sm uppercase">{shiftName}</span>
+            <span className="text-base font-display font-medium text-[#0F172A]">{formattedDate}</span>
+            <span className="bg-[#2A5D8F] text-white text-xs px-3 py-1.5 rounded-lg font-bold tracking-wider shadow-sm uppercase">{shiftName}</span>
           </div>
         </div>
       </div>
