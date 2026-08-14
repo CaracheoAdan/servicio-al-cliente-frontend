@@ -138,13 +138,14 @@ export function OrderListPage() {
   const filteredOrders = orders.filter(o => {
     const matchesSearch = (o.key || '').toLowerCase().includes(searchTerm.toLowerCase());
     if (filterStatus === 'all') return matchesSearch;
-    if (filterStatus === 'active') return matchesSearch && o.status !== 'closed' && o.status !== 'delivered';
-    if (filterStatus === 'completed') return matchesSearch && (o.status === 'closed' || o.status === 'delivered');
+    const s = o.status?.toLowerCase();
+    if (filterStatus === 'active') return matchesSearch && s !== 'closed' && s !== 'delivered';
+    if (filterStatus === 'completed') return matchesSearch && (s === 'closed' || s === 'delivered');
     return matchesSearch;
   });
 
   const totalOrders = orders.length;
-  const activeOrders = orders.filter(o => o.status !== 'closed' && o.status !== 'delivered').length;
+  const activeOrders = orders.filter(o => o.status?.toLowerCase() !== 'closed' && o.status?.toLowerCase() !== 'delivered').length;
   const closedOrders = totalOrders - activeOrders;
 
   return (
@@ -281,13 +282,13 @@ export function OrderListPage() {
                       </div>
                     </td>
                     <td className="px-8 py-5 whitespace-nowrap">
-                      {getStatusBadge(order.status)}
+                      {getStatusBadge(order.status?.toLowerCase())}
                     </td>
                     <td className="px-8 py-5 whitespace-nowrap">
                       <div className="text-sm font-mono text-[#475569] font-medium">{formatDate(order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || order.scheduled_delivery_date)}</div>
                     </td>
                     <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
-                      {order.status !== 'in_delivery' && order.status !== 'delivered' && order.status !== 'closed' ? (
+                      {order.status?.toLowerCase() !== 'in_delivery' && order.status?.toLowerCase() !== 'delivered' && order.status?.toLowerCase() !== 'closed' ? (
                         <button 
                           onClick={() => handleLiberarCamion(order)}
                           className="flex items-center text-[#D97706] bg-[#FFFBEB] hover:bg-[#FEF3C7] px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs"
