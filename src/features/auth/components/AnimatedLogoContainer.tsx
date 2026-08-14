@@ -1,67 +1,50 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 // Componente placeholder para la futura animación de Lottie/Spline
-// Actualmente utiliza Framer Motion para simular piezas (cajas) cayendo y ensamblando la "T"
+// Utiliza animaciones CSS nativas para simular piezas ensamblando la "T"
 export function AnimatedLogoContainer() {
-  // Configuración de la animación
-  const containerVariants = {
-    hidden: {},
-    visible: {
-      transition: {
-        staggerChildren: 0.3,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const boxVariants = {
-    hidden: { y: -150, opacity: 0, rotate: -45 },
-    visible: { 
-      y: 0, 
-      opacity: 1, 
-      rotate: 0,
-      transition: { 
-        type: 'spring', 
-        damping: 12, 
-        stiffness: 100 
-      }
-    },
-  };
-
   return (
     <div className="mx-auto h-24 w-24 mb-8 relative">
-      <motion.div 
-        className="w-full h-full bg-white rounded-2xl flex items-center justify-center shadow-2xl relative overflow-hidden"
-        initial={{ rotate: -15, scale: 0.8, opacity: 0 }}
-        animate={{ rotate: -3, scale: 1, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        whileHover={{ rotate: 0 }}
+      <style>
+        {`
+          @keyframes dropIn {
+            0% { transform: translateY(-150px) rotate(-45deg); opacity: 0; }
+            60% { transform: translateY(10px) rotate(5deg); opacity: 1; }
+            100% { transform: translateY(0) rotate(0); opacity: 1; }
+          }
+          @keyframes popIn {
+            0% { transform: scale(0.8) rotate(-15deg); opacity: 0; }
+            100% { transform: scale(1) rotate(-3deg); opacity: 1; }
+          }
+          .animate-pop-in {
+            animation: popIn 0.8s ease-out forwards;
+          }
+          .animate-drop-1 {
+            animation: dropIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s forwards;
+            opacity: 0;
+          }
+          .animate-drop-2 {
+            animation: dropIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s forwards;
+            opacity: 0;
+          }
+        `}
+      </style>
+      <div 
+        className="w-full h-full bg-white rounded-2xl flex items-center justify-center shadow-2xl relative overflow-hidden animate-pop-in transition-transform hover:rotate-0"
       >
-        {/* Este contenedor de motion simulará las piezas de la "T" armándose */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="relative w-12 h-14"
-        >
+        <div className="relative w-12 h-14">
           {/* Barra horizontal de la T */}
-          <motion.div 
-            variants={boxVariants}
-            className="absolute top-0 left-0 w-12 h-4 bg-[#2A5D8F] rounded-sm"
-          />
+          <div className="absolute top-0 left-0 w-12 h-4 bg-[#2A5D8F] rounded-sm animate-drop-1" />
           {/* Barra vertical de la T */}
-          <motion.div 
-            variants={boxVariants}
-            className="absolute top-4 left-4 w-4 h-10 bg-[#2A5D8F] rounded-sm"
-          />
-        </motion.div>
+          <div className="absolute top-4 left-4 w-4 h-10 bg-[#2A5D8F] rounded-sm animate-drop-2" />
+        </div>
         
         {/* Espacio reservado para integrar el componente Lottie o Spline en el futuro.
             Ejemplo de cómo sería:
             <Lottie animationData={robotBuildingLogo} loop={false} className="absolute inset-0" />
         */}
-      </motion.div>
+      </div>
     </div>
   );
 }
+
