@@ -247,6 +247,7 @@ export function UsersPage() {
                     </div>
                   </div>
                 </>
+              )
             ) : (
               roles.length === 0 ? (
                 <div className="p-8">
@@ -270,8 +271,9 @@ export function UsersPage() {
                   </div>
                 </div>
               ) : (
-                <table className="w-full text-left border-collapse">
-                  <thead>
+                <>
+                  <table className="w-full text-left border-collapse">
+                    <thead>
                     <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
                       <th className="px-8 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Nombre del Rol</th>
                       <th className="px-8 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Usuarios asignados</th>
@@ -308,7 +310,8 @@ export function UsersPage() {
                             </div>
                           </td>
                         </tr>
-                      ))}
+                      );
+                    })}
                     </tbody>
                   </table>
                   <div className="px-8 py-4 border-t border-[#E2E8F0] dark:border-gray-800 bg-[#F8FAFC] dark:bg-gray-800 flex justify-between items-center text-sm font-medium text-[#64748B] dark:text-gray-400">
