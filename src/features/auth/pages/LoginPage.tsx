@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Button } from '../../../shared/components/Button';
 
+import { AnimatedLogoContainer } from '../components/AnimatedLogoContainer';
+
 export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,9 +41,7 @@ export function LoginPage() {
         <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-[#1E4D73]/40 blur-3xl"></div>
         
         <div className="relative z-10 text-center px-12 animate-fade-in-up">
-          <div className="mx-auto h-24 w-24 bg-white rounded-2xl flex items-center justify-center text-[#2A5D8F] text-5xl font-bold shadow-2xl mb-8 transform -rotate-3 transition-transform hover:rotate-0">
-            T
-          </div>
+          <AnimatedLogoContainer />
           <h1 className="text-5xl font-extrabold text-white mb-6 tracking-tight">Totebin</h1>
           <p className="text-xl text-blue-100 max-w-md mx-auto leading-relaxed">
             Plataforma premium de gestión de clientes y seguimiento de órdenes.
