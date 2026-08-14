@@ -45,7 +45,25 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Toaster position="top-right" />
+        <Toaster 
+          position="bottom-right" 
+          toastOptions={{
+            style: {
+              background: 'var(--surface-card)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '12px',
+              fontFamily: 'Inter, sans-serif',
+              boxShadow: '0 4px 24px -4px rgba(0, 0, 0, 0.1)',
+            },
+            success: {
+              iconTheme: { primary: '#10B981', secondary: '#fff' },
+            },
+            error: {
+              iconTheme: { primary: '#EF4444', secondary: '#fff' },
+            },
+          }} 
+        />
         <ErrorBoundary>
           <Suspense fallback={<GlobalLoader />}>
             <Routes>

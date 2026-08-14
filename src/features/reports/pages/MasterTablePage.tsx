@@ -4,6 +4,8 @@ import { api } from '../../../shared/api/axiosInstance';
 import { orderService } from '../../../shared/api/orderService';
 import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
+import { SkeletonLoader } from '../../../shared/components/SkeletonLoader';
+import { Inbox } from 'lucide-react';
 
 export function MasterTablePage() {
   const [data, setData] = useState<any[]>([]);
@@ -139,7 +141,7 @@ export function MasterTablePage() {
         </button>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-b-2xl" style={{ maxHeight: 'calc(100vh - 250px)' }}>
+      <div className="overflow-x-auto bg-white dark:bg-gray-900 rounded-b-2xl" style={{ maxHeight: 'calc(100vh - 250px)' }}>
         <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
             <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
@@ -163,30 +165,54 @@ export function MasterTablePage() {
               <th className="px-6 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Comentarios</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#E2E8F0]">
+          <tbody className="divide-y divide-[#E2E8F0] dark:divide-gray-800">
             {loading ? (
-              <tr><td colSpan={12} className="px-6 py-12 text-center font-display font-bold text-[#0F172A]">Cargando tabla...</td></tr>
+              <tr><td colSpan={12} className="p-6"><SkeletonLoader type="table" rows={10} /></td></tr>
             ) : data.length === 0 ? (
-              <tr><td colSpan={12} className="px-6 py-12 text-center font-display font-bold text-[#0F172A]">No hay datos para mostrar</td></tr>
+              <tr>
+                <td colSpan={12} className="p-8">
+                  <div className="flex flex-col items-center justify-center gap-4 py-20 rounded-2xl border-2 border-dashed border-[#E2E8F0] dark:border-gray-800 bg-[#F8FAFC] dark:bg-gray-800/50">
+                    <div className="p-6 rounded-3xl bg-white dark:bg-gray-800 shadow-sm border border-[#E2E8F0] dark:border-gray-700">
+                      <svg className="w-16 h-16 text-[#2A5D8F]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <div className="text-center">
+                      <p className="font-display font-bold text-[#0F172A] dark:text-white text-lg">No hay datos para exportar</p>
+                      <p className="text-sm text-[#64748B] dark:text-gray-400 mt-1 max-w-sm mx-auto">No se encontraron órdenes registradas para consolidar en el reporte maestro.</p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
             ) : (
               data.map((row, idx) => (
-                <tr key={idx} className="hover:bg-[#EFF6FF] transition-colors">
-                  <td className="px-6 py-4 font-mono font-bold text-[#0F172A] border-r border-[#E2E8F0]">{row.noOrden}</td>
-                  <td className="px-6 py-4 font-mono text-[#475569] border-r border-[#E2E8F0]">{row.producto}</td>
-                  <td className="px-6 py-4 font-mono text-[#475569] border-r border-[#E2E8F0] text-center">{row.cantidadPedida}</td>
-                  <td className="px-6 py-4 font-mono text-[#475569] border-r border-[#E2E8F0] text-center">{row.fechaCompromiso}</td>
-                  <td className="px-6 py-4 font-mono text-[#475569] border-r border-[#E2E8F0] text-center">{row.cantidadSurtida}</td>
-                  <td className="px-6 py-4 text-center font-display font-bold text-[#2A5D8F] border-r border-[#E2E8F0] bg-[#EFF6FF]/30">{row.producidoSi}</td>
-                  <td className="px-6 py-4 text-center font-display font-bold text-[#DC2626] border-r border-[#E2E8F0]">{row.producidoNo}</td>
-                  <td className="px-6 py-4 text-center font-display font-bold text-[#D97706] border-r border-[#E2E8F0] bg-[#FFFBEB]/30">{row.salidaSi}</td>
-                  <td className="px-6 py-4 text-center font-display font-bold text-[#DC2626] border-r border-[#E2E8F0]">{row.salidaNo}</td>
-                  <td className="px-6 py-4 font-mono text-[#475569] border-r border-[#E2E8F0] text-center">{row.horaEnvio}</td>
-                  <td className="px-6 py-4 font-display font-bold text-[#0F172A] border-r border-[#E2E8F0] text-center">{row.cerrarPedido}</td>
-                  <td className="px-6 py-4 font-body text-[#475569] text-sm max-w-[200px] truncate" title={row.comentarios}>{row.comentarios}</td>
+                <tr key={idx} className={`hover:bg-[#EFF6FF] dark:hover:bg-gray-800/50 transition-colors dark:text-gray-300 border-l-4 ${row.noOrden ? 'border-l-[#2A5D8F]' : 'border-l-transparent'}`}>
+                  <td className="px-6 py-4 font-mono font-bold text-[#0F172A] dark:text-white border-r border-[#E2E8F0] dark:border-gray-800">{row.noOrden}</td>
+                  <td className="px-6 py-4 font-mono text-[#475569] dark:text-gray-400 border-r border-[#E2E8F0] dark:border-gray-800">{row.producto}</td>
+                  <td className="px-6 py-4 font-mono text-[#475569] dark:text-gray-400 border-r border-[#E2E8F0] dark:border-gray-800 text-center">{row.cantidadPedida}</td>
+                  <td className="px-6 py-4 font-mono text-[#475569] dark:text-gray-400 border-r border-[#E2E8F0] dark:border-gray-800 text-center">{row.fechaCompromiso}</td>
+                  <td className="px-6 py-4 font-mono text-[#475569] dark:text-gray-400 border-r border-[#E2E8F0] dark:border-gray-800 text-center">{row.cantidadSurtida}</td>
+                  <td className="px-6 py-4 text-center font-display font-bold text-[#2A5D8F] dark:text-blue-400 border-r border-[#E2E8F0] dark:border-gray-800 bg-[#EFF6FF]/30 dark:bg-blue-900/10">{row.producidoSi}</td>
+                  <td className="px-6 py-4 text-center font-display font-bold text-[#DC2626] dark:text-red-400 border-r border-[#E2E8F0] dark:border-gray-800">{row.producidoNo}</td>
+                  <td className="px-6 py-4 text-center font-display font-bold text-[#D97706] dark:text-amber-400 border-r border-[#E2E8F0] dark:border-gray-800 bg-[#FFFBEB]/30 dark:bg-amber-900/10">{row.salidaSi}</td>
+                  <td className="px-6 py-4 text-center font-display font-bold text-[#DC2626] dark:text-red-400 border-r border-[#E2E8F0] dark:border-gray-800">{row.salidaNo}</td>
+                  <td className="px-6 py-4 font-mono text-[#475569] dark:text-gray-400 border-r border-[#E2E8F0] dark:border-gray-800 text-center">{row.horaEnvio}</td>
+                  <td className="px-6 py-4 font-display font-bold text-[#0F172A] dark:text-white border-r border-[#E2E8F0] dark:border-gray-800 text-center">{row.cerrarPedido}</td>
+                  <td className="px-6 py-4 font-body text-[#475569] dark:text-gray-400 text-sm max-w-[200px] truncate" title={row.comentarios}>{row.comentarios}</td>
                 </tr>
               ))
             )}
           </tbody>
+        </table>
+        
+        {!loading && data.length > 0 && (
+          <div className="px-8 py-4 border-t border-[#E2E8F0] dark:border-gray-800 bg-[#F8FAFC] dark:bg-gray-800 flex justify-between items-center text-sm font-medium text-[#64748B] dark:text-gray-400 sticky left-0">
+            <div className="flex items-center">
+              <span className="w-2 h-2 rounded-full bg-[#2A5D8F] mr-2"></span>
+              Mostrando {data.length} registros consolidados
+            </div>
+          </div>
+        )}
         </table>
       </div>
     </div>

@@ -18,7 +18,6 @@ const CustomFulfillmentTooltip = ({ active, payload, label }: any) => {
     const data = payload[0].payload;
     const isPerfect = data.fulfillment === 100;
     const isWarning = data.fulfillment >= 80 && data.fulfillment < 100;
-    const isDanger = data.fulfillment < 80;
     
     return (
       <div className="bg-[#0F172A] p-5 rounded-2xl shadow-2xl border border-[#334155] font-body text-white min-w-[200px] animate-fade-in-up">
@@ -37,6 +36,30 @@ const CustomFulfillmentTooltip = ({ active, payload, label }: any) => {
              <p className="text-[#64748B] uppercase tracking-wide text-[10px] mb-1">Entregado</p>
              <p className="font-mono font-bold text-white">{data.totalDelivered} <span className="text-[#64748B] font-normal">unds</span></p>
            </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+const CustomTransportTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    const isLate = data.time > 11.5;
+    
+    return (
+      <div className="bg-[#0F172A] p-5 rounded-2xl shadow-2xl border border-[#334155] font-body text-white min-w-[200px] animate-fade-in-up z-50 relative">
+        <p className="font-display font-bold text-[#94A3B8] mb-2 uppercase tracking-wide text-[10px]">Orden <span className="text-white text-xs ml-1">#{data.order}</span></p>
+        <div className="flex items-end gap-2 mb-4">
+          <p className={`text-4xl font-mono font-bold leading-none ${isLate ? 'text-[#EF4444]' : 'text-[#10B981]'}`}>
+            {data.label}
+          </p>
+        </div>
+        <div className="pt-3 border-t border-[#334155] text-xs">
+           <p className={`${isLate ? 'text-[#EF4444]' : 'text-[#10B981]'} font-bold`}>
+             {isLate ? 'Salida Retrasada' : 'Salida A Tiempo'}
+           </p>
         </div>
       </div>
     );
@@ -93,7 +116,50 @@ const RealTimeClock = () => {
   );
 };
 
+const AnimatedGauge = ({ value, faceConfig }: { value: number, faceConfig: any }) => {
+  const [animatedValue, setAnimatedValue] = useState(0);
+  useEffect(() => {
+    let start = 0;
+    const duration = 1500;
+    const increment = value / (duration / 16);
+    if (value === 0) return;
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= value) {
+        clearInterval(timer);
+        setAnimatedValue(value);
+      } else {
+        setAnimatedValue(start);
+      }
+    }, 16);
+    return () => clearInterval(timer);
+  }, [value]);
+
+  const radius = 46;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (animatedValue / 100) * circumference;
+
+  return (
+    <div className="relative flex items-center justify-center w-32 h-32 mb-4">
+      <svg className="w-full h-full transform -rotate-90 drop-shadow-md">
+        <circle cx="64" cy="64" r={radius} stroke="currentColor" strokeWidth="12" fill="transparent" className="text-[#E2E8F0] dark:text-[#334155]" />
+        <circle 
+          cx="64" cy="64" r={radius} stroke="currentColor" strokeWidth="12" fill="transparent" 
+          strokeDasharray={circumference} 
+          strokeDashoffset={strokeDashoffset} 
+          className={`${faceConfig.color} transition-all duration-300 ease-out`} 
+          strokeLinecap="round" 
+        />
+      </svg>
+      <div className="absolute flex flex-col items-center justify-center">
+        <span className={`text-3xl font-mono font-bold leading-none ${faceConfig.color}`}>{Math.round(animatedValue)}%</span>
+      </div>
+    </div>
+  );
+};
+
 export function ReportsPage() {
+  const [period, setPeriod] = useState('Hoy');
   const { loading, error, transportData, fulfillmentData, latestOrder, generalMetrics } = useReports();
 
   const getFaceConfig = (score: number) => {
@@ -140,6 +206,20 @@ export function ReportsPage() {
         </div>
       ) : (
         <>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-2">
+            <div className="flex bg-[#F1F5F9] dark:bg-[#1E293B] p-1.5 rounded-2xl border border-[#E2E8F0] dark:border-[#334155] shadow-sm w-full md:w-auto">
+              {['Hoy', 'Esta semana', 'Este mes'].map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPeriod(p)}
+                  className={`flex-1 md:flex-none px-6 py-2.5 rounded-xl font-display font-bold text-sm transition-all duration-300 ${period === p ? 'bg-white dark:bg-[#0F172A] text-[#2A5D8F] shadow-md transform scale-105' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5'}`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Top Cards Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Última Orden Salida */}
@@ -218,15 +298,13 @@ export function ReportsPage() {
                     <p className="text-sm text-[#94A3B8] font-medium leading-none">Surtido x Tiempo</p>
                   </div>
                 </div>
-                <div className={`w-16 h-16 rounded-full border-4 flex items-center justify-center bg-white shadow-sm transition-transform hover:scale-105 cursor-default select-none ${faceConfig.border}`}>
-                  <Target className={`w-8 h-8 ${faceConfig.color}`} />
+                <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center bg-white shadow-sm transition-transform hover:scale-105 cursor-default select-none ${faceConfig.border}`}>
+                  <Target className={`w-6 h-6 ${faceConfig.color}`} />
                 </div>
               </div>
 
-              <div className="flex items-end gap-3 mb-8 relative z-10 pl-2">
-                <p className={`text-6xl font-mono font-bold leading-none tracking-tight ${faceConfig.color}`}>
-                  {generalMetrics.general}%
-                </p>
+              <div className="flex justify-center items-center relative z-10">
+                <AnimatedGauge value={generalMetrics.general} faceConfig={faceConfig} />
               </div>
 
               <div className="grid grid-cols-2 gap-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-5 relative z-10 ml-2">
@@ -259,10 +337,7 @@ export function ReportsPage() {
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
                       <XAxis dataKey="order" tick={{fill: '#64748B', fontSize: 12, fontFamily: 'IBM Plex Mono'}} axisLine={false} tickLine={false} />
                       <YAxis domain={[9, 13]} tickFormatter={formatTimeAxis} tick={{fill: '#64748B', fontSize: 12, fontFamily: 'IBM Plex Mono'}} axisLine={false} tickLine={false} />
-                      <Tooltip 
-                        formatter={(value: number, name: string, props: any) => [props.payload.label, 'Salida']}
-                        contentStyle={{ borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', fontFamily: 'IBM Plex Mono' }}
-                      />
+                      <Tooltip content={<CustomTransportTooltip />} cursor={{ stroke: '#E2E8F0', strokeWidth: 2 }} />
                       <ReferenceArea y1={11.0} y2={11.5} fill="#2A5D8F" fillOpacity={0.1} />
                       <ReferenceLine y={11.0} stroke="#2A5D8F" strokeDasharray="4 4" label={{ position: 'top', value: 'Meta (11:00)', fill: '#2A5D8F', fontSize: 12, fontFamily: 'IBM Plex Mono' }} />
                       <ReferenceLine y={11.5} stroke="#D97706" strokeDasharray="4 4" label={{ position: 'top', value: 'Límite (11:30)', fill: '#D97706', fontSize: 12, fontFamily: 'IBM Plex Mono' }} />
@@ -271,6 +346,9 @@ export function ReportsPage() {
                         dataKey="time" 
                         stroke="#2A5D8F" 
                         strokeWidth={4}
+                        isAnimationActive={true}
+                        animationDuration={2000}
+                        animationEasing="ease-in-out"
                         dot={{ fill: '#2A5D8F', strokeWidth: 2, r: 6, stroke: '#ffffff' }}
                         activeDot={{ r: 8, strokeWidth: 0, fill: '#1E4D73' }} 
                       />

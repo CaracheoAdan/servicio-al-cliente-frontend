@@ -17,120 +17,144 @@
   --color-brand-700: #1E4D73;
   --color-brand-800: #163B58;
   --color-brand-900: #0F2B42;
+
+  --color-surface-bg: var(--surface-bg);
+  --color-surface-card: var(--surface-card);
+  --color-surface-canvas: var(--surface-canvas);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-border-subtle: var(--border-subtle);
 }
 
 @layer base {
+  :root {
+    --surface-bg: #F8FAFC;
+    --surface-card: #FFFFFF;
+    --surface-canvas: #EFF2F7;
+    --text-primary: #0F172A;
+    --text-secondary: #64748B;
+    --border-subtle: #E2E8F0;
+  }
+
+  html.dark {
+    --surface-bg: #121212;
+    --surface-card: #18181B;
+    --surface-canvas: #09090B;
+    --text-primary: #F4F4F5;
+    --text-secondary: #A1A1AA;
+    --border-subtle: #27272A;
+  }
+
   body {
-    @apply bg-[#F8FAFC] text-[#0F172A];
+    @apply bg-surface-bg text-text-primary;
     font-family: 'Inter', sans-serif;
+    transition: background-color 300ms, color 300ms;
   }
 }
 
-/* ── Dark-mode toggle ─────────────────────────────── */
-html.dark body {
-  @apply bg-[#121212] text-[#F4F4F5];
-}
-
+/* ── Dark-mode Overrides ─────────────────────────────── */
+/* Instead of !important, we update specific CSS variables for targeted contexts */
 html.dark .sidebar-card {
-  background: #18181B !important;
+  background: var(--surface-card);
+  border-color: var(--border-subtle);
 }
 html.dark .sidebar-card .sidebar-brand,
 html.dark .sidebar-card .sidebar-user-name {
-  color: #F4F4F5 !important;
+  color: var(--text-primary);
 }
 html.dark .sidebar-card .sidebar-section-label {
-  color: #A1A1AA !important;
+  color: var(--text-secondary);
 }
 html.dark .sidebar-card .sidebar-menu-item {
-  color: #D4D4D8 !important;
+  color: #D4D4D8;
 }
 html.dark .sidebar-card .sidebar-menu-item:hover {
-  background: #27272A !important;
-  color: #7DBAE8 !important;
+  background: #27272A;
+  color: #7DBAE8;
 }
 html.dark .sidebar-card .sidebar-icon-box {
-  background: #27272A !important;
+  background: #27272A;
 }
 html.dark .sidebar-card .sidebar-menu-item:hover .sidebar-icon-box {
-  background: #3F3F46 !important;
+  background: #3F3F46;
 }
 html.dark .sidebar-card .sidebar-user-card {
-  background: #27272A !important;
-  border-color: #3F3F46 !important;
+  background: #27272A;
+  border-color: #3F3F46;
 }
 html.dark .sidebar-card .sidebar-user-role {
-  color: #A1A1AA !important;
+  color: var(--text-secondary);
 }
 html.dark .sidebar-card .sidebar-logout-btn {
-  background: #27272A !important;
-  color: #D4D4D8 !important;
-  border-color: #3F3F46 !important;
+  background: #27272A;
+  color: #D4D4D8;
+  border-color: #3F3F46;
 }
 html.dark .sidebar-card .sidebar-logout-btn:hover {
-  background: #450a0a !important;
-  color: #f87171 !important;
-  border-color: #7f1d1d !important;
+  background: #450a0a;
+  color: #f87171;
+  border-color: #7f1d1d;
 }
 
 html.dark .dashboard-header {
-  background: #18181B !important;
-  border-color: #27272A !important;
+  background: var(--surface-card);
+  border-color: var(--border-subtle);
 }
 html.dark .dashboard-header .header-title {
-  color: #F4F4F5 !important;
+  color: var(--text-primary);
 }
 html.dark .dashboard-header .header-breadcrumb {
-  color: #7DBAE8 !important;
+  color: #7DBAE8;
 }
 html.dark .dashboard-header .header-subtitle {
-  color: #A1A1AA !important;
+  color: var(--text-secondary);
 }
 html.dark .dashboard-header .header-logout-btn {
-  background: #27272A !important;
-  color: #D4D4D8 !important;
-  border-color: #3F3F46 !important;
+  background: #27272A;
+  color: #D4D4D8;
+  border-color: #3F3F46;
 }
 html.dark .dashboard-header .header-logout-btn:hover {
-  background: #450a0a !important;
-  color: #f87171 !important;
+  background: #450a0a;
+  color: #f87171;
 }
 
 html.dark .dashboard-main {
-  background: #121212 !important;
+  background: var(--surface-bg);
 }
 
-/* ── Form & Content Dark Mode Overrides ──────────────── */
+/* ── Form & Content Dark Mode Context Overrides ──────────────── */
 html.dark .dashboard-main .bg-white,
 html.dark .fixed .bg-white {
-  background-color: #1E1E1E !important;
-  border-color: #333333 !important;
+  background-color: var(--surface-card);
+  border-color: #333333;
 }
 
 html.dark .dashboard-main .bg-\[\#F8FAFC\],
 html.dark .fixed .bg-\[\#F8FAFC\] {
-  background-color: #27272A !important;
-  border-color: #3F3F46 !important;
+  background-color: #27272A;
+  border-color: #3F3F46;
 }
 
 html.dark .dashboard-main .bg-\[\#EFF6FF\],
 html.dark .fixed .bg-\[\#EFF6FF\] {
-  background-color: #27272A !important;
-  border-color: #3F3F46 !important;
+  background-color: #27272A;
+  border-color: #3F3F46;
 }
 
 html.dark .dashboard-main .border-\[\#E2E8F0\],
 html.dark .fixed .border-\[\#E2E8F0\] {
-  border-color: #333333 !important;
+  border-color: #333333;
 }
 
 html.dark .dashboard-main .text-\[\#0F172A\],
 html.dark .fixed .text-\[\#0F172A\] {
-  color: #F4F4F5 !important;
+  color: var(--text-primary);
 }
 
 html.dark .dashboard-main .text-\[\#64748B\],
 html.dark .fixed .text-\[\#64748B\] {
-  color: #A1A1AA !important;
+  color: var(--text-secondary);
 }
 
 /* Inputs, Selects, and Tables */
@@ -138,33 +162,33 @@ html.dark .dashboard-main input,
 html.dark .dashboard-main select,
 html.dark .fixed input,
 html.dark .fixed select {
-  background-color: #121212 !important;
-  border-color: #3F3F46 !important;
-  color: #F4F4F5 !important;
+  background-color: #121212;
+  border-color: #3F3F46;
+  color: var(--text-primary);
 }
 
 html.dark .dashboard-main input:focus,
 html.dark .dashboard-main select:focus,
 html.dark .fixed input:focus,
 html.dark .fixed select:focus {
-  border-color: #5BA3D9 !important;
+  border-color: #5BA3D9;
 }
 
 html.dark .dashboard-main th,
 html.dark .fixed th {
-  background-color: #18181B !important;
-  border-color: #333333 !important;
-  color: #A1A1AA !important;
+  background-color: var(--surface-card);
+  border-color: #333333;
+  color: var(--text-secondary);
 }
 
 html.dark .dashboard-main tr:hover,
 html.dark .fixed tr:hover {
-  background-color: #27272A !important;
+  background-color: #27272A;
 }
 
 html.dark .dashboard-main td,
 html.dark .fixed td {
-  border-color: #333333 !important;
+  border-color: #333333;
 }
 
 @layer utilities {
@@ -216,16 +240,16 @@ html.dark .fixed td {
 
 /* ── Dashboard Shell & Content Panel ──────────────── */
 html.dark .dashboard-shell {
-  background: #09090B !important;
+  background: var(--surface-canvas);
 }
 
 html.dark .content-panel {
-  background: #121212 !important;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35) !important;
+  background: var(--surface-bg);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
 }
 
 html.dark .sidebar-card {
-  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.35) !important;
+  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.35);
 }
 
 @keyframes blobBreathe {
@@ -235,4 +259,15 @@ html.dark .sidebar-card {
 
 @keyframes shimmer {
   100% { transform: translateX(100%); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out forwards;
+  }
 }

@@ -29,17 +29,47 @@ export function Header() {
     meta = { breadcrumb: 'PANEL', title: 'Panel de Control', subtitle: 'Sistema Totebin' }
   }
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Buenos días';
+    if (hour < 19) return 'Buenas tardes';
+    return 'Buenas noches';
+  };
+
+  const getTurn = () => {
+    const hour = new Date().getHours();
+    if (hour >= 6 && hour < 14) return 'Turno Matutino';
+    if (hour >= 14 && hour < 22) return 'Turno Vespertino';
+    return 'Turno Nocturno';
+  };
+
   return (
-    <header className="dashboard-header bg-white border-b border-[#E2E8F0] relative shrink-0">
+    <header className="dashboard-header bg-white border-b border-[#E2E8F0] relative shrink-0 transition-colors duration-300">
       
       <div className="flex items-center justify-between px-8 py-5">
         <div>
-          <span className="header-breadcrumb font-mono text-[11px] uppercase tracking-[0.15em] text-[#2A5D8F] font-bold block mb-1">{meta.breadcrumb}</span>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="header-breadcrumb font-mono text-[11px] uppercase tracking-[0.15em] text-[#2A5D8F] font-bold cursor-pointer hover:text-[#5BA3D9] transition-colors">{getGreeting()}, Javier — {getTurn()}</span>
+            <span className="text-[#E2E8F0] dark:text-[#3F3F46] text-[10px]">|</span>
+            <span className="header-breadcrumb font-mono text-[11px] uppercase tracking-[0.15em] text-[#64748B] font-medium">{meta.breadcrumb}</span>
+          </div>
           <h1 className="header-title text-xl font-display font-extrabold text-[#0F172A] tracking-tight">{meta.title}</h1>
           <p className="header-subtitle text-sm text-[#64748B] mt-0.5 font-medium">{meta.subtitle}</p>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-6">
+          <div className="hidden md:flex flex-col items-end">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#64748B] dark:text-[#A1A1AA]">Progreso de Turno</span>
+              <span className="text-[10px] font-bold text-[#2A5D8F] dark:text-[#5BA3D9]">75%</span>
+            </div>
+            <div className="w-32 h-1.5 bg-[#EFF2F7] dark:bg-[#27272A] rounded-full overflow-hidden shadow-inner">
+              <div className="h-full bg-gradient-to-r from-[#1E4D73] to-[#5BA3D9] rounded-full" style={{ width: '75%' }}></div>
+            </div>
+          </div>
+          
+          <div className="h-8 w-px bg-[#E2E8F0] dark:bg-[#3F3F46]"></div>
+
           <button 
             onClick={handleLogout}
             className="header-logout-btn bg-transparent border border-[#E2E8F0] hover:border-[#DC2626] text-[#64748B] hover:text-[#DC2626] px-5 py-2.5 rounded-xl font-display font-bold text-sm transition-all flex items-center gap-2 shadow-sm"

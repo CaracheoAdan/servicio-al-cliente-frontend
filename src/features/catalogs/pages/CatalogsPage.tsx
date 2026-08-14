@@ -2,13 +2,18 @@ import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Package, Search, Plus, X, Database, Edit2, Trash2, Tag, CheckCircle2, XCircle, Inbox } from 'lucide-react';
 import { api } from '../../../shared/api/axiosInstance';
-
+import { SkeletonLoader } from '../../../shared/components/SkeletonLoader';
+import { KPICard } from '../../../shared/components/KPICard';
+import { ConfirmModal } from '../../../shared/components/ConfirmModal';
+import { Card, CardHeader } from '../../../shared/components/Card';
 export function CatalogsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
   
   // Estado del formulario
   const [editId, setEditId] = useState<number | null>(null);
@@ -89,19 +94,24 @@ export function CatalogsPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (confirm('¿Estás seguro de eliminar este producto de la base de datos?')) {
-      try {
-        await api.delete(`/products/${id}`);
-        toast.success('Producto eliminado.', {
-          style: { borderRadius: '10px', background: '#333', color: '#fff' }
-        });
-        fetchProducts();
-      } catch (error) {
-        toast.error('Error al eliminar producto.', {
-          style: { borderRadius: '10px', background: '#333', color: '#fff' }
-        });
-      }
+  const handleDeleteClick = (id: number) => {
+    setConfirmDeleteId(id);
+  };
+
+  const executeDelete = async () => {
+    if (!confirmDeleteId) return;
+    try {
+      await api.delete(`/products/${confirmDeleteId}`);
+      toast.success('Producto eliminado.', {
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
+      fetchProducts();
+    } catch (error) {
+      toast.error('Error al eliminar producto.', {
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
+    } finally {
+      setConfirmDeleteId(null);
     }
   };
 
@@ -119,8 +129,8 @@ export function CatalogsPage() {
   const inactiveProducts = totalProducts - activeProducts;
 
   return (
-    <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] min-h-[500px] flex flex-col font-body animate-fade-in-up">
-      <div className="p-6 border-b border-[#E2E8F0] flex flex-col md:flex-row justify-between items-center bg-white rounded-t-2xl gap-4">
+    <Card className="min-h-[500px] flex flex-col font-body animate-fade-in-up border-0 sm:border">
+      <CardHeader className="flex flex-col md:flex-row justify-between items-center gap-4">
         
         {/* Quick Filters */}
         <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
@@ -176,57 +186,66 @@ export function CatalogsPage() {
             <Plus className="w-5 h-5" /> Nuevo Producto
           </button>
         </div>
-      </div>
+      </CardHeader>
       
       {/* KPIs Row */}
+      {/* KPIs Row */}
       {!loading && (
-        <div className="px-8 py-5 border-b border-[#E2E8F0] bg-white grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex items-center gap-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl px-4 py-3.5">
-            <div className="p-2 rounded-xl bg-white border border-[#E2E8F0]">
-              <Package className="w-5 h-5 text-[#2A5D8F]" />
-            </div>
-            <div>
-              <div className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide">Total de Productos</div>
-              <div className="font-mono font-bold text-lg text-[#0F172A] tabular-nums">{totalProducts}</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl px-4 py-3.5">
-            <div className="p-2 rounded-xl bg-white border border-[#E2E8F0]">
-              <CheckCircle2 className="w-5 h-5 text-[#2A5D8F]" />
-            </div>
-            <div>
-              <div className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide">Activos</div>
-              <div className="font-mono font-bold text-lg text-[#0F172A] tabular-nums">{activeProducts}</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl px-4 py-3.5">
-            <div className="p-2 rounded-xl bg-white border border-[#E2E8F0]">
-              <XCircle className="w-5 h-5 text-[#94A3B8]" />
-            </div>
-            <div>
-              <div className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide">Inactivos</div>
-              <div className="font-mono font-bold text-lg text-[#0F172A] tabular-nums">{inactiveProducts}</div>
-            </div>
-          </div>
+        <div className="px-8 py-5 border-b border-[#E2E8F0] dark:border-[#334155] bg-white dark:bg-[#0F172A] grid grid-cols-1 md:grid-cols-3 gap-4">
+          <KPICard 
+            title="Total de Productos" 
+            value={totalProducts} 
+            icon={<Package />} 
+            iconColorClass="text-[#2A5D8F]"
+            trend={3}
+            trendLabel="vs mes pasado"
+            sparklineData={[50, 52, 51, 55, 58, 60, totalProducts || 60]}
+          />
+          <KPICard 
+            title="Activos" 
+            value={activeProducts} 
+            icon={<CheckCircle2 />} 
+            iconColorClass="text-[#10B981]"
+            trend={1}
+            trendLabel="vs ayer"
+            sparklineData={[40, 42, 42, 45, 48, 50, activeProducts || 50]}
+          />
+          <KPICard 
+            title="Inactivos" 
+            value={inactiveProducts} 
+            icon={<XCircle />} 
+            iconColorClass="text-[#EF4444]"
+            trend={-2}
+            trendLabel="vs ayer"
+            sparklineData={[10, 10, 9, 10, 10, 10, inactiveProducts || 10]}
+          />
         </div>
       )}
 
-      <div className="flex-1 bg-white rounded-b-2xl overflow-hidden">
+      <div className="flex-1 bg-white dark:bg-gray-900 rounded-b-2xl overflow-hidden">
         {loading ? (
-          <div className="flex justify-center items-center h-64 bg-white">
-            <div className="text-center">
-              <div className="inline-block animate-spin w-8 h-8 border-4 border-[#2A5D8F] border-t-transparent rounded-full mb-4"></div>
-              <p className="font-display font-bold text-[#0F172A]">Cargando productos...</p>
-            </div>
+          <div className="p-6">
+            <SkeletonLoader type="table" rows={6} />
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className="p-8">
-            <div className="flex flex-col items-center justify-center gap-3 py-16 rounded-2xl border-2 border-dashed border-[#E2E8F0] bg-[#F8FAFC]">
-              <div className="p-4 rounded-2xl bg-white border border-[#E2E8F0]">
-                <Inbox className="w-8 h-8 text-[#94A3B8]" />
+            <div className="flex flex-col items-center justify-center gap-4 py-20 rounded-2xl border-2 border-dashed border-[#E2E8F0] dark:border-gray-800 bg-[#F8FAFC] dark:bg-gray-800/50">
+              <div className="p-6 rounded-3xl bg-white dark:bg-gray-800 shadow-sm border border-[#E2E8F0] dark:border-gray-700">
+                <svg className="w-16 h-16 text-[#2A5D8F]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
               </div>
-              <p className="font-display font-bold text-[#0F172A]">No se encontraron productos</p>
-              <p className="text-sm text-[#64748B]">Prueba con otra búsqueda o agrega el primer producto.</p>
+              <div className="text-center">
+                <p className="font-display font-bold text-[#0F172A] dark:text-white text-lg">Catálogo vacío</p>
+                <p className="text-sm text-[#64748B] dark:text-gray-400 mt-1 max-w-sm mx-auto">No se encontraron productos con estos criterios. Agrega un nuevo producto para comenzar.</p>
+              </div>
+              <button
+                onClick={openCreateModal}
+                className="mt-2 px-6 py-3 rounded-xl font-display font-bold text-sm text-white bg-[#2A5D8F] hover:bg-[#1B3D5C] shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all flex items-center"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Crear Nuevo Producto
+              </button>
             </div>
           </div>
         ) : (
@@ -240,11 +259,12 @@ export function CatalogsPage() {
                   <th className="px-8 py-4 text-right text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E2E8F0]">
+              <tbody className="divide-y divide-[#E2E8F0] dark:divide-gray-800">
                 {filteredProducts.map((p) => {
                   const isActiveState = p.isActive !== undefined ? p.isActive : p.is_active;
+                  const borderClass = isActiveState ? 'border-l-4 border-l-[#2A5D8F]' : 'border-l-4 border-l-slate-400';
                   return (
-                    <tr key={p.id} className="hover:bg-[#EFF6FF] transition-colors group">
+                    <tr key={p.id} className={`hover:bg-[#EFF6FF] dark:hover:bg-gray-800/50 transition-colors group relative ${borderClass} dark:text-gray-300`}>
                       <td className="px-8 py-5 whitespace-nowrap text-base font-mono font-bold text-[#64748B]">{p.id}</td>
                       <td className="px-8 py-5 whitespace-nowrap text-base font-mono font-bold text-[#0F172A]">
                         <div className="flex items-center">
@@ -271,25 +291,34 @@ export function CatalogsPage() {
                           )}
                         </button>
                       </td>
-                      <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
-                        <button 
-                          onClick={() => openEditModal(p)}
-                          className="flex items-center text-[#2A5D8F] bg-[#EFF6FF] hover:bg-[#DBEAFE] px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
-                        >
-                          <Edit2 className="w-4 h-4 mr-1.5" /> Editar
-                        </button>
-                        <button 
-                          onClick={() => handleDelete(p.id)} 
-                          className="flex items-center text-[#DC2626] bg-[#FEF2F2] hover:bg-[#FEE2E2] px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
-                        >
-                          <Trash2 className="w-4 h-4 mr-1.5" /> Eliminar
-                        </button>
+                      <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium overflow-hidden">
+                        <div className="flex justify-end space-x-2 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+                          <button 
+                            onClick={() => openEditModal(p)}
+                            className="flex items-center text-[#2A5D8F] bg-[#EFF6FF] dark:bg-blue-900/30 hover:bg-[#DBEAFE] dark:hover:bg-blue-900/50 px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
+                          >
+                            <Edit2 className="w-4 h-4 mr-1.5" /> Editar
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteClick(p.id)} 
+                            className="flex items-center text-[#DC2626] bg-[#FEF2F2] dark:bg-red-900/30 hover:bg-[#FEE2E2] dark:hover:bg-red-900/50 px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
+                          >
+                            <Trash2 className="w-4 h-4 mr-1.5" /> Eliminar
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
+            
+            <div className="px-8 py-4 border-t border-[#E2E8F0] dark:border-gray-800 bg-[#F8FAFC] dark:bg-gray-800 flex justify-between items-center text-sm font-medium text-[#64748B] dark:text-gray-400">
+              <div className="flex items-center">
+                <span className="w-2 h-2 rounded-full bg-[#2A5D8F] mr-2"></span>
+                Mostrando {filteredProducts.length > 0 ? 1 : 0} - {filteredProducts.length} de {products.length} productos
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -347,6 +376,21 @@ export function CatalogsPage() {
           </div>
         </div>
       )}
-    </div>
+
+      <ConfirmModal
+        isOpen={confirmDeleteId !== null}
+        title="Eliminar Producto"
+        message={
+          <>
+            ¿Estás seguro de eliminar este producto de la base de datos? <strong className="text-[#DC2626]">Esta acción no se puede deshacer.</strong>
+          </>
+        }
+        confirmText="Sí, eliminar producto"
+        cancelText="Cancelar"
+        variant="danger"
+        onConfirm={executeDelete}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
+    </Card>
   );
 }

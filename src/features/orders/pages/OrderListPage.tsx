@@ -4,6 +4,7 @@ import { ClipboardList, Edit2, Trash2, Search, X, CheckCircle2, Clock, Inbox, Ta
 import { orderService } from '../../../shared/api/orderService';
 import toast from 'react-hot-toast';
 import { api } from '../../../shared/api/axiosInstance';
+import { KPICard } from '../../../shared/components/KPICard';
 
 export function OrderListPage() {
   const navigate = useNavigate();
@@ -205,54 +206,60 @@ export function OrderListPage() {
       </div>
       
       {/* KPIs Row */}
+      {/* KPIs Row */}
       {!loading && (
-        <div className="px-8 py-5 border-b border-[#E2E8F0] bg-white grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex items-center gap-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-4 py-3.5">
-            <div className="p-2 rounded-xl bg-white border border-[#E2E8F0]">
-              <ClipboardList className="w-5 h-5 text-[#2A5D8F]" />
-            </div>
-            <div>
-              <div className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide">Total Órdenes</div>
-              <div className="font-mono font-bold text-lg text-[#0F172A] tabular-nums">{totalOrders}</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-4 py-3.5">
-            <div className="p-2 rounded-xl bg-white border border-[#E2E8F0]">
-              <Clock className="w-5 h-5 text-[#D97706]" />
-            </div>
-            <div>
-              <div className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide">En Proceso</div>
-              <div className="font-mono font-bold text-lg text-[#0F172A] tabular-nums">{activeOrders}</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-4 py-3.5">
-            <div className="p-2 rounded-xl bg-white border border-[#E2E8F0]">
-              <CheckCircle2 className="w-5 h-5 text-[#2A5D8F]" />
-            </div>
-            <div>
-              <div className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide">Completadas</div>
-              <div className="font-mono font-bold text-lg text-[#0F172A] tabular-nums">{closedOrders}</div>
-            </div>
-          </div>
+        <div className="px-8 py-5 border-b border-[#E2E8F0] dark:border-[#334155] bg-white dark:bg-[#0F172A] grid grid-cols-1 md:grid-cols-3 gap-4">
+          <KPICard 
+            title="Total Órdenes" 
+            value={totalOrders} 
+            icon={<ClipboardList />} 
+            iconColorClass="text-[#2A5D8F]"
+            trend={12}
+            sparklineData={[10, 15, 20, 25, 22, 30, totalOrders || 30]}
+          />
+          <KPICard 
+            title="En Proceso" 
+            value={activeOrders} 
+            icon={<Clock />} 
+            iconColorClass="text-[#D97706]"
+            trend={-5}
+            sparklineData={[20, 18, 15, 22, 25, 20, activeOrders || 15]}
+          />
+          <KPICard 
+            title="Completadas" 
+            value={closedOrders} 
+            icon={<CheckCircle2 />} 
+            iconColorClass="text-[#10B981]"
+            trend={8}
+            sparklineData={[5, 10, 15, 12, 18, 25, closedOrders || 25]}
+          />
         </div>
       )}
       
-      <div className="flex-1 bg-white rounded-b-2xl overflow-hidden">
+      <div className="flex-1 bg-white dark:bg-gray-900 rounded-b-2xl overflow-hidden">
         {loading ? (
-          <div className="flex justify-center items-center h-64 bg-white">
-            <div className="text-center">
-              <div className="inline-block animate-spin w-8 h-8 border-4 border-[#2A5D8F] border-t-transparent rounded-full mb-4"></div>
-              <p className="font-display font-bold text-[#0F172A]">Cargando órdenes...</p>
-            </div>
+          <div className="p-6">
+            <SkeletonLoader type="table" rows={6} />
           </div>
         ) : filteredOrders.length === 0 ? (
           <div className="p-8">
-            <div className="flex flex-col items-center justify-center gap-3 py-16 rounded-xl border-2 border-dashed border-[#E2E8F0] bg-[#F8FAFC]">
-              <div className="p-4 rounded-xl bg-white border border-[#E2E8F0]">
-                <Inbox className="w-8 h-8 text-[#94A3B8]" />
+            <div className="flex flex-col items-center justify-center gap-4 py-20 rounded-2xl border-2 border-dashed border-[#E2E8F0] dark:border-gray-800 bg-[#F8FAFC] dark:bg-gray-800/50">
+              <div className="p-6 rounded-3xl bg-white dark:bg-gray-800 shadow-sm border border-[#E2E8F0] dark:border-gray-700">
+                <svg className="w-16 h-16 text-[#2A5D8F]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
               </div>
-              <p className="font-display font-bold text-[#0F172A]">No se encontraron órdenes</p>
-              <p className="text-sm text-[#64748B]">Prueba con otra búsqueda o crea una nueva orden.</p>
+              <div className="text-center">
+                <p className="font-display font-bold text-[#0F172A] dark:text-white text-lg">Aún no hay órdenes</p>
+                <p className="text-sm text-[#64748B] dark:text-gray-400 mt-1 max-w-sm mx-auto">Parece que no tienes órdenes creadas o tu búsqueda no dio resultados. ¡Anímate a crear la primera!</p>
+              </div>
+              <button
+                onClick={() => navigate('/orders/new')}
+                className="mt-2 px-6 py-3 rounded-xl font-display font-bold text-sm text-white bg-[#2A5D8F] hover:bg-[#1B3D5C] shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all flex items-center"
+              >
+                <ClipboardList className="w-4 h-4 mr-2" />
+                Crear Nueva Orden
+              </button>
             </div>
           </div>
         ) : (
@@ -267,9 +274,19 @@ export function OrderListPage() {
                   <th className="px-8 py-4 text-right text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E2E8F0]">
-                {filteredOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-[#EFF6FF] transition-colors group">
+              <tbody className="divide-y divide-[#E2E8F0] dark:divide-gray-800">
+                {filteredOrders.map((order) => {
+                  let borderClass = 'border-l-4 border-l-transparent';
+                  const s = order.status?.toLowerCase();
+                  if (s === 'open') borderClass = 'border-l-4 border-l-slate-400';
+                  else if (s === 'in_process' || s === 'in_production') borderClass = 'border-l-4 border-l-blue-400';
+                  else if (s === 'produced') borderClass = 'border-l-4 border-l-indigo-400';
+                  else if (s === 'in_delivery') borderClass = 'border-l-4 border-l-amber-500';
+                  else if (s === 'delivered') borderClass = 'border-l-4 border-l-emerald-500';
+                  else if (s === 'closed') borderClass = 'border-l-4 border-l-red-500';
+
+                  return (
+                  <tr key={order.id} className={`hover:bg-[#EFF6FF] dark:hover:bg-gray-800/50 transition-colors group relative ${borderClass} dark:text-gray-300`}>
                     <td className="px-8 py-5 whitespace-nowrap">
                       <div className="flex items-center">
                         <Tag className="w-4 h-4 text-[#94A3B8] mr-2" />
@@ -287,42 +304,51 @@ export function OrderListPage() {
                     <td className="px-8 py-5 whitespace-nowrap">
                       <div className="text-sm font-mono text-[#475569] font-medium">{formatDate(order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || order.scheduled_delivery_date)}</div>
                     </td>
-                    <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
-                      {order.status?.toLowerCase() !== 'in_delivery' && order.status?.toLowerCase() !== 'delivered' && order.status?.toLowerCase() !== 'closed' ? (
+                    <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium overflow-hidden">
+                      <div className="flex justify-end space-x-2 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+                        {order.status?.toLowerCase() !== 'in_delivery' && order.status?.toLowerCase() !== 'delivered' && order.status?.toLowerCase() !== 'closed' ? (
+                          <button 
+                            onClick={() => handleLiberarCamion(order)}
+                            className="flex items-center text-[#D97706] bg-[#FFFBEB] dark:bg-amber-900/30 hover:bg-[#FEF3C7] dark:hover:bg-amber-900/50 px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs"
+                            title="Liberar Camión"
+                          >
+                            <Truck className="w-4 h-4 mr-1.5" /> Liberar
+                          </button>
+                        ) : (
+                          <span 
+                            className="flex items-center text-[#10B981] bg-[#ECFDF5] dark:bg-emerald-900/30 px-3 py-2 rounded-lg font-display font-bold text-xs cursor-default"
+                            title="El transporte ya ha salido"
+                          >
+                            <CheckCircle2 className="w-4 h-4 mr-1.5" /> Liberado
+                          </span>
+                        )}
                         <button 
-                          onClick={() => handleLiberarCamion(order)}
-                          className="flex items-center text-[#D97706] bg-[#FFFBEB] hover:bg-[#FEF3C7] px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs"
-                          title="Liberar Camión"
+                          onClick={() => navigate(`/orders/${order.id}`)}
+                          className="flex items-center text-[#2A5D8F] bg-[#EFF6FF] dark:bg-blue-900/30 hover:bg-[#DBEAFE] dark:hover:bg-blue-900/50 px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs"
+                          title="Editar"
                         >
-                          <Truck className="w-4 h-4 mr-1.5" /> Liberar
+                          <Edit2 className="w-4 h-4 mr-1.5" /> Editar
                         </button>
-                      ) : (
-                        <span 
-                          className="flex items-center text-[#10B981] bg-[#ECFDF5] px-3 py-2 rounded-lg font-display font-bold text-xs cursor-default"
-                          title="El transporte ya ha salido"
+                        <button 
+                          onClick={() => handleDelete(order)}
+                          className="flex items-center text-[#DC2626] bg-[#FEF2F2] dark:bg-red-900/30 hover:bg-[#FEE2E2] dark:hover:bg-red-900/50 px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs"
+                          title="Eliminar"
                         >
-                          <CheckCircle2 className="w-4 h-4 mr-1.5" /> Liberado
-                        </span>
-                      )}
-                      <button 
-                        onClick={() => navigate(`/orders/${order.id}`)}
-                        className="flex items-center text-[#2A5D8F] bg-[#EFF6FF] hover:bg-[#DBEAFE] px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs"
-                        title="Editar"
-                      >
-                        <Edit2 className="w-4 h-4 mr-1.5" /> Editar
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(order)}
-                        className="flex items-center text-[#DC2626] bg-[#FEF2F2] hover:bg-[#FEE2E2] px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs"
-                        title="Eliminar"
-                      >
-                        <Trash2 className="w-4 h-4 mr-1.5" /> Eliminar
-                      </button>
+                          <Trash2 className="w-4 h-4 mr-1.5" /> Eliminar
+                        </button>
+                      </div>
                     </td>
                   </tr>
-                ))}
+                )})}
               </tbody>
             </table>
+            
+            <div className="px-8 py-4 border-t border-[#E2E8F0] dark:border-gray-800 bg-[#F8FAFC] dark:bg-gray-800 flex justify-between items-center text-sm font-medium text-[#64748B] dark:text-gray-400">
+              <div className="flex items-center">
+                <span className="w-2 h-2 rounded-full bg-[#2A5D8F] mr-2"></span>
+                Mostrando {filteredOrders.length > 0 ? 1 : 0} - {filteredOrders.length} de {orders.length} órdenes
+              </div>
+            </div>
           </div>
         )}
       </div>

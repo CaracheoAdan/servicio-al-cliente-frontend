@@ -30,13 +30,13 @@ export function Sidebar() {
       label: 'GENERAL',
       items: [
         { name: 'Registro de Pedidos', path: '/orders/new', icon: Plus },
-        { name: 'Gestión de Órdenes', path: '/orders', icon: ClipboardList },
+        { name: 'Gestión de Órdenes', path: '/orders', icon: ClipboardList, badge: 12 },
       ],
     },
     {
       label: 'CATÁLOGOS',
       items: [
-        { name: 'Catálogo de Productos', path: '/catalogs', icon: Database },
+        { name: 'Catálogo de Productos', path: '/catalogs', icon: Database, badge: 145 },
       ],
     },
     {
@@ -49,7 +49,7 @@ export function Sidebar() {
     {
       label: 'ADMINISTRACIÓN',
       items: [
-        { name: 'Usuarios', path: '/users', icon: Settings },
+        { name: 'Usuarios', path: '/users', icon: Settings, badge: 5 },
       ],
     },
   ]
@@ -104,7 +104,7 @@ export function Sidebar() {
                       to={item.path}
                       end={item.path === '/orders'}
                       className={({ isActive }) =>
-                        `sidebar-menu-item flex items-center ${collapsed ? 'justify-center px-3' : 'px-3'} py-3 text-sm font-display font-bold rounded-xl transition-all duration-200 group ${
+                        `sidebar-menu-item flex items-center ${collapsed ? 'justify-center px-3' : 'px-3'} py-3 text-sm font-display font-bold rounded-xl transition-all duration-200 group relative overflow-hidden ${
                           isActive
                             ? 'sidebar-item-active text-white'
                             : 'text-[#475569] hover:bg-[#EFF6FF] hover:text-[#2A5D8F] hover:shadow-[0_2px_8px_-2px_rgba(42,93,143,0.1)]'
@@ -114,14 +114,34 @@ export function Sidebar() {
                     >
                       {({ isActive }) => (
                         <>
-                          <div className={`sidebar-icon-box ${collapsed ? '' : 'mr-3'} p-1.5 rounded-lg transition-colors ${
+                          {isActive && (
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#5BA3D9] rounded-r-full shadow-[2px_0_8px_rgba(91,163,217,0.5)]"></div>
+                          )}
+                          <div className={`sidebar-icon-box ${collapsed ? '' : 'mr-3'} relative p-1.5 rounded-lg transition-colors ${
                             isActive 
                               ? 'bg-white/20' 
                               : 'bg-[#F1F5F9] group-hover:bg-[#DBEAFE] text-[#64748B] group-hover:text-[#2A5D8F]'
                           }`}>
                             <Icon className="w-[18px] h-[18px]" strokeWidth={2} />
+                            {collapsed && item.badge && (
+                              <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5BA3D9] opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-[#5BA3D9]"></span>
+                              </span>
+                            )}
                           </div>
-                          {!collapsed && item.name}
+                          {!collapsed && (
+                            <div className="flex-1 flex justify-between items-center">
+                              <span>{item.name}</span>
+                              {item.badge && (
+                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
+                                  isActive ? 'bg-white/20 text-white' : 'bg-[#E2E8F0] dark:bg-[#3F3F46] text-[#64748B] dark:text-[#A1A1AA]'
+                                }`}>
+                                  {item.badge}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </>
                       )}
                     </NavLink>

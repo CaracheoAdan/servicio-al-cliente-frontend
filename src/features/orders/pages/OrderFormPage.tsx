@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Save, Plus, X, FileText, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Save, Plus, X, FileText, CheckCircle2, MessageSquare, Package, Truck, Check } from 'lucide-react';
 import { api } from '../../../shared/api/axiosInstance';
 import { orderService } from '../../../shared/api/orderService';
 import { OrderStatus } from '../types/order.types';
@@ -19,6 +19,14 @@ export function OrderFormPage() {
   
   const [loading, setLoading] = useState(true);
   const [availableProducts, setAvailableProducts] = useState<any[]>([]);
+  const [isDirty, setIsDirty] = useState(false);
+
+  // Mark as dirty when these change
+  useEffect(() => {
+    if (!loading) {
+      setIsDirty(true);
+    }
+  }, [orderKey, scheduledDeliveryDate, items, status, comments]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,6 +60,7 @@ export function OrderFormPage() {
         toast.error('Error al cargar datos del servidor.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
       } finally {
         setLoading(false);
+        setTimeout(() => setIsDirty(false), 50); // Reset dirty after load
       }
     };
     fetchData();
@@ -104,7 +113,6 @@ export function OrderFormPage() {
       return;
     }
 
-    // Check duplicate products
     const productIds = items.map(i => i.productId);
     const uniqueProductIds = new Set(productIds);
     if (uniqueProductIds.size !== productIds.length) {
@@ -112,7 +120,6 @@ export function OrderFormPage() {
       return;
     }
 
-    // Check for valid quantities
     if (items.some(item => Number(item.orderedQuantity) < 1 || isNaN(Number(item.orderedQuantity)))) {
       toast.error('La cantidad pedida debe ser un número entero mayor o igual a 1.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
       return;
@@ -128,7 +135,7 @@ export function OrderFormPage() {
         key: orderKey,
         status: status,
         scheduledDeliveryDate: scheduledDeliveryDate,
-        comments: comments, // Enviamos el comentario al backend
+        comments: comments,
         items: items.map(item => ({
           productId: parseInt(item.productId as string, 10),
           orderedQuantity: parseInt(item.orderedQuantity as string, 10),
@@ -144,193 +151,278 @@ export function OrderFormPage() {
         toast.success('Orden creada en DB.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
         setTimeout(() => navigate('/orders'), 1000);
       }
+      setIsDirty(false);
     } catch (error) {
       toast.error('Error al guardar. Revisa la consola o backend.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
     }
   };
 
   if (loading) {
-    return <div className="p-8 text-center text-[#64748B] font-display font-bold">Cargando datos...</div>;
+    return <div className="p-8 text-center text-[#64748B] dark:text-slate-400 font-display font-bold">Cargando datos...</div>;
   }
 
-  const isProduced = status === 'produced' || status === 'in_delivery' || status === 'delivered' || status === 'closed';
-  const isDelivered = status === 'in_delivery' || status === 'delivered' || status === 'closed';
+  const statuses: { value: OrderStatus; label: string; icon: any }[] = [
+    { value: 'open', label: 'Abierto', icon: FileText },
+    { value: 'produced', label: 'Producido', icon: Package },
+    { value: 'in_delivery', label: 'En Transporte', icon: Truck },
+    { value: 'delivered', label: 'Entregado', icon: CheckCircle2 },
+    { value: 'closed', label: 'Cerrado', icon: Check }
+  ];
+
+  const currentStatusIndex = statuses.findIndex(s => s.value === status);
+
+  const totalOrdered = items.reduce((acc, curr) => acc + (Number(curr.orderedQuantity) || 0), 0);
+  const totalDelivered = items.reduce((acc, curr) => acc + (Number(curr.deliveredQuantity) || 0), 0);
 
   return (
-    <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] overflow-hidden font-body animate-fade-in-up w-full mx-auto">
+    <div className="bg-white dark:bg-[#0F172A] rounded-2xl shadow-card-base border border-[#E2E8F0] dark:border-slate-800 overflow-hidden font-body animate-fade-in-up w-full mx-auto">
       {/* Toolbar */}
-      <div className="px-10 md:px-12 py-6 border-b border-[#E2E8F0] bg-[#F8FAFC] flex justify-between items-center rounded-t-2xl gap-4">
-        <div className="font-display font-bold text-[#0F172A] text-lg flex items-center gap-2">
-          <FileText className="w-5 h-5 text-[#2A5D8F]" />
-          {isEditing ? `Gestión de Orden No. ${id}` : 'Nueva Orden de Producción'}
+      <div className="px-6 md:px-10 py-5 border-b border-[#E2E8F0] dark:border-slate-800 bg-[#F8FAFC] dark:bg-[#1E293B] flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex items-center gap-4">
+          <button 
+            type="button"
+            onClick={() => navigate('/orders')} 
+            className="p-2 bg-white dark:bg-slate-800 border border-[#E2E8F0] dark:border-slate-700 hover:border-[#2A5D8F] dark:hover:border-[#5BA3D9] text-[#64748B] dark:text-slate-400 hover:text-[#2A5D8F] dark:hover:text-[#5BA3D9] rounded-xl transition-all shadow-sm"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <h2 className="font-display font-extrabold text-[#0F172A] dark:text-white text-xl">
+              {isEditing ? `Gestión de Orden No. ${id}` : 'Nueva Orden de Producción'}
+            </h2>
+            <div className="flex items-center gap-2 mt-1">
+              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isDirty ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
+                {isDirty ? '• Cambios sin guardar' : '✓ Guardado'}
+              </span>
+            </div>
+          </div>
         </div>
-        <button 
-          type="button"
-          onClick={() => navigate('/orders')} 
-          className="bg-transparent border border-[#E2E8F0] hover:border-[#2A5D8F] text-[#64748B] hover:text-[#2A5D8F] px-5 py-2.5 rounded-xl font-display font-bold text-sm transition-all flex items-center gap-2 shadow-sm"
-        >
-          <ArrowLeft className="w-4 h-4" /> Regresar
-        </button>
+
+        {/* Visual 3-step indicator */}
+        <div className="hidden lg:flex items-center space-x-2 text-sm font-semibold text-[#64748B] dark:text-slate-400">
+          <div className="flex items-center"><span className="w-6 h-6 rounded-full bg-[#2A5D8F] text-white flex items-center justify-center mr-2 text-xs">1</span>Datos generales</div>
+          <div className="w-8 h-px bg-[#E2E8F0] dark:bg-slate-700"></div>
+          <div className="flex items-center"><span className="w-6 h-6 rounded-full bg-[#2A5D8F] text-white flex items-center justify-center mr-2 text-xs">2</span>Productos</div>
+          <div className="w-8 h-px bg-[#E2E8F0] dark:bg-slate-700"></div>
+          <div className="flex items-center"><span className="w-6 h-6 rounded-full bg-[#2A5D8F] text-white flex items-center justify-center mr-2 text-xs">3</span>Estado y envío</div>
+        </div>
       </div>
 
-      <form onSubmit={handleSave} className="p-10 md:p-12 space-y-14">
+      <form onSubmit={handleSave} className="p-6 md:p-10 space-y-12">
         {/* Datos Principales */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-[#F8FAFC] p-8 md:p-10 rounded-2xl border border-[#E2E8F0]">
-          <div>
-            <label className="block font-display font-bold text-sm text-[#0F172A] mb-2">No. Orden</label>
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              required
-              value={orderKey}
-              onChange={(e) => setOrderKey(e.target.value.replace(/\D/g, ''))}
-              placeholder="Ej: 12515"
-              className="block w-full border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F172A] placeholder:text-[#94A3B8] outline-none"
-            />
+        <section>
+          <h3 className="text-lg font-display font-bold text-[#0F172A] dark:text-white mb-4 flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-[#2A5D8F]/10 dark:bg-[#5BA3D9]/10 text-[#2A5D8F] dark:text-[#5BA3D9] flex items-center justify-center text-sm lg:hidden">1</span>
+            Datos Generales
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-[#F8FAFC] dark:bg-[#1E293B] p-6 rounded-2xl border border-[#E2E8F0] dark:border-slate-800">
+            <div>
+              <label className="block font-semibold text-sm text-[#475569] dark:text-slate-300 mb-2">No. Orden</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                required
+                value={orderKey}
+                onChange={(e) => setOrderKey(e.target.value.replace(/\D/g, ''))}
+                placeholder="Ej: 12515"
+                className="block w-full border border-[#E2E8F0] dark:border-slate-700 rounded-xl focus:border-[#2A5D8F] dark:focus:border-[#5BA3D9] focus:ring-2 focus:ring-[#2A5D8F]/20 px-4 py-3 bg-white dark:bg-[#0F172A] transition-all font-mono font-semibold text-[#0F172A] dark:text-white placeholder:text-[#94A3B8] outline-none"
+              />
+            </div>
+            <div>
+              <label className="block font-semibold text-sm text-[#475569] dark:text-slate-300 mb-2">Fecha compromiso</label>
+              <input
+                type="date"
+                required
+                value={scheduledDeliveryDate}
+                onChange={(e) => setScheduledDeliveryDate(e.target.value)}
+                className="block w-full border border-[#E2E8F0] dark:border-slate-700 rounded-xl focus:border-[#2A5D8F] dark:focus:border-[#5BA3D9] focus:ring-2 focus:ring-[#2A5D8F]/20 px-4 py-3 bg-white dark:bg-[#0F172A] transition-all font-mono font-semibold text-[#0F172A] dark:text-white outline-none"
+              />
+            </div>
+            <div className="md:col-span-2 lg:col-span-1">
+              <label className="block font-semibold text-sm text-[#475569] dark:text-slate-300 mb-2 flex items-center gap-1">
+                <MessageSquare className="w-4 h-4" /> Comentarios
+              </label>
+              <textarea
+                value={comments}
+                onChange={(e) => setComments(e.target.value)}
+                placeholder="Observaciones adicionales..."
+                rows={1}
+                className="block w-full border border-[#E2E8F0] dark:border-slate-700 rounded-xl focus:border-[#2A5D8F] dark:focus:border-[#5BA3D9] focus:ring-2 focus:ring-[#2A5D8F]/20 px-4 py-3 bg-white dark:bg-[#0F172A] transition-all text-[#0F172A] dark:text-white placeholder:text-[#94A3B8] outline-none resize-y min-h-[50px]"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block font-display font-bold text-sm text-[#0F172A] mb-2">Fecha compromiso de entrega</label>
-            <input
-              type="date"
-              required
-              value={scheduledDeliveryDate}
-              onChange={(e) => setScheduledDeliveryDate(e.target.value)}
-              className="block w-full border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F172A] placeholder:text-[#94A3B8] outline-none"
-            />
-          </div>
-        </div>
+        </section>
 
         {/* Productos */}
-        <div>
-          <div className="flex justify-between items-center mb-4">
-            <h4 className="text-lg font-display font-bold text-[#0F172A]">Productos a Producir</h4>
+        <section>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
+            <h3 className="text-lg font-display font-bold text-[#0F172A] dark:text-white flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-[#2A5D8F]/10 dark:bg-[#5BA3D9]/10 text-[#2A5D8F] dark:text-[#5BA3D9] flex items-center justify-center text-sm lg:hidden">2</span>
+              Productos a Producir
+            </h3>
             <button 
               type="button" 
               onClick={handleAddItem}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#EFF6FF] text-[#2A5D8F] font-display font-bold text-sm border border-[#BFDBFE] hover:bg-[#DBEAFE] transition-colors"
+              className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[#2A5D8F] text-white font-display font-bold text-sm hover:bg-[#1E4D73] transition-colors shadow-sm"
             >
-              <Plus className="w-4 h-4" /> Agregar Fila
+              <Plus className="w-4 h-4" /> Añadir Producto
             </button>
           </div>
 
-          <div className="space-y-6">
-            {items.map((item, index) => (
-              <div key={index} className="flex flex-col md:flex-row items-end gap-6 p-6 md:p-8 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] even:bg-white dark:even:bg-[#1E1E1E]">
-                <div className="w-full md:w-2/5 flex flex-col justify-end">
-                  <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#64748B] mb-2">Producto</label>
-                  <select
-                    value={item.productId}
-                    onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
-                    className="w-full p-3.5 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-body transition-all bg-white"
-                    required
-                  >
-                    <option value="" disabled>-- Selecciona un Producto --</option>
-                    {availableProducts.map(prod => (
-                      <option key={prod.id} value={prod.id}>{prod.key}</option>
-                    ))}
-                  </select>
+          <div className="border border-[#E2E8F0] dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-[#0F172A]">
+            <div className="hidden md:grid grid-cols-12 gap-4 bg-[#F8FAFC] dark:bg-[#1E293B] p-4 border-b border-[#E2E8F0] dark:border-slate-800 font-semibold text-xs text-[#64748B] dark:text-slate-400 uppercase tracking-wider">
+              <div className="col-span-5">Producto</div>
+              <div className="col-span-3 text-center">Cant. Pedida</div>
+              <div className="col-span-3 text-center">Cant. Surtida</div>
+              <div className="col-span-1 text-center">Acción</div>
+            </div>
+            
+            <div className="divide-y divide-[#E2E8F0] dark:divide-slate-800">
+              {items.map((item, index) => (
+                <div key={index} className="flex flex-col md:grid md:grid-cols-12 gap-4 p-4 items-center">
+                  <div className="w-full md:col-span-5">
+                    <label className="md:hidden block text-xs font-semibold text-[#64748B] dark:text-slate-400 mb-1">Producto</label>
+                    <select
+                      value={item.productId}
+                      onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
+                      className="w-full p-2.5 border border-[#E2E8F0] dark:border-slate-700 rounded-lg focus:border-[#2A5D8F] dark:focus:border-[#5BA3D9] focus:ring-2 focus:ring-[#2A5D8F]/20 outline-none text-[#0F172A] dark:text-white bg-white dark:bg-[#1E293B] transition-all"
+                      required
+                    >
+                      <option value="" disabled>-- Selecciona --</option>
+                      {availableProducts.map(prod => (
+                        <option key={prod.id} value={prod.id}>{prod.key}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="w-full md:col-span-3 flex md:justify-center">
+                    <div className="w-full max-w-[120px]">
+                      <label className="md:hidden block text-xs font-semibold text-[#64748B] dark:text-slate-400 mb-1">Cant. Pedida</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={item.orderedQuantity}
+                        onChange={(e) => handleItemChange(index, 'orderedQuantity', e.target.value)}
+                        className="w-full p-2.5 text-center border border-[#E2E8F0] dark:border-slate-700 rounded-lg focus:border-[#2A5D8F] dark:focus:border-[#5BA3D9] focus:ring-2 focus:ring-[#2A5D8F]/20 outline-none text-[#0F172A] dark:text-white font-mono font-bold bg-white dark:bg-[#1E293B] transition-all"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="w-full md:col-span-3 flex md:justify-center">
+                    <div className="w-full max-w-[120px]">
+                      <label className="md:hidden block text-xs font-semibold text-[#64748B] dark:text-slate-400 mb-1">Cant. Surtida</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={item.deliveredQuantity}
+                        onChange={(e) => handleItemChange(index, 'deliveredQuantity', e.target.value)}
+                        className="w-full p-2.5 text-center border border-[#E2E8F0] dark:border-slate-700 rounded-lg focus:border-[#2A5D8F] dark:focus:border-[#5BA3D9] focus:ring-2 focus:ring-[#2A5D8F]/20 outline-none text-[#0F172A] dark:text-white font-mono font-bold bg-white dark:bg-[#1E293B] transition-all"
+                      />
+                    </div>
+                  </div>
+                  <div className="w-full md:col-span-1 flex justify-end md:justify-center mt-2 md:mt-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newItems = [...items];
+                        newItems.splice(index, 1);
+                        setItems(newItems);
+                      }}
+                      className="p-2 text-[#94A3B8] hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-all disabled:opacity-50"
+                      title="Eliminar fila"
+                      disabled={items.length === 1}
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
-                <div className="w-full md:w-1/4 flex flex-col justify-end">
-                  <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#64748B] mb-2">Cant. Pedida</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={item.orderedQuantity}
-                    onChange={(e) => handleItemChange(index, 'orderedQuantity', e.target.value)}
-                    className="w-full p-3.5 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-mono font-bold transition-all bg-white"
-                    required
-                  />
-                </div>
-                <div className="w-full md:w-1/4 flex flex-col justify-end">
-                  <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#64748B] mb-2">Cant. Surtida</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={item.deliveredQuantity}
-                    onChange={(e) => handleItemChange(index, 'deliveredQuantity', e.target.value)}
-                    className="w-full p-3.5 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-mono font-bold transition-all bg-white"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newItems = [...items];
-                    newItems.splice(index, 1);
-                    setItems(newItems);
-                  }}
-                  className="p-3.5 bg-white border border-[#E2E8F0] hover:border-[#DC2626] text-[#64748B] hover:text-[#DC2626] hover:bg-[#FEF2F2] rounded-xl transition-all shrink-0 disabled:opacity-50 dark:bg-[#121212] dark:border-[#333333] dark:hover:border-[#DC2626]"
-                  title="Eliminar fila"
-                  disabled={items.length === 1}
-                >
-                  <X className="w-5 h-5" />
-                </button>
+              ))}
+            </div>
+            
+            {/* Totals */}
+            <div className="bg-[#F8FAFC] dark:bg-[#1E293B] p-4 border-t border-[#E2E8F0] dark:border-slate-800 flex flex-col sm:flex-row justify-end items-center gap-6">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-[#64748B] dark:text-slate-400 font-semibold">Total Pedido:</span>
+                <span className="font-mono font-bold text-lg text-[#0F172A] dark:text-white">{totalOrdered}</span>
               </div>
-            ))}
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-[#64748B] dark:text-slate-400 font-semibold">Total Surtido:</span>
+                <span className={`font-mono font-bold text-lg ${totalDelivered >= totalOrdered && totalOrdered > 0 ? 'text-green-600 dark:text-green-400' : 'text-[#0F172A] dark:text-white'}`}>{totalDelivered}</span>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
 
         {/* Estatus */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Pedido ya esta producido */}
-          <div className="bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] p-8 md:p-10">
-            <h5 className="font-display font-bold text-[#0F172A] mb-6">Pedido ya está producido</h5>
-            <div className="inline-flex rounded-xl bg-[#E2E8F0] dark:bg-[#121212] p-1">
-              <button 
-                type="button" 
-                onClick={() => handleStatusToggle('produced')} 
-                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${isProduced ? 'bg-[#10B981] text-white shadow-[0_2px_0_#047857]' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
-              >
-                Sí
-              </button>
-              <button 
-                type="button" 
-                onClick={() => handleStatusToggle('open')} 
-                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isProduced ? 'bg-[#64748B] text-white shadow-[0_2px_0_#334155]' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
-              >
-                No
-              </button>
-            </div>
-          </div>
+        <section>
+          <h3 className="text-lg font-display font-bold text-[#0F172A] dark:text-white mb-6 flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-[#2A5D8F]/10 dark:bg-[#5BA3D9]/10 text-[#2A5D8F] dark:text-[#5BA3D9] flex items-center justify-center text-sm lg:hidden">3</span>
+            Estado y Envío
+          </h3>
+          
+          <div className="bg-[#F8FAFC] dark:bg-[#1E293B] rounded-2xl border border-[#E2E8F0] dark:border-slate-800 p-8">
+            <div className="relative">
+              {/* Timeline Line */}
+              <div className="absolute top-1/2 left-0 w-full h-1 bg-[#E2E8F0] dark:bg-slate-700 -translate-y-1/2 rounded-full hidden sm:block"></div>
+              <div 
+                className="absolute top-1/2 left-0 h-1 bg-[#2A5D8F] dark:bg-[#5BA3D9] -translate-y-1/2 rounded-full transition-all duration-500 hidden sm:block"
+                style={{ width: `${(currentStatusIndex / (statuses.length - 1)) * 100}%` }}
+              ></div>
 
-          {/* Salida de transporte */}
-          <div className="bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] p-8 md:p-10">
-            <h5 className="font-display font-bold text-[#0F172A] mb-6">Salida de transporte para entrega</h5>
-            <div className="inline-flex rounded-xl bg-[#E2E8F0] dark:bg-[#121212] p-1 mb-6 block">
-              <button 
-                type="button" 
-                onClick={() => handleStatusToggle('in_delivery')} 
-                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${isDelivered ? 'bg-[#10B981] text-white shadow-[0_2px_0_#047857]' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
-              >
-                Sí
-              </button>
-              <button 
-                type="button" 
-                onClick={() => handleStatusToggle('produced')} 
-                className={`px-8 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isDelivered ? 'bg-[#64748B] text-white shadow-[0_2px_0_#334155]' : 'text-[#64748B] hover:text-[#0F172A] dark:hover:text-white'}`}
-              >
-                No
-              </button>
+              <div className="flex flex-col sm:flex-row justify-between items-center relative z-10 gap-4 sm:gap-0">
+                {statuses.map((s, index) => {
+                  const isCompleted = index <= currentStatusIndex;
+                  const isCurrent = index === currentStatusIndex;
+                  const Icon = s.icon;
+                  
+                  return (
+                    <button
+                      key={s.value}
+                      type="button"
+                      onClick={() => handleStatusToggle(s.value)}
+                      className={`flex flex-col items-center gap-2 group outline-none`}
+                    >
+                      <div 
+                        className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm border-2
+                          ${isCurrent ? 'bg-[#2A5D8F] dark:bg-[#5BA3D9] border-[#2A5D8F] dark:border-[#5BA3D9] text-white scale-110' : 
+                            isCompleted ? 'bg-[#EFF6FF] dark:bg-[#1E4D73] border-[#2A5D8F] dark:border-[#5BA3D9] text-[#2A5D8F] dark:text-[#5BA3D9]' : 
+                            'bg-white dark:bg-slate-800 border-[#E2E8F0] dark:border-slate-600 text-[#94A3B8] dark:text-slate-500 group-hover:border-[#94A3B8]'}`}
+                      >
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <span className={`text-sm font-semibold transition-colors
+                        ${isCurrent ? 'text-[#0F172A] dark:text-white' : 
+                          isCompleted ? 'text-[#2A5D8F] dark:text-[#5BA3D9]' : 
+                          'text-[#64748B] dark:text-slate-500'}`}
+                      >
+                        {s.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Acciones */}
-        <div className="flex justify-between items-center pt-10 px-2 border-t border-[#E2E8F0] mt-10">
+        <div className="flex flex-col-reverse sm:flex-row justify-between items-center pt-8 border-t border-[#E2E8F0] dark:border-slate-800 gap-4">
           <button
             type="button"
-            onClick={() => handleStatusToggle('closed')}
-            disabled={status === 'closed'}
-            className={`flex items-center px-6 py-3.5 rounded-xl font-display font-bold border-2 transition-all h-[52px] ${status === 'closed' ? 'bg-[#F8FAFC] text-[#94A3B8] border-[#E2E8F0] cursor-not-allowed dark:bg-[#18181B] dark:border-[#333333]' : 'bg-transparent text-[#64748B] border-[#E2E8F0] hover:border-[#2A5D8F] hover:text-[#2A5D8F] dark:border-[#333333] dark:hover:border-[#5BA3D9] dark:hover:text-[#5BA3D9]'}`}
+            onClick={() => navigate('/orders')}
+            className="w-full sm:w-auto px-6 py-3.5 rounded-xl font-semibold text-[#64748B] dark:text-slate-400 hover:bg-[#F1F5F9] dark:hover:bg-slate-800 transition-colors"
           >
-            <CheckCircle2 className="w-5 h-5 mr-2" /> Cerrar pedido
+            Cancelar
           </button>
 
           <button 
             type="submit"
-            className="bg-[#2A5D8F] hover:bg-[#1E4D73] disabled:opacity-60 text-white px-8 py-3.5 rounded-xl font-display font-bold shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all flex items-center h-[52px]"
+            disabled={!isDirty}
+            className={`w-full sm:w-auto px-8 py-3.5 rounded-xl font-display font-bold shadow-md transition-all flex items-center justify-center h-[52px] gap-2
+              ${isDirty ? 'bg-[#2A5D8F] hover:bg-[#1E4D73] text-white shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1' : 
+              'bg-[#E2E8F0] dark:bg-slate-700 text-[#94A3B8] dark:text-slate-400 cursor-not-allowed shadow-none'}`}
           >
-            <Save className="w-5 h-5 mr-2" />
+            <Save className="w-5 h-5" />
             {isEditing ? 'Guardar Cambios' : 'Crear Orden'}
           </button>
         </div>
