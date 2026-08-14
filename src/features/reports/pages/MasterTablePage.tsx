@@ -213,7 +213,6 @@ export function MasterTablePage() {
             </div>
           </div>
         )}
-        </table>
       </div>
     </div>
   );
