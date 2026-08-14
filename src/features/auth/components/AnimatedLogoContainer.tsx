@@ -147,17 +147,9 @@ export function AnimatedLogoContainer() {
       css += kf + '\n.acr{animation:cr ' + DUR + 's linear both}\n';
     }
 
-    // Color morph
-    css += '@keyframes cm{'
-      + '0%,80%{fill:#DEB887;stroke:#B48E5D;stroke-width:1}'
-      + '86%,91%{fill:#FFF;stroke:#FFF;stroke-width:2;filter:drop-shadow(0 0 8px rgba(91,163,217,0.8))}'
-      + '96%,100%{fill:#2A5D8F;stroke:none;filter:none}'
-      + '}\n';
-    css += '.cm{animation:cm ' + DUR + 's ease-out both}\n';
-
-    // Tape fade
-    css += '@keyframes tf{0%,80%{opacity:1}86%,100%{opacity:0}}\n';
-    css += '.tf{animation:tf ' + DUR + 's ease-out both}\n';
+    // Boxes fade out at the end (no color morph → no visible seams)
+    css += '@keyframes bf{0%,88%{opacity:1}100%{opacity:0}}\n';
+    css += '.bf{animation:bf ' + DUR + 's ease-out both}\n';
 
     return css;
   }, [mode]);
@@ -279,14 +271,16 @@ export function AnimatedLogoContainer() {
               </>
             )}
 
-            {/* Animated boxes */}
-            {BOXES.map((_, i) => (
-              <g key={i} className={'ab' + i}>
-                <rect width="28" height="28" rx="3" fill="#DEB887" className="cm" />
-                <rect x="6" y="12" width="16" height="4" rx="1" fill="#E6C280" className="tf" />
-                <path d="M 0 14 L 28 14" stroke="#B48E5D" strokeWidth="0.5" opacity="0.5" className="tf" />
-              </g>
-            ))}
+            {/* Animated boxes (fade out at end, stay brown) */}
+            <g className="bf">
+              {BOXES.map((_, i) => (
+                <g key={i} className={'ab' + i}>
+                  <rect width="28" height="28" rx="3" fill="#DEB887" stroke="#B48E5D" strokeWidth="0.5" />
+                  <rect x="6" y="12" width="16" height="4" rx="1" fill="#E6C280" />
+                  <path d="M 0 14 L 28 14" stroke="#B48E5D" strokeWidth="0.5" opacity="0.5" />
+                </g>
+              ))}
+            </g>
 
             {/* Robots */}
             {mode !== 'crane' ? (
@@ -299,20 +293,17 @@ export function AnimatedLogoContainer() {
             )}
           </svg>
         ) : (
-          <svg viewBox="0 0 320 200" className="w-full h-full fadeIn pulse">
-            <defs>
-              <linearGradient id="tG" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#3B7AC0" />
-                <stop offset="100%" stopColor="#1E4D7A" />
-              </linearGradient>
-              <filter id="tS">
-                <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#1E3A5F" floodOpacity="0.25" />
-              </filter>
-            </defs>
-            <g filter="url(#tS)">
-              <rect x="48" y="48" width="224" height="28" rx="5" fill="url(#tG)" />
-              <rect x="132" y="48" width="56" height="112" rx="5" fill="url(#tG)" />
-            </g>
+          <svg viewBox="0 0 320 200" className="w-full h-full fadeIn">
+            <text
+              x="160"
+              y="150"
+              textAnchor="middle"
+              fontFamily="'Inter', sans-serif"
+              fontWeight="800"
+              fontSize="180"
+              fill="#2A5D8F"
+              letterSpacing="-4"
+            >T</text>
           </svg>
         )}
       </div>
