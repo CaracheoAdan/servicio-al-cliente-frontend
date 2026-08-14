@@ -28,108 +28,110 @@
 
 /* ── Dark-mode toggle ─────────────────────────────── */
 html.dark body {
-  @apply bg-[#0F172A] text-[#E2E8F0];
+  @apply bg-[#121212] text-[#F4F4F5];
 }
 
 html.dark .sidebar-card {
-  background: #1E293B !important;
-  border-color: #334155 !important;
+  background: #18181B !important;
+  border-color: #27272A !important;
 }
 html.dark .sidebar-card .sidebar-brand,
 html.dark .sidebar-card .sidebar-user-name {
-  color: #F1F5F9 !important;
+  color: #F4F4F5 !important;
 }
 html.dark .sidebar-card .sidebar-section-label {
-  color: #64748B !important;
+  color: #A1A1AA !important;
 }
 html.dark .sidebar-card .sidebar-menu-item {
-  color: #94A3B8 !important;
+  color: #D4D4D8 !important;
 }
 html.dark .sidebar-card .sidebar-menu-item:hover {
-  background: #334155 !important;
-  color: #5BA3D9 !important;
+  background: #27272A !important;
+  color: #7DBAE8 !important;
 }
 html.dark .sidebar-card .sidebar-icon-box {
-  background: #334155 !important;
+  background: #27272A !important;
 }
 html.dark .sidebar-card .sidebar-menu-item:hover .sidebar-icon-box {
-  background: #2A5D8F33 !important;
+  background: #3F3F46 !important;
 }
 html.dark .sidebar-card .sidebar-user-card {
-  background: #334155 !important;
-  border-color: #475569 !important;
+  background: #27272A !important;
+  border-color: #3F3F46 !important;
 }
 html.dark .sidebar-card .sidebar-user-role {
-  color: #64748B !important;
+  color: #A1A1AA !important;
 }
 html.dark .sidebar-card .sidebar-logout-btn {
-  background: #334155 !important;
-  color: #94A3B8 !important;
-  border-color: #475569 !important;
+  background: #27272A !important;
+  color: #D4D4D8 !important;
+  border-color: #3F3F46 !important;
 }
 html.dark .sidebar-card .sidebar-logout-btn:hover {
-  background: #FEF2F2 !important;
-  color: #DC2626 !important;
+  background: #450a0a !important;
+  color: #f87171 !important;
+  border-color: #7f1d1d !important;
 }
 
 html.dark .dashboard-header {
-  background: #1E293B !important;
-  border-color: #334155 !important;
+  background: #18181B !important;
+  border-color: #27272A !important;
 }
 html.dark .dashboard-header .header-title {
-  color: #F1F5F9 !important;
+  color: #F4F4F5 !important;
 }
 html.dark .dashboard-header .header-breadcrumb {
-  color: #5BA3D9 !important;
+  color: #7DBAE8 !important;
 }
 html.dark .dashboard-header .header-subtitle {
-  color: #64748B !important;
+  color: #A1A1AA !important;
 }
 html.dark .dashboard-header .header-logout-btn {
-  background: #334155 !important;
-  color: #CBD5E1 !important;
+  background: #27272A !important;
+  color: #D4D4D8 !important;
+  border-color: #3F3F46 !important;
 }
 html.dark .dashboard-header .header-logout-btn:hover {
-  background: #FEF2F2 !important;
-  color: #DC2626 !important;
+  background: #450a0a !important;
+  color: #f87171 !important;
 }
 
 html.dark .dashboard-main {
-  background: #0F172A !important;
+  background: #121212 !important;
 }
 
 /* ── Form & Content Dark Mode Overrides ──────────────── */
 html.dark .dashboard-main .bg-white,
 html.dark .fixed .bg-white {
-  background-color: #1E293B !important;
-  border-color: #334155 !important;
+  background-color: #1E1E1E !important;
+  border-color: #333333 !important;
 }
 
 html.dark .dashboard-main .bg-\[\#F8FAFC\],
 html.dark .fixed .bg-\[\#F8FAFC\] {
-  background-color: #0F172A !important;
-  border-color: #334155 !important;
+  background-color: #27272A !important;
+  border-color: #3F3F46 !important;
 }
 
 html.dark .dashboard-main .bg-\[\#EFF6FF\],
 html.dark .fixed .bg-\[\#EFF6FF\] {
-  background-color: #334155 !important;
-  border-color: #475569 !important;
+  background-color: #27272A !important;
+  border-color: #3F3F46 !important;
 }
 
 html.dark .dashboard-main .border-\[\#E2E8F0\],
 html.dark .fixed .border-\[\#E2E8F0\] {
-  border-color: #334155 !important;
+  border-color: #333333 !important;
 }
 
 html.dark .dashboard-main .text-\[\#0F172A\],
 html.dark .fixed .text-\[\#0F172A\] {
-  color: #F1F5F9 !important;
+  color: #F4F4F5 !important;
 }
 
 html.dark .dashboard-main .text-\[\#64748B\],
 html.dark .fixed .text-\[\#64748B\] {
-  color: #94A3B8 !important;
+  color: #A1A1AA !important;
 }
 
 /* Inputs, Selects, and Tables */
@@ -137,25 +139,33 @@ html.dark .dashboard-main input,
 html.dark .dashboard-main select,
 html.dark .fixed input,
 html.dark .fixed select {
-  background-color: #0F172A !important;
-  border-color: #475569 !important;
-  color: #F1F5F9 !important;
+  background-color: #121212 !important;
+  border-color: #3F3F46 !important;
+  color: #F4F4F5 !important;
+}
+
+html.dark .dashboard-main input:focus,
+html.dark .dashboard-main select:focus,
+html.dark .fixed input:focus,
+html.dark .fixed select:focus {
+  border-color: #5BA3D9 !important;
 }
 
 html.dark .dashboard-main th,
 html.dark .fixed th {
-  background-color: #0F172A !important;
-  border-color: #334155 !important;
+  background-color: #18181B !important;
+  border-color: #333333 !important;
+  color: #A1A1AA !important;
 }
 
 html.dark .dashboard-main tr:hover,
 html.dark .fixed tr:hover {
-  background-color: #1E293B !important;
+  background-color: #27272A !important;
 }
 
 html.dark .dashboard-main td,
 html.dark .fixed td {
-  border-color: #334155 !important;
+  border-color: #333333 !important;
 }
 
 @layer utilities {
