@@ -293,20 +293,17 @@ export function AnimatedLogoContainer() {
             )}
           </svg>
         ) : (
-          <svg viewBox="0 0 320 200" className="w-full h-full fadeIn pulse">
-            <defs>
-              <linearGradient id="tG" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#3B7AC0" />
-                <stop offset="100%" stopColor="#1E4D7A" />
-              </linearGradient>
-              <filter id="tS">
-                <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#1E3A5F" floodOpacity="0.25" />
-              </filter>
-            </defs>
-            <g filter="url(#tS)">
-              <rect x="48" y="20" width="224" height="56" rx="6" fill="url(#tG)" />
-              <rect x="132" y="20" width="56" height="140" rx="6" fill="url(#tG)" />
-            </g>
+          <svg viewBox="0 0 320 200" className="w-full h-full fadeIn">
+            <text
+              x="160"
+              y="150"
+              textAnchor="middle"
+              fontFamily="'Inter', sans-serif"
+              fontWeight="800"
+              fontSize="180"
+              fill="#2A5D8F"
+              letterSpacing="-4"
+            >T</text>
           </svg>
         )}
       </div>
