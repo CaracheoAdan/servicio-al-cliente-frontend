@@ -117,14 +117,15 @@ export function ReportsPage() {
   return (
     <div className="space-y-8 animate-fade-in-up font-body">
       <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
-        <div className="bg-white p-6 rounded-3xl shadow-card-base border border-[#E2E8F0] flex-1 w-full h-full flex flex-col justify-center">
-          <div className="font-display font-bold text-[#0F172A] text-xl flex items-center gap-3 mb-2">
-            <div className="bg-[#EFF6FF] p-2.5 rounded-xl border border-[#DBEAFE]">
+        <div className="bg-gradient-to-r from-[#BFDBFE] to-white p-6 rounded-3xl shadow-card-brand border border-[#DBEAFE] flex-1 w-full h-full flex flex-col justify-center relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-32 h-32 bg-white/40 rounded-full blur-2xl -translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+          <div className="font-display font-bold text-[#0F172A] text-xl flex items-center gap-3 mb-2 relative z-10">
+            <div className="flex-shrink-0 bg-white/80 backdrop-blur-md w-12 h-12 rounded-full flex items-center justify-center shadow-sm border border-white/60">
               <BarChart3 className="w-6 h-6 text-[#2A5D8F]" />
             </div>
             Inteligencia de Negocios
           </div>
-          <p className="text-[#64748B] text-sm max-w-md">Monitoreo en tiempo real de operaciones, nivel de cumplimiento de surtido y picos de distribución de camiones.</p>
+          <p className="text-[#475569] text-sm max-w-md relative z-10 font-medium">Monitoreo en tiempo real de operaciones, nivel de cumplimiento de surtido y picos de distribución de camiones.</p>
         </div>
         <RealTimeClock />
       </div>
@@ -142,55 +143,55 @@ export function ReportsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Última Orden Salida */}
             {latestOrder ? (
-              <div className="bg-white p-6 md:p-8 rounded-2xl shadow-card-base border border-[#E2E8F0] card-glow transition-all relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#10B981]/10 to-transparent rounded-bl-full pointer-events-none"></div>
+              <div className="bg-gradient-to-br from-[#BFDBFE] to-white p-6 md:p-8 rounded-3xl shadow-card-brand border border-[#DBEAFE] card-glow transition-all relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-white/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
                 
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 relative z-10">
                   <div className="flex items-center gap-3 mb-4 md:mb-0">
-                    <div className="bg-[#ECFDF5] p-3 rounded-2xl border border-[#D1FAE5]">
-                      <Truck className="w-6 h-6 text-[#10B981]" />
+                    <div className="flex-shrink-0 bg-white/80 backdrop-blur-md w-14 h-14 rounded-full flex items-center justify-center shadow-sm border border-white/60">
+                      <Truck className="w-7 h-7 text-[#2A5D8F]" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-display font-bold text-[#64748B] uppercase tracking-wide">Último Camión Lanzado</h3>
+                      <h3 className="text-sm font-display font-bold text-[#475569] uppercase tracking-wide">Último Camión Lanzado</h3>
                       <p className="text-2xl font-mono font-bold text-[#0F172A]">Orden <span className="text-[#2A5D8F]">#{latestOrder.key}</span></p>
                     </div>
                   </div>
-                  <div className="bg-[#ECFDF5] px-4 py-2 rounded-xl border border-[#A7F3D0] flex items-center">
-                    <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse mr-2"></div>
-                    <span className="font-display font-bold text-sm text-[#065F46] uppercase tracking-wider">
-                      {latestOrder.status?.toLowerCase() === 'delivered' ? 'Entregado' : latestOrder.status?.toLowerCase() === 'closed' ? 'Cerrado' : 'En Tránsito'}
+                  <div className="bg-[#2A5D8F] px-4 py-2 rounded-xl shadow-sm flex items-center">
+                    <div className="w-2 h-2 rounded-full bg-[#60A5FA] animate-pulse mr-2"></div>
+                    <span className="font-display font-bold text-sm text-white uppercase tracking-wider">
+                      {latestOrder.status?.toLowerCase() === 'delivered' ? 'ENTREGADO' : latestOrder.status?.toLowerCase() === 'closed' ? 'CERRADO' : 'EN TRÁNSITO'}
                     </span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white/60 backdrop-blur-sm border border-white/50 rounded-2xl p-6 relative z-10 shadow-sm">
                   <div className="flex items-center gap-4">
-                    <div className="p-3 bg-white rounded-xl shadow-sm border border-[#E2E8F0]">
+                    <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-[#E2E8F0]">
                       <Clock className="w-5 h-5 text-[#64748B]" />
                     </div>
                     <div>
                       <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Hora de Salida</p>
-                      <p className="font-mono font-bold text-[#0F172A] text-lg">{latestOrder.shippingDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                      <p className="font-mono font-bold text-[#2A5D8F] text-lg">{latestOrder.shippingDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-white rounded-xl shadow-sm border border-[#E2E8F0]">
+                  <div className="flex items-center gap-4 border-l-0 md:border-l border-white/50 md:pl-4">
+                    <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-[#E2E8F0]">
                       <CheckCircle2 className="w-5 h-5 text-[#2A5D8F]" />
                     </div>
                     <div>
                       <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Cumplimiento</p>
-                      <p className="font-mono font-bold text-[#0F172A] text-lg">{latestOrder.fulfillment}%</p>
+                      <p className="font-mono font-bold text-[#2A5D8F] text-lg">{latestOrder.fulfillment}%</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-white rounded-xl shadow-sm border border-[#E2E8F0]">
+                  <div className="flex items-center gap-4 border-l-0 md:border-l border-white/50 md:pl-4">
+                    <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-[#E2E8F0]">
                       <TrendingUp className="w-5 h-5 text-[#D97706]" />
                     </div>
                     <div>
-                      <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Productos Surtidos</p>
-                      <p className="font-mono font-bold text-[#0F172A] text-lg">{latestOrder.totalDelivered} <span className="text-sm font-medium text-[#64748B]">de {latestOrder.totalOrdered} ped.</span></p>
+                      <p className="text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Prods. Surtidos</p>
+                      <p className="font-mono font-bold text-[#2A5D8F] text-lg">{latestOrder.totalDelivered} <span className="text-sm font-medium text-[#64748B]">de {latestOrder.totalOrdered}</span></p>
                     </div>
                   </div>
                 </div>
@@ -204,40 +205,40 @@ export function ReportsPage() {
             )}
 
             {/* Cumplimiento General */}
-            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-card-base border border-[#E2E8F0] card-glow transition-all relative overflow-hidden flex flex-col justify-between">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#2A5D8F]/5 to-transparent rounded-bl-full pointer-events-none"></div>
+            <div className="bg-gradient-to-bl from-[#BFDBFE] to-white p-6 md:p-8 rounded-3xl shadow-card-brand border border-[#DBEAFE] card-glow transition-all relative overflow-hidden flex flex-col justify-between">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-white/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
               
-              <div className="flex justify-between items-start mb-4">
+              <div className="flex justify-between items-start mb-4 relative z-10">
                 <div className="flex items-center gap-3">
-                  <div className="bg-[#EFF6FF] p-3 rounded-2xl border border-[#DBEAFE]">
-                    <Activity className="w-6 h-6 text-[#2A5D8F]" />
+                  <div className="flex-shrink-0 bg-white/80 backdrop-blur-md w-14 h-14 rounded-full flex items-center justify-center shadow-sm border border-white/60">
+                    <Activity className="w-7 h-7 text-[#2A5D8F]" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-display font-bold text-[#64748B] uppercase tracking-wide">Cumplimiento General</h3>
-                    <p className="text-xs text-[#94A3B8] font-medium mt-0.5">Surtido x Tiempo</p>
+                    <h3 className="text-sm font-display font-bold text-[#475569] uppercase tracking-wide">Cumplimiento General</h3>
+                    <p className="text-xs text-[#64748B] font-medium mt-0.5">Surtido x Tiempo</p>
                   </div>
                 </div>
-                <div className={`w-28 h-28 md:w-36 md:h-36 rounded-[2rem] border flex items-center justify-center ${faceConfig.bg} ${faceConfig.border} shadow-sm transition-transform hover:scale-110 cursor-default select-none`}>
-                  <span className="text-7xl md:text-8xl drop-shadow-lg" role="img" aria-label="Status Face">
+                <div className={`w-28 h-28 md:w-36 md:h-36 rounded-full border-4 flex items-center justify-center bg-white/80 backdrop-blur-sm shadow-sm transition-transform hover:scale-110 cursor-default select-none ${faceConfig.border}`}>
+                  <span className="text-7xl md:text-8xl drop-shadow-sm" role="img" aria-label="Status Face">
                     {faceConfig.emoji}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-end gap-3 mb-6">
+              <div className="flex items-end gap-3 mb-6 relative z-10">
                 <p className={`text-6xl font-mono font-bold leading-none tracking-tight ${faceConfig.color}`}>
                   {generalMetrics.general}%
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl p-4">
+              <div className="grid grid-cols-2 gap-4 bg-white/60 backdrop-blur-sm border border-white/50 rounded-2xl p-4 relative z-10 shadow-sm">
                 <div>
                   <p className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide mb-1">Cump. de Entregas (Cant.)</p>
-                  <p className="font-mono font-bold text-[#0F172A] text-lg">{generalMetrics.fulfillPct}%</p>
+                  <p className="font-mono font-bold text-[#2A5D8F] text-lg">{generalMetrics.fulfillPct}%</p>
                 </div>
-                <div className="border-l border-[#E2E8F0] pl-4">
+                <div className="border-l border-white/50 pl-4">
                   <p className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide mb-1">Cump. a Entregas (Tiempo)</p>
-                  <p className="font-mono font-bold text-[#0F172A] text-lg">{generalMetrics.onTimePct}%</p>
+                  <p className="font-mono font-bold text-[#2A5D8F] text-lg">{generalMetrics.onTimePct}%</p>
                 </div>
               </div>
             </div>
