@@ -71,7 +71,7 @@ export const orderService = {
 
   async updateOrder(id: string | number, payload: any, currentDetailId?: number, currentItemIds?: number[]) {
     // 1. Actualizar Orden base
-    await api.put(`/orders/${id}`, { id: Number(id), key: payload.key, status: payload.status });
+    await api.put(`/orders/${id}`, { key: payload.key, status: payload.status });
 
     // 2. Actualizar o Crear Detalle (para simplificar, crearemos un wrapper, si no hay detail lo creamos)
     const detailsRes = await api.get('/orderDetails');
@@ -85,7 +85,7 @@ export const orderService = {
     };
 
     if (existingDetail) {
-      await api.put(`/orderDetails/${existingDetail.id}`, { id: existingDetail.id, ...detailPayload });
+      await api.put(`/orderDetails/${existingDetail.id}`, detailPayload);
     } else {
       await api.post('/orderDetails', detailPayload);
     }

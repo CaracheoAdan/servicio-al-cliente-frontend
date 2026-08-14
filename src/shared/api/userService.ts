@@ -18,7 +18,7 @@ export const userService = {
   },
 
   async updateUser(id: number | string, payload: any) {
-    const res = await api.put(`/users/${id}`, { id: Number(id), ...payload });
+    const res = await api.put(`/users/${id}`, payload);
     return res.data.data || res.data;
   },
 
@@ -39,7 +39,7 @@ export const userService = {
   },
 
   async updateRole(id: number | string, payload: any) {
-    const res = await api.put(`/userRoles/${id}`, { id: Number(id), ...payload });
+    const res = await api.put(`/userRoles/${id}`, payload);
     return res.data.data || res.data;
   },
 
