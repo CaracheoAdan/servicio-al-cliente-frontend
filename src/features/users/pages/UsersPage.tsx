@@ -135,33 +135,33 @@ export function UsersPage() {
   };
 
   return (
-    <div className="bg-white rounded-[28px] shadow-card-base border border-[#E3E9E6] min-h-[500px] flex flex-col font-body animate-fade-in-up">
-      <div className="p-8 border-b border-[#E3E9E6] flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-t-[28px] relative overflow-hidden gap-6">
+    <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] min-h-[500px] flex flex-col font-body animate-fade-in-up">
+      <div className="p-8 border-b border-[#E2E8F0] flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-t-2xl relative overflow-hidden gap-6">
         <div className="flex items-center space-x-4 relative z-10">
-          <div className="bg-[#F0FDF4] p-3 rounded-xl border border-[#E3E9E6]">
-            <Settings className="w-8 h-8 text-[#15803D]" />
+          <div className="bg-[#EFF6FF] p-3 rounded-xl border border-[#E2E8F0]">
+            <Settings className="w-8 h-8 text-[#2A5D8F]" />
           </div>
           <div>
-            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-[#0F1B17] tracking-tight">Administración</h3>
-            <p className="text-sm text-[#6B7B76] mt-1 font-medium">Gestión de usuarios y roles del sistema Totebin.</p>
+            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-[#0F172A] tracking-tight">Administración</h3>
+            <p className="text-sm text-[#64748B] mt-1 font-medium">Gestión de usuarios y roles del sistema Totebin.</p>
           </div>
         </div>
         <div className="z-10">
           <button 
             onClick={() => activeTab === 'users' ? handleOpenUserModal() : handleOpenRoleModal()}
-            className="bg-[#15803D] hover:bg-[#116932] disabled:opacity-60 text-white px-6 py-3.5 rounded-2xl font-display font-bold shadow-[0_4px_0_#0F5C2A] active:shadow-[0_0px_0_#0F5C2A] active:translate-y-1 transition-all flex items-center gap-2 text-sm whitespace-nowrap"
+            className="bg-[#2A5D8F] hover:bg-[#1E4D73] disabled:opacity-60 text-white px-6 py-3.5 rounded-2xl font-display font-bold shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all flex items-center gap-2 text-sm whitespace-nowrap"
           >
             <Plus className="w-5 h-5" /> Nuevo {activeTab === 'users' ? 'Usuario' : 'Rol'}
           </button>
         </div>
       </div>
 
-      <div className="border-b border-[#E3E9E6] bg-[#F7FAF8]">
+      <div className="border-b border-[#E2E8F0] bg-[#F8FAFC]">
         <nav className="flex px-8" aria-label="Tabs">
           <button
             onClick={() => setActiveTab('users')}
             className={`py-4 px-6 font-display font-bold text-sm transition-all border-b-2 flex items-center gap-2 ${
-              activeTab === 'users' ? 'border-[#15803D] text-[#15803D]' : 'border-transparent text-[#6B7B76] hover:text-[#0F1B17] hover:bg-[#E3E9E6]/30'
+              activeTab === 'users' ? 'border-[#2A5D8F] text-[#2A5D8F]' : 'border-transparent text-[#64748B] hover:text-[#0F172A] hover:bg-[#E2E8F0]/30'
             }`}
           >
             <User className="w-4 h-4" /> Usuarios
@@ -169,7 +169,7 @@ export function UsersPage() {
           <button
             onClick={() => setActiveTab('roles')}
             className={`py-4 px-6 font-display font-bold text-sm transition-all border-b-2 flex items-center gap-2 ${
-              activeTab === 'roles' ? 'border-[#15803D] text-[#15803D]' : 'border-transparent text-[#6B7B76] hover:text-[#0F1B17] hover:bg-[#E3E9E6]/30'
+              activeTab === 'roles' ? 'border-[#2A5D8F] text-[#2A5D8F]' : 'border-transparent text-[#64748B] hover:text-[#0F172A] hover:bg-[#E2E8F0]/30'
             }`}
           >
             <Shield className="w-4 h-4" /> Roles y Permisos
@@ -177,12 +177,12 @@ export function UsersPage() {
         </nav>
       </div>
       
-      <div className="flex-1 bg-white rounded-b-[28px] overflow-hidden">
+      <div className="flex-1 bg-white rounded-b-2xl overflow-hidden">
         {loading ? (
           <div className="p-16 flex justify-center items-center">
             <div className="text-center">
-              <div className="inline-block animate-spin w-8 h-8 border-4 border-[#15803D] border-t-transparent rounded-full mb-4"></div>
-              <p className="font-display font-bold text-[#0F1B17]">Cargando...</p>
+              <div className="inline-block animate-spin w-8 h-8 border-4 border-[#2A5D8F] border-t-transparent rounded-full mb-4"></div>
+              <p className="font-display font-bold text-[#0F172A]">Cargando...</p>
             </div>
           </div>
         ) : (
@@ -190,40 +190,40 @@ export function UsersPage() {
             {activeTab === 'users' ? (
               users.length === 0 ? (
                 <div className="p-8">
-                  <div className="flex flex-col items-center justify-center gap-3 py-16 rounded-2xl border-2 border-dashed border-[#E3E9E6] bg-[#F7FAF8]">
-                    <div className="p-4 rounded-2xl bg-white border border-[#E3E9E6]">
-                      <Inbox className="w-8 h-8 text-[#9CA8A3]" />
+                  <div className="flex flex-col items-center justify-center gap-3 py-16 rounded-2xl border-2 border-dashed border-[#E2E8F0] bg-[#F8FAFC]">
+                    <div className="p-4 rounded-2xl bg-white border border-[#E2E8F0]">
+                      <Inbox className="w-8 h-8 text-[#94A3B8]" />
                     </div>
-                    <p className="font-display font-bold text-[#0F1B17]">No hay usuarios registrados</p>
+                    <p className="font-display font-bold text-[#0F172A]">No hay usuarios registrados</p>
                   </div>
                 </div>
               ) : (
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-[#F7FAF8] border-b border-[#EDF1EF]">
-                      <th className="px-8 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Nombre / Correo</th>
-                      <th className="px-8 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Rol</th>
-                      <th className="px-8 py-4 text-right text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Acciones</th>
+                    <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+                      <th className="px-8 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Nombre / Correo</th>
+                      <th className="px-8 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Rol</th>
+                      <th className="px-8 py-4 text-right text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Acciones</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#EDF1EF]">
+                  <tbody className="divide-y divide-[#E2E8F0]">
                     {users.map(user => {
                       const role = roles.find(r => r.id === (user.roleId || user.role_id));
                       return (
-                        <tr key={user.id} className="hover:bg-[#F0FDF4] transition-colors group">
+                        <tr key={user.id} className="hover:bg-[#EFF6FF] transition-colors group">
                           <td className="px-8 py-5">
-                            <div className="font-display font-bold text-[#0F1B17] text-sm">{user.firstName || user.first_name} {user.lastName || user.last_name}</div>
-                            <div className="text-xs text-[#6B7B76] font-mono mt-0.5">{user.email}</div>
+                            <div className="font-display font-bold text-[#0F172A] text-sm">{user.firstName || user.first_name} {user.lastName || user.last_name}</div>
+                            <div className="text-xs text-[#64748B] font-mono mt-0.5">{user.email}</div>
                           </td>
                           <td className="px-8 py-5">
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-display font-bold text-[#15803D] bg-[#F0FDF4] border border-[#BBF7D0]">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-display font-bold text-[#2A5D8F] bg-[#EFF6FF] border border-[#BFDBFE]">
                               <Shield className="w-3 h-3 mr-1.5" /> {role ? role.name : 'Sin rol'}
                             </span>
                           </td>
                           <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
                             <button 
                               onClick={() => handleOpenUserModal(user)}
-                              className="flex items-center text-[#15803D] bg-[#F0FDF4] hover:bg-[#DCFCE7] px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
+                              className="flex items-center text-[#2A5D8F] bg-[#EFF6FF] hover:bg-[#DBEAFE] px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
                             >
                               <Edit2 className="w-4 h-4 mr-1.5" /> Editar
                             </button>
@@ -243,39 +243,39 @@ export function UsersPage() {
             ) : (
               roles.length === 0 ? (
                 <div className="p-8">
-                  <div className="flex flex-col items-center justify-center gap-3 py-16 rounded-2xl border-2 border-dashed border-[#E3E9E6] bg-[#F7FAF8]">
-                    <div className="p-4 rounded-2xl bg-white border border-[#E3E9E6]">
-                      <Inbox className="w-8 h-8 text-[#9CA8A3]" />
+                  <div className="flex flex-col items-center justify-center gap-3 py-16 rounded-2xl border-2 border-dashed border-[#E2E8F0] bg-[#F8FAFC]">
+                    <div className="p-4 rounded-2xl bg-white border border-[#E2E8F0]">
+                      <Inbox className="w-8 h-8 text-[#94A3B8]" />
                     </div>
-                    <p className="font-display font-bold text-[#0F1B17]">No hay roles registrados</p>
+                    <p className="font-display font-bold text-[#0F172A]">No hay roles registrados</p>
                   </div>
                 </div>
               ) : (
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-[#F7FAF8] border-b border-[#EDF1EF]">
-                      <th className="px-8 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Nombre del Rol</th>
-                      <th className="px-8 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Usuarios asignados</th>
-                      <th className="px-8 py-4 text-right text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Acciones</th>
+                    <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+                      <th className="px-8 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Nombre del Rol</th>
+                      <th className="px-8 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Usuarios asignados</th>
+                      <th className="px-8 py-4 text-right text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Acciones</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#EDF1EF]">
+                  <tbody className="divide-y divide-[#E2E8F0]">
                     {roles.map(role => {
                       const usersWithRole = users.filter(u => (u.roleId || u.role_id) === role.id).length;
                       return (
-                        <tr key={role.id} className="hover:bg-[#F0FDF4] transition-colors group">
+                        <tr key={role.id} className="hover:bg-[#EFF6FF] transition-colors group">
                           <td className="px-8 py-5">
-                            <div className="font-display font-bold text-[#0F1B17] text-sm">{role.name}</div>
+                            <div className="font-display font-bold text-[#0F172A] text-sm">{role.name}</div>
                           </td>
                           <td className="px-8 py-5">
-                            <div className="text-sm font-mono text-[#0F1B17] font-semibold bg-[#F7FAF8] px-3 py-1.5 rounded-lg border border-[#E3E9E6] inline-block">
+                            <div className="text-sm font-mono text-[#0F172A] font-semibold bg-[#F8FAFC] px-3 py-1.5 rounded-lg border border-[#E2E8F0] inline-block">
                               {usersWithRole} usuarios
                             </div>
                           </td>
                           <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
                             <button 
                               onClick={() => handleOpenRoleModal(role)}
-                              className="flex items-center text-[#15803D] bg-[#F0FDF4] hover:bg-[#DCFCE7] px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
+                              className="flex items-center text-[#2A5D8F] bg-[#EFF6FF] hover:bg-[#DBEAFE] px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
                             >
                               <Edit2 className="w-4 h-4 mr-1.5" /> Editar
                             </button>
@@ -299,13 +299,13 @@ export function UsersPage() {
 
       {/* User Modal */}
       {isUserModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F1B17]/40 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-[28px] shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
-            <div className="flex justify-between items-center p-6 border-b border-[#E3E9E6] bg-[#F7FAF8]">
-              <h3 className="font-display font-extrabold text-[#0F1B17] text-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F172A]/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
+            <div className="flex justify-between items-center p-6 border-b border-[#E2E8F0] bg-[#F8FAFC]">
+              <h3 className="font-display font-extrabold text-[#0F172A] text-xl">
                 {editingItem ? 'Editar Usuario' : 'Nuevo Usuario'}
               </h3>
-              <button onClick={() => setIsUserModalOpen(false)} className="text-[#9CA8A3] hover:text-[#DC2626] transition-colors p-2 rounded-xl hover:bg-white">
+              <button onClick={() => setIsUserModalOpen(false)} className="text-[#94A3B8] hover:text-[#DC2626] transition-colors p-2 rounded-xl hover:bg-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -313,55 +313,55 @@ export function UsersPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-display font-bold text-[#0F1B17] mb-1.5">Nombre</label>
+                    <label className="block text-sm font-display font-bold text-[#0F172A] mb-1.5">Nombre</label>
                     <input
                       type="text"
                       required
                       value={userForm.firstName}
                       onChange={(e) => setUserForm({...userForm, firstName: e.target.value})}
-                      className="w-full px-4 py-3 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-body transition-all"
+                      className="w-full px-4 py-3 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-body transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-display font-bold text-[#0F1B17] mb-1.5">Apellidos</label>
+                    <label className="block text-sm font-display font-bold text-[#0F172A] mb-1.5">Apellidos</label>
                     <input
                       type="text"
                       required
                       value={userForm.lastName}
                       onChange={(e) => setUserForm({...userForm, lastName: e.target.value})}
-                      className="w-full px-4 py-3 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-body transition-all"
+                      className="w-full px-4 py-3 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-body transition-all"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-display font-bold text-[#0F1B17] mb-1.5">Correo Electrónico</label>
+                  <label className="block text-sm font-display font-bold text-[#0F172A] mb-1.5">Correo Electrónico</label>
                   <input
                     type="email"
                     required
                     value={userForm.email}
                     onChange={(e) => setUserForm({...userForm, email: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-body transition-all"
+                    className="w-full px-4 py-3 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-body transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-display font-bold text-[#0F1B17] mb-1.5">
-                    Contraseña {editingItem && <span className="text-[#9CA8A3] font-normal text-xs">(Dejar en blanco para no cambiar)</span>}
+                  <label className="block text-sm font-display font-bold text-[#0F172A] mb-1.5">
+                    Contraseña {editingItem && <span className="text-[#94A3B8] font-normal text-xs">(Dejar en blanco para no cambiar)</span>}
                   </label>
                   <input
                     type="password"
                     required={!editingItem}
                     value={userForm.passwordHash}
                     onChange={(e) => setUserForm({...userForm, passwordHash: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-body transition-all"
+                    className="w-full px-4 py-3 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-body transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-display font-bold text-[#0F1B17] mb-1.5">Rol</label>
+                  <label className="block text-sm font-display font-bold text-[#0F172A] mb-1.5">Rol</label>
                   <select
                     required
                     value={userForm.roleId}
                     onChange={(e) => setUserForm({...userForm, roleId: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-body transition-all bg-white"
+                    className="w-full px-4 py-3 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-body transition-all bg-white"
                   >
                     <option value="" disabled>Selecciona un rol</option>
                     {roles.map(r => (
@@ -371,10 +371,10 @@ export function UsersPage() {
                 </div>
               </div>
               <div className="mt-8 flex justify-end gap-3">
-                <button type="button" onClick={() => setIsUserModalOpen(false)} className="px-5 py-3 rounded-xl font-display font-bold text-[#6B7B76] hover:bg-[#F3F6F4] transition-colors">
+                <button type="button" onClick={() => setIsUserModalOpen(false)} className="px-5 py-3 rounded-xl font-display font-bold text-[#64748B] hover:bg-[#F8FAFC] transition-colors">
                   Cancelar
                 </button>
-                <button type="submit" className="bg-[#15803D] hover:bg-[#116932] text-white px-6 py-3 rounded-xl font-display font-bold shadow-[0_4px_0_#0F5C2A] active:shadow-[0_0px_0_#0F5C2A] active:translate-y-1 transition-all">
+                <button type="submit" className="bg-[#2A5D8F] hover:bg-[#1E4D73] text-white px-6 py-3 rounded-xl font-display font-bold shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all">
                   Guardar
                 </button>
               </div>
@@ -385,35 +385,35 @@ export function UsersPage() {
 
       {/* Role Modal */}
       {isRoleModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F1B17]/40 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-[28px] shadow-2xl w-full max-w-sm overflow-hidden animate-slide-up">
-            <div className="flex justify-between items-center p-6 border-b border-[#E3E9E6] bg-[#F7FAF8]">
-              <h3 className="font-display font-extrabold text-[#0F1B17] text-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F172A]/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-slide-up">
+            <div className="flex justify-between items-center p-6 border-b border-[#E2E8F0] bg-[#F8FAFC]">
+              <h3 className="font-display font-extrabold text-[#0F172A] text-xl">
                 {editingItem ? 'Editar Rol' : 'Nuevo Rol'}
               </h3>
-              <button onClick={() => setIsRoleModalOpen(false)} className="text-[#9CA8A3] hover:text-[#DC2626] transition-colors p-2 rounded-xl hover:bg-white">
+              <button onClick={() => setIsRoleModalOpen(false)} className="text-[#94A3B8] hover:text-[#DC2626] transition-colors p-2 rounded-xl hover:bg-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <form onSubmit={handleSaveRole} className="p-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-display font-bold text-[#0F1B17] mb-1.5">Nombre del Rol</label>
+                  <label className="block text-sm font-display font-bold text-[#0F172A] mb-1.5">Nombre del Rol</label>
                   <input
                     type="text"
                     required
                     value={roleForm.name}
                     onChange={(e) => setRoleForm({...roleForm, name: e.target.value})}
                     placeholder="Ej: Administrador, Operador..."
-                    className="w-full px-4 py-3 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-body transition-all"
+                    className="w-full px-4 py-3 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-body transition-all"
                   />
                 </div>
               </div>
               <div className="mt-8 flex justify-end gap-3">
-                <button type="button" onClick={() => setIsRoleModalOpen(false)} className="px-5 py-3 rounded-xl font-display font-bold text-[#6B7B76] hover:bg-[#F3F6F4] transition-colors">
+                <button type="button" onClick={() => setIsRoleModalOpen(false)} className="px-5 py-3 rounded-xl font-display font-bold text-[#64748B] hover:bg-[#F8FAFC] transition-colors">
                   Cancelar
                 </button>
-                <button type="submit" className="bg-[#15803D] hover:bg-[#116932] text-white px-6 py-3 rounded-xl font-display font-bold shadow-[0_4px_0_#0F5C2A] active:shadow-[0_0px_0_#0F5C2A] active:translate-y-1 transition-all">
+                <button type="submit" className="bg-[#2A5D8F] hover:bg-[#1E4D73] text-white px-6 py-3 rounded-xl font-display font-bold shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all">
                   Guardar
                 </button>
               </div>

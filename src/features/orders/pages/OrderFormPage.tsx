@@ -115,25 +115,25 @@ export function OrderFormPage() {
   };
 
   if (loading) {
-    return <div className="p-8 text-center text-[#6B7B76] font-display font-bold">Cargando datos...</div>;
+    return <div className="p-8 text-center text-[#64748B] font-display font-bold">Cargando datos...</div>;
   }
 
   const isProduced = status === 'produced' || status === 'in_delivery' || status === 'delivered' || status === 'closed';
   const isDelivered = status === 'in_delivery' || status === 'delivered' || status === 'closed';
 
   return (
-    <div className="bg-white rounded-[28px] shadow-card-base border border-[#E3E9E6] overflow-hidden font-body animate-fade-in-up max-w-5xl mx-auto">
+    <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] overflow-hidden font-body animate-fade-in-up max-w-5xl mx-auto">
       {/* Cabecera */}
-      <div className="px-8 py-8 border-b border-[#E3E9E6] bg-white flex justify-between items-start">
+      <div className="px-8 py-8 border-b border-[#E2E8F0] bg-white flex justify-between items-start">
         <div className="flex items-center space-x-4">
-          <div className="w-14 h-14 rounded-2xl bg-[#F0FDF4] flex items-center justify-center border border-[#E3E9E6] shrink-0">
-            <FileText className="w-7 h-7 text-[#15803D]" />
+          <div className="w-14 h-14 rounded-2xl bg-[#EFF6FF] flex items-center justify-center border border-[#E2E8F0] shrink-0">
+            <FileText className="w-7 h-7 text-[#2A5D8F]" />
           </div>
           <div>
-            <span className="font-mono uppercase tracking-widest text-[#15803D] text-[11px] font-bold block mb-1">
+            <span className="font-mono uppercase tracking-[0.15em] text-[#2A5D8F] text-[11px] font-bold block mb-1">
               {isEditing ? 'Producción · Gestión de orden' : 'Producción · Nueva orden'}
             </span>
-            <h3 className="text-2xl font-display font-extrabold text-[#0F1B17] tracking-tight">
+            <h3 className="text-2xl font-display font-extrabold text-[#0F172A] tracking-tight">
               {isEditing ? `Orden No. ${id}` : 'Nueva Orden de Producción'}
             </h3>
           </div>
@@ -141,7 +141,7 @@ export function OrderFormPage() {
         <button 
           type="button"
           onClick={() => navigate('/orders')} 
-          className="bg-[#F3F6F4] hover:bg-[#E7ECE9] text-[#0F1B17] px-4 py-2.5 rounded-xl font-display font-bold text-sm transition-colors flex items-center gap-2"
+          className="bg-[#F8FAFC] hover:bg-[#E2E8F0] text-[#0F172A] px-4 py-2.5 rounded-xl font-display font-bold text-sm transition-colors flex items-center gap-2"
         >
           <ArrowLeft className="w-4 h-4" /> Regresar
         </button>
@@ -149,26 +149,26 @@ export function OrderFormPage() {
 
       <form onSubmit={handleSave} className="p-8 space-y-10">
         {/* Datos Principales */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-[#F7FAF8] p-6 rounded-3xl border border-[#E3E9E6]">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-[#F8FAFC] p-6 rounded-2xl border border-[#E2E8F0]">
           <div>
-            <label className="block font-display font-bold text-sm text-[#0F1B17] mb-2">No. Orden</label>
+            <label className="block font-display font-bold text-sm text-[#0F172A] mb-2">No. Orden</label>
             <input
               type="text"
               required
               value={orderKey}
               onChange={(e) => setOrderKey(e.target.value)}
               placeholder="Ej: 12515"
-              className="block w-full border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F1B17] outline-none"
+              className="block w-full border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F172A] outline-none"
             />
           </div>
           <div>
-            <label className="block font-display font-bold text-sm text-[#0F1B17] mb-2">Fecha compromiso de entrega</label>
+            <label className="block font-display font-bold text-sm text-[#0F172A] mb-2">Fecha compromiso de entrega</label>
             <input
               type="date"
               required
               value={scheduledDeliveryDate}
               onChange={(e) => setScheduledDeliveryDate(e.target.value)}
-              className="block w-full border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F1B17] outline-none"
+              className="block w-full border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F172A] outline-none"
             />
           </div>
         </div>
@@ -176,11 +176,11 @@ export function OrderFormPage() {
         {/* Productos */}
         <div>
           <div className="flex justify-between items-center mb-4">
-            <h4 className="text-lg font-display font-bold text-[#0F1B17]">Productos a Producir</h4>
+            <h4 className="text-lg font-display font-bold text-[#0F172A]">Productos a Producir</h4>
             <button 
               type="button" 
               onClick={handleAddItem}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#F0FDF4] text-[#15803D] font-display font-bold text-sm border border-[#BBF7D0] hover:bg-[#DCFCE7] transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#EFF6FF] text-[#2A5D8F] font-display font-bold text-sm border border-[#BFDBFE] hover:bg-[#DBEAFE] transition-colors"
             >
               <Plus className="w-4 h-4" /> Agregar Fila
             </button>
@@ -188,13 +188,13 @@ export function OrderFormPage() {
 
           <div className="space-y-4">
             {items.map((item, index) => (
-              <div key={index} className="flex flex-col md:flex-row items-end gap-4 p-5 rounded-2xl bg-[#F7FAF8] border border-[#E3E9E6]">
+              <div key={index} className="flex flex-col md:flex-row items-end gap-4 p-5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0]">
                 <div className="w-full md:w-2/5">
-                  <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#6B7B76] mb-2">Producto</label>
+                  <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#64748B] mb-2">Producto</label>
                   <select
                     value={item.productId}
                     onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
-                    className="w-full p-3.5 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-body transition-all bg-white"
+                    className="w-full p-3.5 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-body transition-all bg-white"
                     required
                   >
                     <option value="" disabled>-- Selecciona un Producto --</option>
@@ -204,24 +204,24 @@ export function OrderFormPage() {
                   </select>
                 </div>
                 <div className="w-full md:w-1/4">
-                  <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#6B7B76] mb-2">Cant. Pedida</label>
+                  <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#64748B] mb-2">Cant. Pedida</label>
                   <input
                     type="number"
                     min="1"
                     value={item.orderedQuantity}
                     onChange={(e) => handleItemChange(index, 'orderedQuantity', parseInt(e.target.value) || 1)}
-                    className="w-full p-3.5 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-mono font-bold transition-all bg-white"
+                    className="w-full p-3.5 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-mono font-bold transition-all bg-white"
                     required
                   />
                 </div>
                 <div className="w-full md:w-1/4">
-                  <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#6B7B76] mb-2">Cant. Surtida</label>
+                  <label className="block font-display font-bold text-[11px] uppercase tracking-wide text-[#64748B] mb-2">Cant. Surtida</label>
                   <input
                     type="number"
                     min="0"
                     value={item.deliveredQuantity}
                     onChange={(e) => handleItemChange(index, 'deliveredQuantity', parseInt(e.target.value) || 0)}
-                    className="w-full p-3.5 border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 outline-none text-[#0F1B17] font-mono font-bold transition-all bg-white"
+                    className="w-full p-3.5 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-mono font-bold transition-all bg-white"
                   />
                 </div>
                 <button
@@ -245,20 +245,20 @@ export function OrderFormPage() {
         {/* Estatus */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Pedido ya esta producido */}
-          <div className="bg-[#F7FAF8] rounded-2xl border border-[#E3E9E6] p-5">
-            <h5 className="font-display font-bold text-[#0F1B17] mb-4">Pedido ya está producido</h5>
-            <div className="inline-flex rounded-xl bg-white border border-[#E3E9E6] p-1">
+          <div className="bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] p-5">
+            <h5 className="font-display font-bold text-[#0F172A] mb-4">Pedido ya está producido</h5>
+            <div className="inline-flex rounded-xl bg-white border border-[#E2E8F0] p-1">
               <button 
                 type="button" 
                 onClick={() => handleStatusToggle('produced')} 
-                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${isProduced ? 'bg-[#15803D] text-white shadow-sm' : 'text-[#6B7B76] hover:text-[#0F1B17]'}`}
+                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${isProduced ? 'bg-[#2A5D8F] text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]'}`}
               >
                 Sí
               </button>
               <button 
                 type="button" 
                 onClick={() => handleStatusToggle('open')} 
-                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isProduced ? 'bg-[#DC2626] text-white shadow-sm' : 'text-[#6B7B76] hover:text-[#0F1B17]'}`}
+                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isProduced ? 'bg-[#DC2626] text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]'}`}
               >
                 No
               </button>
@@ -266,23 +266,23 @@ export function OrderFormPage() {
           </div>
 
           {/* Salida de transporte */}
-          <div className="bg-[#F7FAF8] rounded-2xl border border-[#E3E9E6] p-5">
-            <h5 className="font-display font-bold text-[#0F1B17] mb-4">Salida de transporte para entrega</h5>
-            <div className="inline-flex rounded-xl bg-white border border-[#E3E9E6] p-1 mb-6 block">
+          <div className="bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] p-5">
+            <h5 className="font-display font-bold text-[#0F172A] mb-4">Salida de transporte para entrega</h5>
+            <div className="inline-flex rounded-xl bg-white border border-[#E2E8F0] p-1 mb-6 block">
               <button 
                 type="button" 
                 onClick={() => {
                   handleStatusToggle('in_delivery');
                   if (!shippingDate) setShippingDate(new Date().toISOString().split('T')[0]);
                 }} 
-                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${isDelivered ? 'bg-[#15803D] text-white shadow-sm' : 'text-[#6B7B76] hover:text-[#0F1B17]'}`}
+                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${isDelivered ? 'bg-[#2A5D8F] text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]'}`}
               >
                 Sí
               </button>
               <button 
                 type="button" 
                 onClick={() => handleStatusToggle('produced')} 
-                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isDelivered ? 'bg-[#DC2626] text-white shadow-sm' : 'text-[#6B7B76] hover:text-[#0F1B17]'}`}
+                className={`px-6 py-2 rounded-lg font-display font-bold text-sm transition-all ${!isDelivered ? 'bg-[#DC2626] text-white shadow-sm' : 'text-[#64748B] hover:text-[#0F172A]'}`}
               >
                 No
               </button>
@@ -290,12 +290,12 @@ export function OrderFormPage() {
 
             {isDelivered && (
               <div className="animate-fade-in-up">
-                <label className="block font-display font-bold text-xs uppercase tracking-wide text-[#6B7B76] mb-2">Fecha de envío</label>
+                <label className="block font-display font-bold text-xs uppercase tracking-wide text-[#64748B] mb-2">Fecha de envío</label>
                 <input
                   type="date"
                   value={shippingDate}
                   onChange={(e) => setShippingDate(e.target.value)}
-                  className="block w-full border-2 border-[#E3E9E6] rounded-xl focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F1B17] outline-none"
+                  className="block w-full border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 px-4 py-3.5 bg-white transition-all font-mono font-semibold text-[#0F172A] outline-none"
                 />
               </div>
             )}
@@ -303,19 +303,19 @@ export function OrderFormPage() {
         </div>
 
         {/* Acciones */}
-        <div className="flex justify-between items-center pt-8 border-t border-[#EDF1EF]">
+        <div className="flex justify-between items-center pt-8 border-t border-[#E2E8F0]">
           <button
             type="button"
             onClick={() => handleStatusToggle('closed')}
             disabled={status === 'closed'}
-            className={`flex items-center px-5 py-3 rounded-xl font-display font-bold border transition-all ${status === 'closed' ? 'bg-[#F3F6F4] text-[#9CA8A3] border-[#E3E9E6] cursor-not-allowed' : 'bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#DC2626] border-[#FCA5A5]/40 shadow-sm'}`}
+            className={`flex items-center px-5 py-3 rounded-xl font-display font-bold border transition-all ${status === 'closed' ? 'bg-[#F8FAFC] text-[#94A3B8] border-[#E2E8F0] cursor-not-allowed' : 'bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#DC2626] border-[#FCA5A5]/40 shadow-sm'}`}
           >
             <CheckCircle2 className="w-5 h-5 mr-2" /> Cerrar pedido
           </button>
 
           <button 
             type="submit"
-            className="bg-[#15803D] hover:bg-[#116932] disabled:opacity-60 text-white px-6 py-3.5 rounded-2xl font-display font-bold shadow-[0_4px_0_#0F5C2A] active:shadow-[0_0px_0_#0F5C2A] active:translate-y-1 transition-all flex items-center"
+            className="bg-[#2A5D8F] hover:bg-[#1E4D73] disabled:opacity-60 text-white px-6 py-3.5 rounded-2xl font-display font-bold shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all flex items-center"
           >
             <Save className="w-5 h-5 mr-2" />
             {isEditing ? 'Guardar Cambios' : 'Crear Orden'}

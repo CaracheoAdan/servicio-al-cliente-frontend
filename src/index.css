@@ -5,42 +5,132 @@
   --font-display: "Plus Jakarta Sans", sans-serif;
   --font-body: "Inter", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
+
+  /* Brand — Azul Petróleo */
+  --color-brand-50: #EFF6FF;
+  --color-brand-100: #DBEAFE;
+  --color-brand-200: #BFDBFE;
+  --color-brand-300: #7DBAE8;
+  --color-brand-400: #5BA3D9;
+  --color-brand-500: #3B82C4;
+  --color-brand-600: #2A5D8F;
+  --color-brand-700: #1E4D73;
+  --color-brand-800: #163B58;
+  --color-brand-900: #0F2B42;
 }
 
 @layer base {
   body {
-    @apply bg-[#F3F6F4] text-[#0F1B17];
+    @apply bg-[#F8FAFC] text-[#0F172A];
     font-family: 'Inter', sans-serif;
   }
 }
 
-@layer utilities {
+/* ── Dark-mode toggle ─────────────────────────────── */
+html.dark body {
+  @apply bg-[#0F172A] text-[#E2E8F0];
+}
 
+html.dark .sidebar-card {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+}
+html.dark .sidebar-card .sidebar-brand,
+html.dark .sidebar-card .sidebar-user-name {
+  color: #F1F5F9 !important;
+}
+html.dark .sidebar-card .sidebar-section-label {
+  color: #64748B !important;
+}
+html.dark .sidebar-card .sidebar-menu-item {
+  color: #94A3B8 !important;
+}
+html.dark .sidebar-card .sidebar-menu-item:hover {
+  background: #334155 !important;
+  color: #5BA3D9 !important;
+}
+html.dark .sidebar-card .sidebar-icon-box {
+  background: #334155 !important;
+}
+html.dark .sidebar-card .sidebar-menu-item:hover .sidebar-icon-box {
+  background: #2A5D8F33 !important;
+}
+html.dark .sidebar-card .sidebar-user-card {
+  background: #334155 !important;
+  border-color: #475569 !important;
+}
+html.dark .sidebar-card .sidebar-user-role {
+  color: #64748B !important;
+}
+html.dark .sidebar-card .sidebar-logout-btn {
+  background: #334155 !important;
+  color: #94A3B8 !important;
+  border-color: #475569 !important;
+}
+html.dark .sidebar-card .sidebar-logout-btn:hover {
+  background: #FEF2F2 !important;
+  color: #DC2626 !important;
+}
+
+html.dark .dashboard-header {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+}
+html.dark .dashboard-header .header-title {
+  color: #F1F5F9 !important;
+}
+html.dark .dashboard-header .header-breadcrumb {
+  color: #5BA3D9 !important;
+}
+html.dark .dashboard-header .header-subtitle {
+  color: #64748B !important;
+}
+html.dark .dashboard-header .header-logout-btn {
+  background: #334155 !important;
+  color: #CBD5E1 !important;
+}
+html.dark .dashboard-header .header-logout-btn:hover {
+  background: #FEF2F2 !important;
+  color: #DC2626 !important;
+}
+
+html.dark .dashboard-main {
+  background: #0F172A !important;
+}
+
+@layer utilities {
   .blob-breathe {
     animation: blobBreathe 8s ease-in-out infinite;
   }
-  
-  .card-glow { 
-    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; 
+
+  .card-glow {
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
   }
   .card-glow:hover {
     transform: translateY(-3px);
-    box-shadow: 0 16px 36px -16px rgba(21,128,61,0.28);
-    border-color: rgba(21,128,61,0.35);
+    box-shadow: 0 16px 36px -16px rgba(42,93,143,0.22);
+    border-color: rgba(42,93,143,0.30);
   }
-  
+
   .shadow-card-base {
-    box-shadow: 0 6px 20px -16px rgba(15,27,23,0.15);
+    box-shadow: 0 1px 3px 0 rgba(15,23,42,0.06), 0 1px 2px -1px rgba(15,23,42,0.06);
   }
-  .shadow-card-green {
-    box-shadow: 0 8px 30px -18px rgba(21,128,61,0.25);
+  .shadow-card-brand {
+    box-shadow: 0 8px 30px -18px rgba(42,93,143,0.25);
   }
   .shadow-btn-3d {
-    box-shadow: 0 4px 0 #0F5C2A;
+    box-shadow: 0 4px 0 #1B3D5C;
   }
   .shadow-btn-3d:active {
-    box-shadow: 0 0px 0 #0F5C2A;
+    box-shadow: 0 0px 0 #1B3D5C;
     transform: translateY(4px);
+  }
+
+  /* Floating sidebar card */
+  .sidebar-float {
+    box-shadow:
+      0 1px 3px 0 rgba(15,23,42,0.05),
+      0 10px 30px -10px rgba(15,23,42,0.08);
   }
 }
 

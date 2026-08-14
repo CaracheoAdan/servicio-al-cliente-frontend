@@ -123,71 +123,71 @@ export function MasterTablePage() {
   };
 
   return (
-    <div className="bg-white rounded-[28px] shadow-card-base border border-[#E3E9E6] overflow-hidden font-body animate-fade-in-up">
-      <div className="p-8 border-b border-[#E3E9E6] flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-t-[28px] relative overflow-hidden gap-6">
+    <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] overflow-hidden font-body animate-fade-in-up">
+      <div className="p-8 border-b border-[#E2E8F0] flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-t-2xl relative overflow-hidden gap-6">
         <div className="flex items-center space-x-4 relative z-10">
-          <div className="bg-[#F0FDF4] p-3 rounded-xl border border-[#E3E9E6]">
-            <TableIcon className="w-8 h-8 text-[#15803D]" />
+          <div className="bg-[#EFF6FF] p-3 rounded-xl border border-[#E2E8F0]">
+            <TableIcon className="w-8 h-8 text-[#2A5D8F]" />
           </div>
           <div>
-            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-[#0F1B17] tracking-tight">Tabla Maestra de Órdenes</h3>
-            <p className="text-sm text-[#6B7B76] mt-1 font-medium">Vista detallada estilo Excel para exportación y análisis</p>
+            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-[#0F172A] tracking-tight">Tabla Maestra de Órdenes</h3>
+            <p className="text-sm text-[#64748B] mt-1 font-medium">Vista detallada estilo Excel para exportación y análisis</p>
           </div>
         </div>
         <button 
           onClick={handleExportExcel}
           disabled={loading || data.length === 0}
-          className="bg-[#15803D] hover:bg-[#116932] disabled:opacity-60 text-white px-6 py-3.5 rounded-2xl font-display font-bold shadow-[0_4px_0_#0F5C2A] active:shadow-[0_0px_0_#0F5C2A] active:translate-y-1 transition-all flex items-center justify-center gap-2 text-sm z-10 whitespace-nowrap"
+          className="bg-[#2A5D8F] hover:bg-[#1E4D73] disabled:opacity-60 text-white px-6 py-3.5 rounded-2xl font-display font-bold shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all flex items-center justify-center gap-2 text-sm z-10 whitespace-nowrap"
         >
           <Download className="w-5 h-5" />
           Descargar Excel
         </button>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-b-[28px]" style={{ maxHeight: 'calc(100vh - 250px)' }}>
+      <div className="overflow-x-auto bg-white rounded-b-2xl" style={{ maxHeight: 'calc(100vh - 250px)' }}>
         <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
-            <tr className="bg-[#F7FAF8] border-b border-[#E3E9E6]">
-              <th colSpan={5} className="px-6 py-3 border-r border-[#EDF1EF]"></th>
-              <th colSpan={2} className="px-6 py-3 text-center border-r border-[#EDF1EF] text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Pedido ya está producido</th>
-              <th colSpan={2} className="px-6 py-3 text-center border-r border-[#EDF1EF] text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Salida de transporte</th>
+            <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+              <th colSpan={5} className="px-6 py-3 border-r border-[#E2E8F0]"></th>
+              <th colSpan={2} className="px-6 py-3 text-center border-r border-[#E2E8F0] text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Pedido ya está producido</th>
+              <th colSpan={2} className="px-6 py-3 text-center border-r border-[#E2E8F0] text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Salida de transporte</th>
               <th colSpan={3} className="px-6 py-3"></th>
             </tr>
-            <tr className="bg-[#F7FAF8] border-b border-[#E3E9E6]">
-              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">No. Orden</th>
-              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Producto</th>
-              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Cantidad pedida</th>
-              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Fecha compromiso</th>
-              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Cantidad surtida</th>
-              <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Sí</th>
-              <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">No</th>
-              <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Sí</th>
-              <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">No</th>
-              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Hora de envio</th>
-              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide border-r border-[#EDF1EF]">Cerrar pedido</th>
-              <th className="px-6 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Comentarios</th>
+            <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide border-r border-[#E2E8F0]">No. Orden</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide border-r border-[#E2E8F0]">Producto</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide border-r border-[#E2E8F0]">Cantidad pedida</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide border-r border-[#E2E8F0]">Fecha compromiso</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide border-r border-[#E2E8F0]">Cantidad surtida</th>
+              <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#64748B] uppercase tracking-wide border-r border-[#E2E8F0]">Sí</th>
+              <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#64748B] uppercase tracking-wide border-r border-[#E2E8F0]">No</th>
+              <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#64748B] uppercase tracking-wide border-r border-[#E2E8F0]">Sí</th>
+              <th className="px-6 py-4 text-center text-xs font-display font-bold text-[#64748B] uppercase tracking-wide border-r border-[#E2E8F0]">No</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide border-r border-[#E2E8F0]">Hora de envio</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide border-r border-[#E2E8F0]">Cerrar pedido</th>
+              <th className="px-6 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Comentarios</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#EDF1EF]">
+          <tbody className="divide-y divide-[#E2E8F0]">
             {loading ? (
-              <tr><td colSpan={12} className="px-6 py-12 text-center font-display font-bold text-[#0F1B17]">Cargando tabla...</td></tr>
+              <tr><td colSpan={12} className="px-6 py-12 text-center font-display font-bold text-[#0F172A]">Cargando tabla...</td></tr>
             ) : data.length === 0 ? (
-              <tr><td colSpan={12} className="px-6 py-12 text-center font-display font-bold text-[#0F1B17]">No hay datos para mostrar</td></tr>
+              <tr><td colSpan={12} className="px-6 py-12 text-center font-display font-bold text-[#0F172A]">No hay datos para mostrar</td></tr>
             ) : (
               data.map((row, idx) => (
-                <tr key={idx} className="hover:bg-[#F0FDF4] transition-colors">
-                  <td className="px-6 py-4 font-mono font-bold text-[#0F1B17] border-r border-[#EDF1EF]">{row.noOrden}</td>
-                  <td className="px-6 py-4 font-mono text-[#4B5A5D] border-r border-[#EDF1EF]">{row.producto}</td>
-                  <td className="px-6 py-4 font-mono text-[#4B5A5D] border-r border-[#EDF1EF] text-center">{row.cantidadPedida}</td>
-                  <td className="px-6 py-4 font-mono text-[#4B5A5D] border-r border-[#EDF1EF] text-center">{row.fechaCompromiso}</td>
-                  <td className="px-6 py-4 font-mono text-[#4B5A5D] border-r border-[#EDF1EF] text-center">{row.cantidadSurtida}</td>
-                  <td className="px-6 py-4 text-center font-display font-bold text-[#15803D] border-r border-[#EDF1EF] bg-[#F0FDF4]/30">{row.producidoSi}</td>
-                  <td className="px-6 py-4 text-center font-display font-bold text-[#DC2626] border-r border-[#EDF1EF]">{row.producidoNo}</td>
-                  <td className="px-6 py-4 text-center font-display font-bold text-[#D97706] border-r border-[#EDF1EF] bg-[#FFFBEB]/30">{row.salidaSi}</td>
-                  <td className="px-6 py-4 text-center font-display font-bold text-[#DC2626] border-r border-[#EDF1EF]">{row.salidaNo}</td>
-                  <td className="px-6 py-4 font-mono text-[#4B5A5D] border-r border-[#EDF1EF] text-center">{row.horaEnvio}</td>
-                  <td className="px-6 py-4 font-display font-bold text-[#0F1B17] border-r border-[#EDF1EF] text-center">{row.cerrarPedido}</td>
-                  <td className="px-6 py-4 font-body text-[#4B5A5D] text-sm max-w-[200px] truncate" title={row.comentarios}>{row.comentarios}</td>
+                <tr key={idx} className="hover:bg-[#EFF6FF] transition-colors">
+                  <td className="px-6 py-4 font-mono font-bold text-[#0F172A] border-r border-[#E2E8F0]">{row.noOrden}</td>
+                  <td className="px-6 py-4 font-mono text-[#475569] border-r border-[#E2E8F0]">{row.producto}</td>
+                  <td className="px-6 py-4 font-mono text-[#475569] border-r border-[#E2E8F0] text-center">{row.cantidadPedida}</td>
+                  <td className="px-6 py-4 font-mono text-[#475569] border-r border-[#E2E8F0] text-center">{row.fechaCompromiso}</td>
+                  <td className="px-6 py-4 font-mono text-[#475569] border-r border-[#E2E8F0] text-center">{row.cantidadSurtida}</td>
+                  <td className="px-6 py-4 text-center font-display font-bold text-[#2A5D8F] border-r border-[#E2E8F0] bg-[#EFF6FF]/30">{row.producidoSi}</td>
+                  <td className="px-6 py-4 text-center font-display font-bold text-[#DC2626] border-r border-[#E2E8F0]">{row.producidoNo}</td>
+                  <td className="px-6 py-4 text-center font-display font-bold text-[#D97706] border-r border-[#E2E8F0] bg-[#FFFBEB]/30">{row.salidaSi}</td>
+                  <td className="px-6 py-4 text-center font-display font-bold text-[#DC2626] border-r border-[#E2E8F0]">{row.salidaNo}</td>
+                  <td className="px-6 py-4 font-mono text-[#475569] border-r border-[#E2E8F0] text-center">{row.horaEnvio}</td>
+                  <td className="px-6 py-4 font-display font-bold text-[#0F172A] border-r border-[#E2E8F0] text-center">{row.cerrarPedido}</td>
+                  <td className="px-6 py-4 font-body text-[#475569] text-sm max-w-[200px] truncate" title={row.comentarios}>{row.comentarios}</td>
                 </tr>
               ))
             )}

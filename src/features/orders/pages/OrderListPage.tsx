@@ -50,21 +50,21 @@ export function OrderListPage() {
     switch (status) {
       case 'open':
         return (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#6B7B76] bg-[#F3F6F4] border border-[#E3E9E6]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#9CA8A3] mr-1.5"></span> Abierto
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#64748B] bg-[#F8FAFC] border border-[#E2E8F0]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#94A3B8] mr-1.5"></span> Abierto
           </span>
         );
       case 'in_production':
       case 'in_process':
         return (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#0F1B17] bg-[#E3E9E6] border border-[#CBD5E1]">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#0F172A] bg-[#E2E8F0] border border-[#CBD5E1]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#475569] mr-1.5"></span> En Proceso
           </span>
         );
       case 'produced':
         return (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#15803D] bg-[#F0FDF4] border border-[#BBF7D0]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#15803D] mr-1.5"></span> Producido
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#2A5D8F] bg-[#EFF6FF] border border-[#BFDBFE]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2A5D8F] mr-1.5"></span> Producido
           </span>
         );
       case 'in_delivery':
@@ -75,8 +75,8 @@ export function OrderListPage() {
         );
       case 'delivered':
         return (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#15803D] bg-[#F0FDF4] border border-[#BBF7D0]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#15803D] mr-1.5"></span> Entregado
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#2A5D8F] bg-[#EFF6FF] border border-[#BFDBFE]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2A5D8F] mr-1.5"></span> Entregado
           </span>
         );
       case 'closed':
@@ -87,7 +87,7 @@ export function OrderListPage() {
         );
       default:
         return (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#6B7B76] bg-[#F3F6F4] border border-[#E3E9E6]">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wide text-[#64748B] bg-[#F8FAFC] border border-[#E2E8F0]">
             {status}
           </span>
         );
@@ -112,40 +112,40 @@ export function OrderListPage() {
   const closedOrders = totalOrders - activeOrders;
 
   return (
-    <div className="bg-white rounded-[28px] shadow-card-base border border-[#E3E9E6] min-h-[500px] flex flex-col font-body animate-fade-in-up">
-      <div className="p-8 border-b border-[#E3E9E6] flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-t-[28px] relative overflow-hidden gap-6">
+    <div className="bg-white rounded-2xl shadow-card-base border border-[#E2E8F0] min-h-[500px] flex flex-col font-body animate-fade-in-up">
+      <div className="p-8 border-b border-[#E2E8F0] flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white rounded-t-2xl relative overflow-hidden gap-6">
         <div className="flex items-center space-x-4 relative z-10">
-          <div className="bg-[#F0FDF4] p-3 rounded-xl border border-[#E3E9E6]">
-            <ClipboardList className="w-8 h-8 text-[#15803D]" />
+          <div className="bg-[#EFF6FF] p-3 rounded-xl border border-[#E2E8F0]">
+            <ClipboardList className="w-8 h-8 text-[#2A5D8F]" />
           </div>
           <div>
-            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-[#0F1B17] tracking-tight">Listado de Órdenes</h3>
-            <p className="text-sm text-[#6B7B76] mt-1 font-medium">Control visual del avance y estatus en el piso de producción</p>
+            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-[#0F172A] tracking-tight">Listado de Órdenes</h3>
+            <p className="text-sm text-[#64748B] mt-1 font-medium">Control visual del avance y estatus en el piso de producción</p>
           </div>
         </div>
         
         <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 z-10 w-full lg:w-auto">
           <div>
             <div className="relative">
-              <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-[#9CA8A3]" />
+              <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-[#94A3B8]" />
               <input 
                 type="text" 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar No. Orden..." 
-                className="pl-11 pr-10 py-3.5 border-2 border-[#E3E9E6] rounded-xl text-[#0F1B17] font-semibold focus:outline-none focus:border-[#15803D] focus:ring-4 focus:ring-[#15803D]/10 transition-all w-full md:w-64 shadow-sm"
+                className="pl-11 pr-10 py-3.5 border-2 border-[#E2E8F0] rounded-xl text-[#0F172A] font-semibold focus:outline-none focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 transition-all w-full md:w-64 shadow-sm"
               />
               {searchTerm && (
                 <button 
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#9CA8A3] hover:text-[#DC2626] transition-colors"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#94A3B8] hover:text-[#DC2626] transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
               )}
             </div>
             {searchTerm && (
-              <p className="absolute mt-2 font-mono text-xs text-[#15803D] font-semibold">
+              <p className="absolute mt-2 font-mono text-xs text-[#2A5D8F] font-semibold">
                 Mostrando {filteredOrders.length} de {orders.length} órdenes
               </p>
             )}
@@ -155,78 +155,78 @@ export function OrderListPage() {
       
       {/* KPIs Row */}
       {!loading && (
-        <div className="px-8 py-5 border-b border-[#E3E9E6] bg-white grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex items-center gap-3 bg-[#F7FAF8] border border-[#E3E9E6] rounded-2xl px-4 py-3.5">
-            <div className="p-2 rounded-xl bg-white border border-[#E3E9E6]">
-              <ClipboardList className="w-5 h-5 text-[#15803D]" />
+        <div className="px-8 py-5 border-b border-[#E2E8F0] bg-white grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="flex items-center gap-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-4 py-3.5">
+            <div className="p-2 rounded-xl bg-white border border-[#E2E8F0]">
+              <ClipboardList className="w-5 h-5 text-[#2A5D8F]" />
             </div>
             <div>
-              <div className="text-[10px] font-display font-bold text-[#6B7B76] uppercase tracking-wide">Total Órdenes</div>
-              <div className="font-mono font-bold text-lg text-[#0F1B17] tabular-nums">{totalOrders}</div>
+              <div className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide">Total Órdenes</div>
+              <div className="font-mono font-bold text-lg text-[#0F172A] tabular-nums">{totalOrders}</div>
             </div>
           </div>
-          <div className="flex items-center gap-3 bg-[#F7FAF8] border border-[#E3E9E6] rounded-2xl px-4 py-3.5">
-            <div className="p-2 rounded-xl bg-white border border-[#E3E9E6]">
+          <div className="flex items-center gap-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-4 py-3.5">
+            <div className="p-2 rounded-xl bg-white border border-[#E2E8F0]">
               <Clock className="w-5 h-5 text-[#D97706]" />
             </div>
             <div>
-              <div className="text-[10px] font-display font-bold text-[#6B7B76] uppercase tracking-wide">En Proceso</div>
-              <div className="font-mono font-bold text-lg text-[#0F1B17] tabular-nums">{activeOrders}</div>
+              <div className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide">En Proceso</div>
+              <div className="font-mono font-bold text-lg text-[#0F172A] tabular-nums">{activeOrders}</div>
             </div>
           </div>
-          <div className="flex items-center gap-3 bg-[#F7FAF8] border border-[#E3E9E6] rounded-2xl px-4 py-3.5">
-            <div className="p-2 rounded-xl bg-white border border-[#E3E9E6]">
-              <CheckCircle2 className="w-5 h-5 text-[#15803D]" />
+          <div className="flex items-center gap-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-4 py-3.5">
+            <div className="p-2 rounded-xl bg-white border border-[#E2E8F0]">
+              <CheckCircle2 className="w-5 h-5 text-[#2A5D8F]" />
             </div>
             <div>
-              <div className="text-[10px] font-display font-bold text-[#6B7B76] uppercase tracking-wide">Completadas</div>
-              <div className="font-mono font-bold text-lg text-[#0F1B17] tabular-nums">{closedOrders}</div>
+              <div className="text-[10px] font-display font-bold text-[#64748B] uppercase tracking-wide">Completadas</div>
+              <div className="font-mono font-bold text-lg text-[#0F172A] tabular-nums">{closedOrders}</div>
             </div>
           </div>
         </div>
       )}
       
-      <div className="flex-1 bg-white rounded-b-[28px] overflow-hidden">
+      <div className="flex-1 bg-white rounded-b-2xl overflow-hidden">
         {loading ? (
           <div className="flex justify-center items-center h-64 bg-white">
             <div className="text-center">
-              <div className="inline-block animate-spin w-8 h-8 border-4 border-[#15803D] border-t-transparent rounded-full mb-4"></div>
-              <p className="font-display font-bold text-[#0F1B17]">Cargando órdenes...</p>
+              <div className="inline-block animate-spin w-8 h-8 border-4 border-[#2A5D8F] border-t-transparent rounded-full mb-4"></div>
+              <p className="font-display font-bold text-[#0F172A]">Cargando órdenes...</p>
             </div>
           </div>
         ) : filteredOrders.length === 0 ? (
           <div className="p-8">
-            <div className="flex flex-col items-center justify-center gap-3 py-16 rounded-2xl border-2 border-dashed border-[#E3E9E6] bg-[#F7FAF8]">
-              <div className="p-4 rounded-2xl bg-white border border-[#E3E9E6]">
-                <Inbox className="w-8 h-8 text-[#9CA8A3]" />
+            <div className="flex flex-col items-center justify-center gap-3 py-16 rounded-xl border-2 border-dashed border-[#E2E8F0] bg-[#F8FAFC]">
+              <div className="p-4 rounded-xl bg-white border border-[#E2E8F0]">
+                <Inbox className="w-8 h-8 text-[#94A3B8]" />
               </div>
-              <p className="font-display font-bold text-[#0F1B17]">No se encontraron órdenes</p>
-              <p className="text-sm text-[#6B7B76]">Prueba con otra búsqueda o crea una nueva orden.</p>
+              <p className="font-display font-bold text-[#0F172A]">No se encontraron órdenes</p>
+              <p className="text-sm text-[#64748B]">Prueba con otra búsqueda o crea una nueva orden.</p>
             </div>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#F7FAF8] border-b border-[#EDF1EF]">
-                  <th className="px-8 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">No. Orden</th>
-                  <th className="px-8 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Productos</th>
-                  <th className="px-8 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Estatus</th>
-                  <th className="px-8 py-4 text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">F. Entrega</th>
-                  <th className="px-8 py-4 text-right text-xs font-display font-bold text-[#6B7B76] uppercase tracking-wide">Acciones</th>
+                <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+                  <th className="px-8 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">No. Orden</th>
+                  <th className="px-8 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Productos</th>
+                  <th className="px-8 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Estatus</th>
+                  <th className="px-8 py-4 text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">F. Entrega</th>
+                  <th className="px-8 py-4 text-right text-xs font-display font-bold text-[#64748B] uppercase tracking-wide">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#EDF1EF]">
+              <tbody className="divide-y divide-[#E2E8F0]">
                 {filteredOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-[#F0FDF4] transition-colors group">
+                  <tr key={order.id} className="hover:bg-[#EFF6FF] transition-colors group">
                     <td className="px-8 py-5 whitespace-nowrap">
                       <div className="flex items-center">
-                        <Tag className="w-4 h-4 text-[#9CA8A3] mr-2" />
-                        <div className="font-mono font-bold text-[#0F1B17] text-base">{order.key}</div>
+                        <Tag className="w-4 h-4 text-[#94A3B8] mr-2" />
+                        <div className="font-mono font-bold text-[#0F172A] text-base">{order.key}</div>
                       </div>
                     </td>
                     <td className="px-8 py-5">
-                      <div className="text-sm font-mono text-[#0F1B17] font-semibold bg-[#F7FAF8] px-3 py-1.5 rounded-lg border border-[#E3E9E6] inline-block">
+                      <div className="text-sm font-mono text-[#0F172A] font-semibold bg-[#F8FAFC] px-3 py-1.5 rounded-lg border border-[#E2E8F0] inline-block">
                         {order.items?.length || 0} prod.
                       </div>
                     </td>
@@ -234,19 +234,19 @@ export function OrderListPage() {
                       {getStatusBadge(order.status)}
                     </td>
                     <td className="px-8 py-5 whitespace-nowrap">
-                      <div className="text-sm font-mono text-[#4B5A5D] font-medium">{formatDate(order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || order.scheduled_delivery_date)}</div>
+                      <div className="text-sm font-mono text-[#475569] font-medium">{formatDate(order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || order.scheduled_delivery_date)}</div>
                     </td>
                     <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium flex justify-end space-x-2">
                       <button 
                         onClick={() => navigate(`/orders/${order.id}`)}
-                        className="flex items-center text-[#15803D] bg-[#F0FDF4] hover:bg-[#DCFCE7] px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
+                        className="flex items-center text-[#2A5D8F] bg-[#EFF6FF] hover:bg-[#DBEAFE] px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs"
                         title="Editar"
                       >
                         <Edit2 className="w-4 h-4 mr-1.5" /> Editar
                       </button>
                       <button 
                         onClick={() => handleDelete(order.id)}
-                        className="flex items-center text-[#DC2626] bg-[#FEF2F2] hover:bg-[#FEE2E2] px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
+                        className="flex items-center text-[#DC2626] bg-[#FEF2F2] hover:bg-[#FEE2E2] px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs"
                         title="Eliminar"
                       >
                         <Trash2 className="w-4 h-4 mr-1.5" /> Eliminar
@@ -262,3 +262,4 @@ export function OrderListPage() {
     </div>
   );
 }
+
