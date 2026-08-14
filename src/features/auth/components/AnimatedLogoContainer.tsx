@@ -5,7 +5,7 @@ type Variant = 'forklifts' | 'drones' | 'tanks' | 'humanoids' | 'crane';
 const VARIANTS: Variant[] = ['forklifts', 'drones', 'tanks', 'humanoids', 'crane'];
 const DUR = 8;
 
-// 14 box positions forming the T (28x28 boxes)
+// 15 box positions forming the T (28x28 boxes)
 // Build order: stem bottom-up, then top bar center-out
 const BOXES = [
   // Stem bottom-up (centered at x=160: cols at 132, 160)
@@ -147,9 +147,17 @@ export function AnimatedLogoContainer() {
       css += kf + '\n.acr{animation:cr ' + DUR + 's linear both}\n';
     }
 
-    // Boxes fade out at the end (no color morph → no visible seams)
-    css += '@keyframes bf{0%,88%{opacity:1}100%{opacity:0}}\n';
-    css += '.bf{animation:bf ' + DUR + 's ease-out both}\n';
+    // Color morph
+    css += '@keyframes cm{'
+      + '0%,80%{fill:#DEB887;stroke:#B48E5D;stroke-width:1}'
+      + '86%,91%{fill:#FFF;stroke:#FFF;stroke-width:2;filter:drop-shadow(0 0 8px rgba(91,163,217,0.8))}'
+      + '96%,100%{fill:#2A5D8F;stroke:none;filter:none}'
+      + '}\n';
+    css += '.cm{animation:cm ' + DUR + 's ease-out both}\n';
+
+    // Tape fade
+    css += '@keyframes tf{0%,80%{opacity:1}86%,100%{opacity:0}}\n';
+    css += '.tf{animation:tf ' + DUR + 's ease-out both}\n';
 
     return css;
   }, [mode]);
@@ -159,6 +167,9 @@ export function AnimatedLogoContainer() {
     '@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}',
     '@keyframes fadeIn{0%{opacity:0;transform:scale(0.95)}100%{opacity:1;transform:scale(1)}}',
     '@keyframes pulse{0%,100%{filter:drop-shadow(0 2px 6px rgba(42,93,143,0.2))}50%{filter:drop-shadow(0 2px 14px rgba(42,93,143,0.5))}}',
+    '.bob{animation:bob 0.25s infinite}',
+    '.fadeIn{animation:fadeIn 0.6s ease-out forwards}',
+    '.pulse{animation:pulse 3s ease-in-out infinite}',
   ].join('\n');
 
   // ─── Robot SVG ────────────────────────────────────────
@@ -268,16 +279,14 @@ export function AnimatedLogoContainer() {
               </>
             )}
 
-            {/* Animated boxes (fade out at end, stay brown) */}
-            <g className="bf">
-              {BOXES.map((_, i) => (
-                <g key={i} className={'ab' + i}>
-                  <rect width="28" height="28" rx="3" fill="#DEB887" stroke="#B48E5D" strokeWidth="0.5" />
-                  <rect x="6" y="12" width="16" height="4" rx="1" fill="#E6C280" />
-                  <path d="M 0 14 L 28 14" stroke="#B48E5D" strokeWidth="0.5" opacity="0.5" />
-                </g>
-              ))}
-            </g>
+            {/* Animated boxes */}
+            {BOXES.map((_, i) => (
+              <g key={i} className={'ab' + i}>
+                <rect width="28" height="28" rx="3" fill="#DEB887" className="cm" />
+                <rect x="6" y="12" width="16" height="4" rx="1" fill="#E6C280" className="tf" />
+                <path d="M 0 14 L 28 14" stroke="#B48E5D" strokeWidth="0.5" opacity="0.5" className="tf" />
+              </g>
+            ))}
 
             {/* Robots */}
             {mode !== 'crane' ? (
@@ -301,8 +310,8 @@ export function AnimatedLogoContainer() {
               </filter>
             </defs>
             <g filter="url(#tS)">
-              <rect x="48" y="20" width="224" height="56" rx="6" fill="url(#tG)" />
-              <rect x="132" y="20" width="56" height="140" rx="6" fill="url(#tG)" />
+              <rect x="48" y="48" width="224" height="28" rx="5" fill="url(#tG)" />
+              <rect x="132" y="48" width="56" height="112" rx="5" fill="url(#tG)" />
             </g>
           </svg>
         )}
