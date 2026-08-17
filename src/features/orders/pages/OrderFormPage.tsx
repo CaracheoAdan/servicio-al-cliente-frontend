@@ -178,7 +178,8 @@ export function OrderFormPage() {
     { value: 'closed', label: 'Cerrado', icon: Check }
   ];
 
-  const currentStatusIndex = statuses.findIndex(s => s.value === status);
+  const normalizedStatus = status === 'in_production' ? 'in_process' : status;
+  const currentStatusIndex = statuses.findIndex(s => s.value === normalizedStatus);
 
   const totalOrdered = items.reduce((acc, curr) => acc + (Number(curr.orderedQuantity) || 0), 0);
   const totalDelivered = items.reduce((acc, curr) => acc + (Number(curr.deliveredQuantity) || 0), 0);
