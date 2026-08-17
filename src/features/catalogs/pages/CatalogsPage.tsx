@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { Package, Search, Plus, X, Database, Edit2, Trash2, Tag, CheckCircle2, XCircle, Inbox } from 'lucide-react';
+import { Package, Search, Plus, X, Database, Edit2, Trash2, Tag, CheckCircle2, AlertCircle, Inbox } from 'lucide-react';
 import { api } from '../../../shared/api/axiosInstance';
 import { SkeletonLoader } from '../../../shared/components/SkeletonLoader';
 import { KPICard } from '../../../shared/components/KPICard';
