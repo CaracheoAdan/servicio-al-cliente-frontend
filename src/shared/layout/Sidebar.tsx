@@ -90,36 +90,29 @@ export function Sidebar() {
         </div>
 
         {/* Brand */}
-        <div className={`flex items-center border-b border-[#E2E8F0] dark:border-slate-800 ${collapsed ? 'px-4 py-4 justify-center' : 'px-6 py-5'}`}>
-          {collapsed ? (
-            <img 
-              src="/logo.png" 
-              alt="Logo Pequeño" 
-              className="h-8 w-auto object-contain"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.nextElementSibling?.classList.remove('hidden');
-              }}
-            />
-          ) : (
-            <img 
-              src="/logo.png" 
-              alt="Logo" 
-              className="h-8 w-auto object-contain"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.nextElementSibling?.classList.remove('hidden');
-              }}
-            />
-          )}
-          
-          {/* Fallbacks en caso de que no suban la imagen aún */}
-          <span className={`sidebar-brand font-display font-extrabold text-xl text-[#0F172A] dark:text-white hidden`}>
-            T<span className="text-[#2A5D8F] dark:text-[#5BA3D9]">.</span>
-          </span>
-          <h1 className={`sidebar-brand text-2xl font-display font-extrabold text-[#0F172A] dark:text-white tracking-tight hidden`}>
-            Totebin<span className="text-[#2A5D8F] dark:text-[#5BA3D9]">.</span>
-          </h1>
+        <div className={`flex items-center justify-center border-b border-[#E2E8F0] dark:border-slate-800 ${collapsed ? 'px-2 py-4' : 'px-4 py-6'}`}>
+          <div className={`${collapsed ? 'w-16' : 'w-full max-w-[180px]'} mx-auto transition-all duration-300`}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 220" className="w-full h-auto mx-auto">
+              <g transform="translate(100, 15)">
+                {/* Borde exterior azul */}
+                <rect x="0" y="0" width="200" height="110" fill="#ffffff" stroke="#1e5b8d" strokeWidth="16" />
+                
+                {/* Borde interior fino negro */}
+                <rect x="12" y="12" width="176" height="86" fill="transparent" stroke="#000000" strokeWidth="2" />
+                
+                {/* Letras "Tb" centradas */}
+                <text x="100" y="78" fontFamily="Georgia, 'Times New Roman', serif" fontSize="68" fontWeight="bold" fill="#000000" textAnchor="middle">Tb</text>
+              </g>
+
+              {/* Texto TOTEBIN */}
+              {!collapsed && (
+                <>
+                  <text x="200" y="165" fontFamily="Georgia, 'Times New Roman', serif" fontSize="28" fontWeight="bold" fill="currentColor" className="text-slate-900 dark:text-white" textAnchor="middle" letterSpacing="2">TOTEBIN</text>
+                  <text x="200" y="195" fontFamily="Georgia, 'Times New Roman', serif" fontSize="14" fontWeight="bold" fill="currentColor" className="text-slate-700 dark:text-slate-300" textAnchor="middle" letterSpacing="1">EMPAQUES INDUSTRIALES</text>
+                </>
+              )}
+            </svg>
+          </div>
         </div>
 
         {/* Navigation */}

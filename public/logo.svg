@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 220" width="100%" height="100%">
+  <!-- Grupo del recuadro principal -->
+  <g transform="translate(100, 15)">
+    <!-- Borde exterior azul (Reemplazo del verde original) -->
+    <rect x="0" y="0" width="200" height="110" fill="#ffffff" stroke="#1e5b8d" stroke-width="16" />
+    
+    <!-- Borde interior fino negro -->
+    <rect x="12" y="12" width="176" height="86" fill="transparent" stroke="#000000" stroke-width="2" />
+    
+    <!-- Letras "Tb" centradas -->
+    <text x="100" y="78" font-family="Georgia, 'Times New Roman', serif" font-size="68" font-weight="bold" fill="#000000" text-anchor="middle">Tb</text>
+  </g>
+
+  <!-- Texto TOTEBIN -->
+  <text x="200" y="165" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="bold" fill="#000000" text-anchor="middle" letter-spacing="2">TOTEBIN</text>
+  
+  <!-- Texto EMPAQUES INDUSTRIALES -->
+  <text x="200" y="195" font-family="Georgia, 'Times New Roman', serif" font-size="14" font-weight="bold" fill="#000000" text-anchor="middle" letter-spacing="1">EMPAQUES INDUSTRIALES</text>
+</svg>
