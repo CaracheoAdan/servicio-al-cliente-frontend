@@ -50,34 +50,51 @@ export function OrderListPage() {
     }
   };
 
-  const proceedLiberar = async (order: any) => {
+  const getAdvanceDetails = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'open': return { next: 'in_process', label: 'Iniciar', title: 'Iniciar Producción', msg: '¿Iniciar producción de esta orden?', toast: 'Producción iniciada.', icon: CheckCircle2, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100' };
+      case 'in_process': return { next: 'produced', label: 'Completar', title: 'Completar Producción', msg: '¿Marcar producción como completada?', toast: 'Producción completada.', icon: CheckCircle2, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100' };
+      case 'produced': return { next: 'in_delivery', label: 'Liberar', title: 'Liberar Camión', msg: '¿Confirmas la salida del transporte para esta orden? Se registrará la hora actual como la hora de salida oficial.', toast: 'Camión liberado. Se ha registrado la hora de salida.', icon: Truck, color: 'text-[#D97706]', bg: 'bg-[#FFFBEB] dark:bg-amber-900/30 hover:bg-[#FEF3C7]' };
+      case 'in_delivery': return { next: 'delivered', label: 'Entregar', title: 'Marcar Entregado', msg: '¿Confirmar entrega de esta orden al cliente?', toast: 'Orden marcada como entregada.', icon: CheckCircle2, color: 'text-[#10B981]', bg: 'bg-[#ECFDF5] dark:bg-emerald-900/30 hover:bg-[#D1FAE5]' };
+      case 'delivered': return { next: 'closed', label: 'Cerrar', title: 'Cerrar Orden', msg: '¿Cerrar esta orden definitivamente?', toast: 'Orden cerrada exitosamente.', icon: CheckCircle2, color: 'text-slate-600', bg: 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200' };
+      default: return null;
+    }
+  };
+
+  const proceedAdvanceStatus = async (order: any) => {
+    const details = getAdvanceDetails(order.status);
+    if (!details) return;
+    
     setConfirmAction(null);
     try {
-      const payload = {
+      const payload: any = {
         key: order.key,
-        status: 'in_delivery',
+        status: details.next,
         scheduledDeliveryDate: order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || new Date().toISOString(),
-        shippingDate: new Date().toISOString(),
         items: order.items || []
       };
+      
+      // Preserve shipping date if it exists, or set it if transitioning to in_delivery
+      if (details.next === 'in_delivery') {
+        payload.shippingDate = new Date().toISOString();
+      } else if (order.detail?.shippingDate || order.detail?.shipping_date) {
+        payload.shippingDate = order.detail.shippingDate || order.detail.shipping_date;
+      }
+
       await orderService.updateOrder(order.id, payload);
-      toast.success('Camión liberado. Se ha registrado la hora de salida.', {
+      toast.success(details.toast, {
         style: { borderRadius: '10px', background: '#333', color: '#fff' }
       });
       fetchOrders();
     } catch (error) {
-      toast.error('Error al liberar el camión.', {
+      toast.error(`Error al actualizar el estado de la orden.`, {
         style: { borderRadius: '10px', background: '#333', color: '#fff' }
       });
     }
   };
 
-  const handleDelete = (order: any) => {
-    setConfirmAction({ type: 'delete', order });
-  };
-
-  const handleLiberarCamion = (order: any) => {
-    setConfirmAction({ type: 'release', order });
+  const handleAdvanceStatus = (order: any) => {
+    setConfirmAction({ type: 'advance', order });
   };
 
   const getStatusBadge = (status: string) => {
@@ -301,20 +318,22 @@ export function OrderListPage() {
                     </td>
                     <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium overflow-hidden">
                       <div className="flex justify-end space-x-2 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-                        {order.status?.toLowerCase() !== 'in_delivery' && order.status?.toLowerCase() !== 'delivered' && order.status?.toLowerCase() !== 'closed' ? (
+                        {getAdvanceDetails(order.status) && (
                           <button 
-                            onClick={() => handleLiberarCamion(order)}
-                            className="flex items-center text-[#D97706] bg-[#FFFBEB] dark:bg-amber-900/30 hover:bg-[#FEF3C7] dark:hover:bg-amber-900/50 px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs"
-                            title="Liberar Camión"
+                            onClick={() => handleAdvanceStatus(order)}
+                            className={`flex items-center ${getAdvanceDetails(order.status)!.color} ${getAdvanceDetails(order.status)!.bg} px-3 py-2 rounded-lg transition-colors font-display font-bold text-xs`}
+                            title={getAdvanceDetails(order.status)!.title}
                           >
-                            <Truck className="w-4 h-4 mr-1.5" /> Liberar
+                            {React.createElement(getAdvanceDetails(order.status)!.icon, { className: "w-4 h-4 mr-1.5" })}
+                            {getAdvanceDetails(order.status)!.label}
                           </button>
-                        ) : (
+                        )}
+                        {order.status?.toLowerCase() === 'closed' && (
                           <span 
-                            className="flex items-center text-[#10B981] bg-[#ECFDF5] dark:bg-emerald-900/30 px-3 py-2 rounded-lg font-display font-bold text-xs cursor-default"
-                            title="El transporte ya ha salido"
+                            className="flex items-center text-slate-400 bg-slate-50 dark:bg-slate-800/30 px-3 py-2 rounded-lg font-display font-bold text-xs cursor-default"
+                            title="Orden Completada"
                           >
-                            <CheckCircle2 className="w-4 h-4 mr-1.5" /> Liberado
+                            <CheckCircle2 className="w-4 h-4 mr-1.5" /> Completado
                           </span>
                         )}
                         <button 
@@ -352,12 +371,12 @@ export function OrderListPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F172A]/40 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 lg:p-8 font-body border border-[#E2E8F0] animate-fade-in-up">
             <div className="flex items-center gap-4 mb-6">
-              <div className={`p-4 rounded-2xl flex-shrink-0 ${confirmAction.type === 'delete' ? 'bg-[#FEF2F2] text-[#DC2626]' : 'bg-[#FFFBEB] text-[#D97706]'}`}>
-                {confirmAction.type === 'delete' ? <Trash2 className="w-8 h-8" /> : <Truck className="w-8 h-8" />}
+              <div className={`p-4 rounded-2xl flex-shrink-0 ${confirmAction.type === 'delete' ? 'bg-[#FEF2F2] text-[#DC2626]' : getAdvanceDetails(confirmAction.order.status)?.bg + ' ' + getAdvanceDetails(confirmAction.order.status)?.color}`}>
+                {confirmAction.type === 'delete' ? <Trash2 className="w-8 h-8" /> : React.createElement(getAdvanceDetails(confirmAction.order.status)!.icon, { className: "w-8 h-8" })}
               </div>
               <div>
                 <h3 className="font-display font-bold text-[#0F172A] text-xl">
-                  {confirmAction.type === 'delete' ? 'Eliminar Orden' : 'Liberar Camión'}
+                  {confirmAction.type === 'delete' ? 'Eliminar Orden' : getAdvanceDetails(confirmAction.order.status)?.title}
                 </h3>
                 <p className="text-sm font-display font-bold text-[#64748B] mt-1">Orden No. {confirmAction.order.key}</p>
               </div>
@@ -367,7 +386,7 @@ export function OrderListPage() {
               {confirmAction.type === 'delete' ? (
                 <>¿Estás seguro de eliminar esta orden? Todos sus productos asociados se perderán de la base de datos. <strong className="text-[#DC2626]">Esta acción no se puede deshacer.</strong></>
               ) : (
-                <>¿Confirmas la salida del transporte para esta orden? Se registrará la hora actual como la <strong className="text-[#0F172A]">hora de salida oficial</strong> para las estadísticas.</>
+                <>{getAdvanceDetails(confirmAction.order.status)?.msg}</>
               )}
             </p>
             
@@ -381,13 +400,13 @@ export function OrderListPage() {
               <button 
                 onClick={() => {
                   if (confirmAction.type === 'delete') proceedDelete(confirmAction.order.id);
-                  else proceedLiberar(confirmAction.order);
+                  else proceedAdvanceStatus(confirmAction.order);
                 }}
                 className={`px-6 py-3 rounded-xl font-display font-bold text-sm text-white transition-all flex items-center ${
-                  confirmAction.type === 'delete' ? 'bg-[#DC2626] hover:bg-[#B91C1C] shadow-[0_4px_0_#991B1B] active:shadow-[0_0px_0_#991B1B] active:translate-y-1' : 'bg-[#D97706] hover:bg-[#B45309] shadow-[0_4px_0_#92400E] active:shadow-[0_0px_0_#92400E] active:translate-y-1'
+                  confirmAction.type === 'delete' ? 'bg-[#DC2626] hover:bg-[#B91C1C] shadow-[0_4px_0_#991B1B] active:shadow-[0_0px_0_#991B1B] active:translate-y-1' : 'bg-[#2A5D8F] hover:bg-[#1E4D73] shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1'
                 }`}
               >
-                {confirmAction.type === 'delete' ? 'Sí, eliminar orden' : 'Sí, liberar camión'}
+                {confirmAction.type === 'delete' ? 'Sí, eliminar orden' : 'Confirmar'}
               </button>
             </div>
           </div>
