@@ -45,7 +45,13 @@ export function Header() {
     return 'Turno Nocturno';
   };
 
-  const userName = localStorage.getItem('totebin_user_name') || 'Usuario';
+  let user = null;
+  try {
+    const stored = localStorage.getItem('totebin_user');
+    if (stored) user = JSON.parse(stored);
+  } catch(e) {}
+  
+  const userName = user?.firstName || 'Usuario';
 
   return (
     <header className="dashboard-header bg-white border-b border-[#E2E8F0] relative shrink-0 transition-colors duration-300">
