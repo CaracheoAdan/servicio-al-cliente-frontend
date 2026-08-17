@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Button } from '../../../shared/components/Button';
 
@@ -138,9 +138,9 @@ export function LoginPage() {
                 <label htmlFor="password" className="block text-sm font-semibold text-[#475569] dark:text-slate-300">
                   Contraseña
                 </label>
-                <a href="#" className="text-sm font-medium text-[#2A5D8F] dark:text-[#5BA3D9] hover:underline">
+                <Link to="/forgot-password" className="text-sm font-medium text-[#2A5D8F] dark:text-[#5BA3D9] hover:underline">
                   ¿Olvidaste tu contraseña?
-                </a>
+                </Link>
               </div>
               <div className="relative">
                 <input

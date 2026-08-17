@@ -283,7 +283,7 @@ export function CatalogsPage() {
                         </button>
                       </td>
                       <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium overflow-hidden">
-                        <div className="flex justify-end space-x-2 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+                        <div className="flex justify-end space-x-2 md:translate-x-12 opacity-100 md:opacity-0 md:group-hover:translate-x-0 md:group-hover:opacity-100 transition-all duration-300 ease-out">
                           <button 
                             onClick={() => openEditModal(p)}
                             className="flex items-center text-[#2A5D8F] bg-[#EFF6FF] dark:bg-blue-900/30 hover:bg-[#DBEAFE] dark:hover:bg-blue-900/50 px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"

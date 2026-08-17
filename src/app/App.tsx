@@ -14,6 +14,8 @@ const OrderFormPage = lazy(() => import('../features/orders/pages/OrderFormPage'
 const ReportsPage = lazy(() => import('../features/reports/pages/ReportsPage').then(m => ({ default: m.ReportsPage })));
 const MasterTablePage = lazy(() => import('../features/reports/pages/MasterTablePage').then(m => ({ default: m.MasterTablePage })));
 const UsersPage = lazy(() => import('../features/users/pages/UsersPage').then(m => ({ default: m.UsersPage })));
+const ForgotPasswordPage = lazy(() => import('../features/auth/pages/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })));
+const NotFoundPage = lazy(() => import('../shared/pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 
 // React Query Client setup
 const queryClient = new QueryClient({
@@ -116,6 +118,9 @@ function App() {
                   <UsersPage />
                 </PrivateRoute>
               } />
+
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>
         </ErrorBoundary>
