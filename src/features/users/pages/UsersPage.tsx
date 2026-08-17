@@ -19,10 +19,19 @@ export function UsersPage() {
 
   // Form state
   const [userForm, setUserForm] = useState({ firstName: '', lastName: '', email: '', passwordHash: '', roleId: '' });
-  const [roleForm, setRoleForm] = useState({ name: '' });
+  const [roleForm, setRoleForm] = useState<{ name: string; permissions: string[] }>({ name: '', permissions: [] });
 
   // Delete modal state
   const [confirmDelete, setConfirmDelete] = useState<{ id: number; type: 'user' | 'role' } | null>(null);
+
+  const pages = [
+    { id: 'orders', label: 'Gestión de Órdenes' },
+    { id: 'orders_new', label: 'Registro de Pedidos' },
+    { id: 'catalogs', label: 'Catálogo de Productos' },
+    { id: 'reports', label: 'Gráficas y Estadísticas' },
+    { id: 'master_table', label: 'Exportar Excel' },
+    { id: 'users', label: 'Usuarios y Roles' }
+  ];
 
   const fetchData = async () => {
     try {
@@ -83,10 +92,15 @@ export function UsersPage() {
   const handleOpenRoleModal = (role?: any) => {
     if (role) {
       setEditingItem(role);
-      setRoleForm({ name: role.name || '' });
+      let perms: string[] = [];
+      try {
+        if (typeof role.permissions === 'string') perms = JSON.parse(role.permissions);
+        else if (Array.isArray(role.permissions)) perms = role.permissions;
+      } catch(e) {}
+      setRoleForm({ name: role.name || '', permissions: perms });
     } else {
       setEditingItem(null);
-      setRoleForm({ name: '' });
+      setRoleForm({ name: '', permissions: [] });
     }
     setIsRoleModalOpen(true);
   };
@@ -121,11 +135,16 @@ export function UsersPage() {
   const handleSaveRole = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const payload = {
+        name: roleForm.name,
+        permissions: JSON.stringify(roleForm.permissions)
+      };
+
       if (editingItem) {
-        await userService.updateRole(editingItem.id, roleForm);
+        await userService.updateRole(editingItem.id, payload);
         toast.success('Rol actualizado');
       } else {
-        await userService.createRole(roleForm);
+        await userService.createRole(payload);
         toast.success('Rol creado');
       }
       setIsRoleModalOpen(false);
@@ -417,12 +436,12 @@ export function UsersPage() {
       {/* Role Modal */}
       {isRoleModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F172A]/40 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-slide-up">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
             <div className="flex justify-between items-center p-6 border-b border-[#E2E8F0] bg-[#F8FAFC]">
               <h3 className="font-display font-extrabold text-[#0F172A] text-xl">
                 {editingItem ? 'Editar Rol' : 'Nuevo Rol'}
               </h3>
-              <button onClick={() => setIsRoleModalOpen(false)} className="text-[#94A3B8] hover:text-[#DC2626] transition-colors p-2 rounded-xl hover:bg-white">
+              <button type="button" onClick={() => setIsRoleModalOpen(false)} className="text-[#94A3B8] hover:text-[#DC2626] transition-colors p-2 rounded-xl hover:bg-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -438,6 +457,33 @@ export function UsersPage() {
                     placeholder="Ej: Administrador, Operador..."
                     className="w-full px-4 py-3 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-body transition-all"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-display font-bold text-[#0F172A] mb-2">Páginas Permitidas</label>
+                  <div className="space-y-2 border-2 border-[#E2E8F0] rounded-xl p-4 bg-[#F8FAFC]">
+                    {pages.map(page => (
+                      <label key={page.id} className="flex items-center gap-3 cursor-pointer group">
+                        <div className="relative flex items-center">
+                          <input 
+                            type="checkbox" 
+                            className="peer appearance-none w-5 h-5 border-2 border-[#CBD5E1] rounded-md checked:bg-[#2A5D8F] checked:border-[#2A5D8F] transition-all cursor-pointer"
+                            checked={roleForm.permissions.includes(page.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setRoleForm({ ...roleForm, permissions: [...roleForm.permissions, page.id] });
+                              } else {
+                                setRoleForm({ ...roleForm, permissions: roleForm.permissions.filter(p => p !== page.id) });
+                              }
+                            }}
+                          />
+                          <svg className="absolute w-3.5 h-3.5 left-0.5 top-0.5 pointer-events-none opacity-0 peer-checked:opacity-100 text-white transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                        <span className="text-sm font-medium text-[#475569] group-hover:text-[#0F172A] transition-colors">{page.label}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className="mt-8 flex justify-end gap-3">
