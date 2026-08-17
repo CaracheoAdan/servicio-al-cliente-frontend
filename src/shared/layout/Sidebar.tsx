@@ -22,6 +22,8 @@ export function Sidebar() {
 
   const handleLogout = () => {
     localStorage.removeItem('totebin_token')
+    localStorage.removeItem('totebin_user_name')
+    localStorage.removeItem('totebin_user')
     navigate('/login')
   }
 
@@ -53,6 +55,18 @@ export function Sidebar() {
       ],
     },
   ]
+
+  let user = null;
+  try {
+    const stored = localStorage.getItem('totebin_user');
+    if (stored) user = JSON.parse(stored);
+  } catch(e) {}
+
+  const initials = user ? `${user.firstName?.charAt(0) || ''}${user.lastName?.charAt(0) || ''}`.toUpperCase() || 'U' : 'U';
+  const fullName = user ? `${user.firstName || 'Usuario'} ${user.lastName ? user.lastName.charAt(0) + '.' : ''}` : 'Usuario';
+  let roleName = 'Usuario';
+  if (user?.role?.toLowerCase() === 'admin') roleName = 'Administrador';
+  else if (user?.role) roleName = user.role;
 
   return (
     <aside className={`${collapsed ? 'w-24' : 'w-72'} flex-shrink-0 transition-all duration-300 ease-in-out pt-[15px] pb-3 pl-3 pr-3`}>
@@ -156,14 +170,14 @@ export function Sidebar() {
         <div className={`p-4 border-t border-[#E2E8F0] ${collapsed ? 'flex flex-col items-center gap-2' : ''}`}>
           <div className={`sidebar-user-card bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl ${collapsed ? 'p-2' : 'p-3'} flex items-center ${collapsed ? 'justify-center' : 'space-x-3'}`}>
             <div className="w-9 h-9 rounded-full bg-[#2A5D8F] flex items-center justify-center shrink-0">
-              <span className="font-display font-bold text-white text-xs">JA</span>
+              <span className="font-display font-bold text-white text-xs">{initials}</span>
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0">
-                <p className="sidebar-user-name font-display font-bold text-[#0F172A] text-sm truncate">Javier A.</p>
+                <p className="sidebar-user-name font-display font-bold text-[#0F172A] text-sm truncate">{fullName}</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
-                  <p className="sidebar-user-role font-mono text-[10px] text-[#64748B] truncate">Súper Administrador</p>
+                  <p className="sidebar-user-role font-mono text-[10px] text-[#64748B] truncate capitalize">{roleName}</p>
                 </div>
               </div>
             )}

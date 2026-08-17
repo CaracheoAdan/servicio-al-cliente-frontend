@@ -18,6 +18,7 @@ export function Header() {
   const handleLogout = () => {
     localStorage.removeItem('totebin_token');
     localStorage.removeItem('totebin_user_name');
+    localStorage.removeItem('totebin_user');
     navigate('/login');
   }
 
