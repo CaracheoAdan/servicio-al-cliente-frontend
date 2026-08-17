@@ -13,7 +13,7 @@ export const userService = {
   },
 
   async createUser(payload: any) {
-    const res = await api.post('/users', payload);
+    const res = await api.post('/auth/register', payload);
     return res.data.data || res.data;
   },
 

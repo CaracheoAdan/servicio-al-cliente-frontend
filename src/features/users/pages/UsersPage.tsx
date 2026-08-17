@@ -98,7 +98,8 @@ export function UsersPage() {
         firstName: userForm.firstName,
         lastName: userForm.lastName,
         email: userForm.email,
-        passwordHash: userForm.passwordHash,
+        password: userForm.passwordHash,
+        passwordHash: userForm.passwordHash, // Keep for update just in case
         roleId: Number(userForm.roleId)
       };
 
