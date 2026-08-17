@@ -83,7 +83,7 @@ export const orderService = {
   async getAllCombinedOrders(): Promise<CombinedOrder[]> {
     const [ordersRes, detailsRes, itemsRes] = await Promise.all([
       api.get('/orders'),
-      api.get('/orderDetails'),
+      api.get('/order_details'),
       api.get('/order_items')
     ]);
 
@@ -133,7 +133,7 @@ export const orderService = {
     }
 
     if (payload.scheduledDeliveryDate || payload.shippingDate) {
-      await api.post('/orderDetails', {
+      await api.post('/order_details', {
         orderId,
         scheduledDeliveryDate: payload.scheduledDeliveryDate ? new Date(payload.scheduledDeliveryDate).toISOString() : new Date().toISOString(),
         shippingDate: payload.shippingDate ? new Date(payload.shippingDate).toISOString() : new Date().toISOString()
@@ -161,7 +161,7 @@ export const orderService = {
     // PUT sin id en el payload, solo en la URL
     await api.put(`/orders/${id}`, { key: payload.key, status: statusUpper });
 
-    const detailsRes = await api.get('/orderDetails');
+    const detailsRes = await api.get('/order_details');
     const details: RawOrderDetail[] = Array.isArray(detailsRes.data) ? detailsRes.data : (detailsRes.data.items || detailsRes.data.data || []);
     const existingDetail = details.find(d => d.orderId?.toString() === id.toString() || d.order_id?.toString() === id.toString());
 
@@ -172,9 +172,9 @@ export const orderService = {
     };
 
     if (existingDetail) {
-      await api.put(`/orderDetails/${existingDetail.id}`, detailPayload);
+      await api.put(`/order_details/${existingDetail.id}`, detailPayload);
     } else {
-      await api.post('/orderDetails', detailPayload);
+      await api.post('/order_details', detailPayload);
     }
 
     const itemsRes = await api.get('/order_items');
