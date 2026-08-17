@@ -20,6 +20,7 @@ export function LoginPage() {
     try {
       const response = await authApi.login({ email, password });
       localStorage.setItem('totebin_token', response.accessToken);
+      localStorage.setItem('totebin_user_name', response.user.firstName);
       toast.success(`Bienvenido, ${response.user.firstName}!`, {
         style: { borderRadius: '10px', background: '#333', color: '#fff' }
       });

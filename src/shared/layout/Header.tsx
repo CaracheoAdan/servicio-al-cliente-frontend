@@ -17,6 +17,7 @@ export function Header() {
 
   const handleLogout = () => {
     localStorage.removeItem('totebin_token');
+    localStorage.removeItem('totebin_user_name');
     navigate('/login');
   }
 
@@ -43,13 +44,15 @@ export function Header() {
     return 'Turno Nocturno';
   };
 
+  const userName = localStorage.getItem('totebin_user_name') || 'Usuario';
+
   return (
     <header className="dashboard-header bg-white border-b border-[#E2E8F0] relative shrink-0 transition-colors duration-300">
       
       <div className="flex items-center justify-between px-8 py-5">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="header-breadcrumb font-mono text-[11px] uppercase tracking-[0.15em] text-[#2A5D8F] font-bold cursor-pointer hover:text-[#5BA3D9] transition-colors">{getGreeting()}, Javier — {getTurn()}</span>
+            <span className="header-breadcrumb font-mono text-[11px] uppercase tracking-[0.15em] text-[#2A5D8F] font-bold cursor-pointer hover:text-[#5BA3D9] transition-colors">{getGreeting()}, {userName} — {getTurn()}</span>
             <span className="text-[#E2E8F0] dark:text-[#3F3F46] text-[10px]">|</span>
             <span className="header-breadcrumb font-mono text-[11px] uppercase tracking-[0.15em] text-[#64748B] font-medium">{meta.breadcrumb}</span>
           </div>
