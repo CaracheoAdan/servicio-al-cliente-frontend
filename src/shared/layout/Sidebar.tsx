@@ -56,11 +56,42 @@ export function Sidebar() {
     },
   ]
 
-  let user = null;
+  let user: any = null;
   try {
     const stored = localStorage.getItem('totebin_user');
     if (stored) user = JSON.parse(stored);
   } catch(e) {}
+
+  let userPermissions: string[] = [];
+  try {
+    if (user?.permissions && typeof user.permissions === 'string') {
+      userPermissions = JSON.parse(user.permissions);
+    } else if (Array.isArray(user?.permissions)) {
+      userPermissions = user.permissions;
+    }
+  } catch (e) {}
+
+  // Filter menu sections based on permissions
+  // If the user has no permissions array, we might allow all for admins, but let's restrict strictly if permissions are enabled.
+  // Wait, if no permissions array is defined, we shouldn't block everything if it's an old user. 
+  // But let's assume they have to be granted.
+  const isSuperAdmin = user?.role === 'Administrador' || user?.role === 'Admin';
+  
+  const filteredMenuSections = menuSections.map(section => {
+    return {
+      ...section,
+      items: section.items.filter(item => {
+        if (isSuperAdmin && userPermissions.length === 0) return true; // fallback for admins if perms not set
+        if (item.path === '/orders/new' && userPermissions.includes('orders_new')) return true;
+        if (item.path === '/orders' && userPermissions.includes('orders')) return true;
+        if (item.path === '/catalogs' && userPermissions.includes('catalogs')) return true;
+        if (item.path === '/reports' && userPermissions.includes('reports')) return true;
+        if (item.path === '/master-table' && userPermissions.includes('master_table')) return true;
+        if (item.path === '/users' && userPermissions.includes('users')) return true;
+        return false;
+      })
+    };
+  }).filter(section => section.items.length > 0);
 
   const initials = user && user.firstName ? `${user.firstName.charAt(0)}${user.lastName ? user.lastName.charAt(0) : ''}`.toUpperCase() : '';
   const fullName = user && user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : '';
@@ -117,7 +148,7 @@ export function Sidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
-          {menuSections.map((section) => (
+          {filteredMenuSections.map((section) => (
             <div key={section.label}>
               {!collapsed && (
                 <div className="mb-2 px-3">
