@@ -1,14 +1,53 @@
+/**
+ * @fileoverview Configuración del cliente API con interceptor para tokens JWT y manejo de errores.
+ * Define la instancia de Axios y utilidades para resolver la URL base dinámicamente.
+ *
+ * API base URL (VITE_API_URL), mismo patrón que Totebin-monitor-produc y el portal frontend:
+ * - Dev (Vite proxy): `/api/v1` → vite.config proxies a localhost:5041
+ * - IIS without ARR: `same-host` o ruta relativa en builds de producción
+ *   resuelve a `http(s)://<browser-hostname>:5041/api/v1` para evitar IIS 404.4.
+ * - Explícito absoluto: `http://192.168.88.69:5041/api/v1`
+ */
+
 import axios from 'axios';
 
+/** Puerto API por defecto en host Windows LAN / Kestrel / IIS. */
+const DEFAULT_API_PORT = '5041';
+
+/**
+ * Resuelve la URL base de la API hacia el navegador (incluyendo `/api/v1`).
+ * Se ejecuta por petición para que `same-host` use siempre el hostname con el que accedió el usuario.
+ */
+export function resolveApiBaseUrl(): string {
+  const raw = (import.meta.env.VITE_API_URL as string | undefined)?.trim() || '/api/v1';
+  const apiPort =
+    (import.meta.env.VITE_API_PORT as string | undefined)?.trim() || DEFAULT_API_PORT;
+
+  const wantsSameHost =
+    raw === 'same-host' ||
+    // Producción + ruta relativa caería en 404 en sitio IIS estático sin ARR
+    (import.meta.env.PROD && raw.startsWith('/'));
+
+  if (wantsSameHost) {
+    if (typeof window === 'undefined') {
+      return `http://localhost:${apiPort}/api/v1`;
+    }
+    return `${window.location.protocol}//${window.location.hostname}:${apiPort}/api/v1`;
+  }
+
+  return raw.replace(/\/$/, '');
+}
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5041/api/v1',
+  baseURL: resolveApiBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Interceptor para inyectar el token JWT en cada petición
+// Interceptor para inyectar el token JWT y asegurar baseURL dinámica en cada petición
 api.interceptors.request.use((config) => {
+  config.baseURL = resolveApiBaseUrl();
   const token = localStorage.getItem('totebin_token');
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -20,11 +59,6 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Only import toast dynamically if we want to avoid circular deps or just statically if possible,
-    // but axiosInstance is pure so we can statically import toast.
-    // wait, we can't import toast directly here if it causes a circular dependency, but usually it doesn't.
-    // Let's import it at the top.
-    
     let message = 'Ocurrió un error inesperado';
     const isLoginEndpoint = error.config?.url?.includes('/auth/login');
     let shouldShowToast = true;
