@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Save, Plus, X, FileText, CheckCircle2, MessageSquare, Package, Truck, Check } from 'lucide-react';
+import { ArrowLeft, Save, Plus, X, FileText, CheckCircle2, MessageSquare, Package, Truck, Check, Clock } from 'lucide-react';
 import { api } from '../../../shared/api/axiosInstance';
 import { orderService } from '../../../shared/api/orderService';
 import { OrderStatus } from '../types/order.types';
@@ -171,6 +171,7 @@ export function OrderFormPage() {
 
   const statuses: { value: OrderStatus; label: string; icon: any }[] = [
     { value: 'open', label: 'Abierto', icon: FileText },
+    { value: 'in_process', label: 'En Proceso', icon: Clock },
     { value: 'produced', label: 'Producido', icon: Package },
     { value: 'in_delivery', label: 'En Transporte', icon: Truck },
     { value: 'delivered', label: 'Entregado', icon: CheckCircle2 },
