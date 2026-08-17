@@ -62,11 +62,9 @@ export function Sidebar() {
     if (stored) user = JSON.parse(stored);
   } catch(e) {}
 
-  const initials = user ? `${user.firstName?.charAt(0) || ''}${user.lastName?.charAt(0) || ''}`.toUpperCase() || 'U' : 'U';
-  const fullName = user ? `${user.firstName || 'Usuario'} ${user.lastName ? user.lastName.charAt(0) + '.' : ''}` : 'Usuario';
-  let roleName = 'Usuario';
-  if (user?.role?.toLowerCase() === 'admin') roleName = 'Administrador';
-  else if (user?.role) roleName = user.role;
+  const initials = user && user.firstName ? `${user.firstName.charAt(0)}${user.lastName ? user.lastName.charAt(0) : ''}`.toUpperCase() : '';
+  const fullName = user && user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : '';
+  const roleName = user?.role || '';
 
   return (
     <aside className={`${collapsed ? 'w-24' : 'w-72'} flex-shrink-0 transition-all duration-300 ease-in-out pt-[15px] pb-3 pl-3 pr-3`}>

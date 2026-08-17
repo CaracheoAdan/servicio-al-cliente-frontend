@@ -51,7 +51,7 @@ export function Header() {
     if (stored) user = JSON.parse(stored);
   } catch(e) {}
   
-  const userName = user?.firstName || 'Usuario';
+  const userName = user?.firstName || '';
 
   return (
     <header className="dashboard-header bg-white border-b border-[#E2E8F0] relative shrink-0 transition-colors duration-300">
