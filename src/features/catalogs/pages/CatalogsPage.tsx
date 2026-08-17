@@ -197,27 +197,18 @@ export function CatalogsPage() {
             value={totalProducts} 
             icon={<Package />} 
             iconColorClass="text-[#2A5D8F]"
-            trend={3}
-            trendLabel="vs mes pasado"
-            sparklineData={[50, 52, 51, 55, 58, 60, totalProducts || 60]}
           />
           <KPICard 
             title="Activos" 
             value={activeProducts} 
             icon={<CheckCircle2 />} 
             iconColorClass="text-[#10B981]"
-            trend={1}
-            trendLabel="vs ayer"
-            sparklineData={[40, 42, 42, 45, 48, 50, activeProducts || 50]}
           />
           <KPICard 
             title="Inactivos" 
             value={inactiveProducts} 
-            icon={<XCircle />} 
-            iconColorClass="text-[#EF4444]"
-            trend={-2}
-            trendLabel="vs ayer"
-            sparklineData={[10, 10, 9, 10, 10, 10, inactiveProducts || 10]}
+            icon={<AlertCircle />} 
+            iconColorClass="text-[#F59E0B]"
           />
         </div>
       )}

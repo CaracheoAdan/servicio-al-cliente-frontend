@@ -32,13 +32,13 @@ export function Sidebar() {
       label: 'GENERAL',
       items: [
         { name: 'Registro de Pedidos', path: '/orders/new', icon: Plus },
-        { name: 'Gestión de Órdenes', path: '/orders', icon: ClipboardList, badge: 12 },
+        { name: 'Gestión de Órdenes', path: '/orders', icon: ClipboardList },
       ],
     },
     {
       label: 'CATÁLOGOS',
       items: [
-        { name: 'Catálogo de Productos', path: '/catalogs', icon: Database, badge: 145 },
+        { name: 'Catálogo de Productos', path: '/catalogs', icon: Database },
       ],
     },
     {
@@ -51,7 +51,7 @@ export function Sidebar() {
     {
       label: 'ADMINISTRACIÓN',
       items: [
-        { name: 'Usuarios', path: '/users', icon: Settings, badge: 5 },
+        { name: 'Usuarios', path: '/users', icon: Settings },
       ],
     },
   ]

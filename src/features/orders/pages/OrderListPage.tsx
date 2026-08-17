@@ -215,24 +215,18 @@ export function OrderListPage() {
             value={totalOrders} 
             icon={<ClipboardList />} 
             iconColorClass="text-[#2A5D8F]"
-            trend={12}
-            sparklineData={[10, 15, 20, 25, 22, 30, totalOrders || 30]}
           />
           <KPICard 
             title="En Proceso" 
             value={activeOrders} 
             icon={<Clock />} 
             iconColorClass="text-[#D97706]"
-            trend={-5}
-            sparklineData={[20, 18, 15, 22, 25, 20, activeOrders || 15]}
           />
           <KPICard 
             title="Completadas" 
             value={closedOrders} 
             icon={<CheckCircle2 />} 
             iconColorClass="text-[#10B981]"
-            trend={8}
-            sparklineData={[5, 10, 15, 12, 18, 25, closedOrders || 25]}
           />
         </div>
       )}
