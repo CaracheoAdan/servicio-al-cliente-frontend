@@ -116,8 +116,41 @@ export const orderService = {
   },
 
   async getOrderById(id: string | number): Promise<CombinedOrder | undefined> {
-    const combinedOrders = await this.getAllCombinedOrders();
-    return combinedOrders.find(o => o.id.toString() === id.toString());
+    try {
+      const orderRes = await api.get(`/orders/${id}`);
+      const order: RawOrder = orderRes.data?.data || orderRes.data;
+      if (!order) return undefined;
+
+      const [detailsRes, itemsRes] = await Promise.all([
+        api.get(`/order_details?orderId=${id}`),
+        api.get(`/order_items?orderId=${id}`)
+      ]);
+
+      const details: RawOrderDetail[] = Array.isArray(detailsRes.data) ? detailsRes.data : (detailsRes.data.items || detailsRes.data.data || []);
+      const items: RawOrderItem[] = Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data.items || itemsRes.data.data || []);
+
+      const orderDetail = details.find(d => d.orderId?.toString() === id.toString() || d.order_id?.toString() === id.toString());
+
+      return {
+        id: order.id,
+        key: order.key,
+        status: (order.status?.toString().toUpperCase() as OrderStatus) || OrderStatus.NONE,
+        detail: orderDetail ? {
+          id: orderDetail.id,
+          scheduledDeliveryDate: orderDetail.scheduledDeliveryDate || orderDetail.scheduled_delivery_date || '',
+          shippingDate: orderDetail.shippingDate || orderDetail.shipping_date || ''
+        } : null,
+        items: items.map(i => ({
+          id: i.id,
+          productId: i.productId || i.product_id || 0,
+          productName: i.product?.name || i.product_name || `Producto #${i.productId || i.product_id}`,
+          orderedQuantity: i.orderedQuantity || i.ordered_quantity || 0,
+          deliveredQuantity: i.deliveredQuantity || i.delivered_quantity || 0
+        }))
+      };
+    } catch (e) {
+      return undefined;
+    }
   },
 
   async createOrder(payload: CreateOrderPayload): Promise<number> {
@@ -161,7 +194,7 @@ export const orderService = {
     // PUT sin id en el payload, solo en la URL
     await api.put(`/orders/${id}`, { key: payload.key, status: statusUpper });
 
-    const detailsRes = await api.get('/order_details');
+    const detailsRes = await api.get(`/order_details?orderId=${id}`);
     const details: RawOrderDetail[] = Array.isArray(detailsRes.data) ? detailsRes.data : (detailsRes.data.items || detailsRes.data.data || []);
     const existingDetail = details.find(d => d.orderId?.toString() === id.toString() || d.order_id?.toString() === id.toString());
 
@@ -177,7 +210,7 @@ export const orderService = {
       await api.post('/order_details', detailPayload);
     }
 
-    const itemsRes = await api.get('/order_items');
+    const itemsRes = await api.get(`/order_items?orderId=${id}`);
     const items: RawOrderItem[] = Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data.items || itemsRes.data.data || []);
     const existingItems = items.filter(i => i.orderId?.toString() === id.toString() || i.order_id?.toString() === id.toString());
 
