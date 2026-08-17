@@ -90,12 +90,38 @@ export function Sidebar() {
         </div>
 
         {/* Brand */}
-        <div className={`flex items-center border-b border-[#E2E8F0] ${collapsed ? 'px-4 py-4 justify-center' : 'px-6 py-5'}`}>
+        <div className={`flex items-center border-b border-[#E2E8F0] dark:border-slate-800 ${collapsed ? 'px-4 py-4 justify-center' : 'px-6 py-5'}`}>
           {collapsed ? (
-            <span className="sidebar-brand font-display font-extrabold text-xl text-[#0F172A]">T<span className="text-[#2A5D8F]">.</span></span>
+            <img 
+              src="/logo-small.png" 
+              alt="Logo Pequeño" 
+              className="h-8 w-auto object-contain"
+              onError={(e) => {
+                // Fallback si no encuentra la imagen
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
           ) : (
-            <h1 className="sidebar-brand text-2xl font-display font-extrabold text-[#0F172A] tracking-tight">Totebin<span className="text-[#2A5D8F]">.</span></h1>
+            <img 
+              src="/logo.png" 
+              alt="Logo" 
+              className="h-8 w-auto object-contain"
+              onError={(e) => {
+                // Fallback si no encuentra la imagen
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
           )}
+          
+          {/* Fallbacks en caso de que no suban la imagen aún */}
+          <span className={`sidebar-brand font-display font-extrabold text-xl text-[#0F172A] dark:text-white hidden`}>
+            T<span className="text-[#2A5D8F] dark:text-[#5BA3D9]">.</span>
+          </span>
+          <h1 className={`sidebar-brand text-2xl font-display font-extrabold text-[#0F172A] dark:text-white tracking-tight hidden`}>
+            Totebin<span className="text-[#2A5D8F] dark:text-[#5BA3D9]">.</span>
+          </h1>
         </div>
 
         {/* Navigation */}
