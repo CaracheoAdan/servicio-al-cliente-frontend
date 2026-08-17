@@ -122,14 +122,15 @@ export const orderService = {
       if (!order) return undefined;
 
       const [detailsRes, itemsRes] = await Promise.all([
-        api.get(`/order_details?orderId=${id}`),
-        api.get(`/order_items?orderId=${id}`)
+        api.get('/order_details'),
+        api.get('/order_items')
       ]);
 
       const details: RawOrderDetail[] = Array.isArray(detailsRes.data) ? detailsRes.data : (detailsRes.data.items || detailsRes.data.data || []);
-      const items: RawOrderItem[] = Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data.items || itemsRes.data.data || []);
-
+      const itemsAll: RawOrderItem[] = Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data.items || itemsRes.data.data || []);
+      
       const orderDetail = details.find(d => d.orderId?.toString() === id.toString() || d.order_id?.toString() === id.toString());
+      const items = itemsAll.filter(i => i.orderId?.toString() === id.toString() || i.order_id?.toString() === id.toString());
 
       return {
         id: order.id,
@@ -194,7 +195,7 @@ export const orderService = {
     // PUT sin id en el payload, solo en la URL
     await api.put(`/orders/${id}`, { key: payload.key, status: statusUpper });
 
-    const detailsRes = await api.get(`/order_details?orderId=${id}`);
+    const detailsRes = await api.get('/order_details');
     const details: RawOrderDetail[] = Array.isArray(detailsRes.data) ? detailsRes.data : (detailsRes.data.items || detailsRes.data.data || []);
     const existingDetail = details.find(d => d.orderId?.toString() === id.toString() || d.order_id?.toString() === id.toString());
 
@@ -210,7 +211,7 @@ export const orderService = {
       await api.post('/order_details', detailPayload);
     }
 
-    const itemsRes = await api.get(`/order_items?orderId=${id}`);
+    const itemsRes = await api.get('/order_items');
     const items: RawOrderItem[] = Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data.items || itemsRes.data.data || []);
     const existingItems = items.filter(i => i.orderId?.toString() === id.toString() || i.order_id?.toString() === id.toString());
 
