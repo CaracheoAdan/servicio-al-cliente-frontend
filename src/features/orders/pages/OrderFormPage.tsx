@@ -13,6 +13,7 @@ export function OrderFormPage() {
 
   const [orderKey, setOrderKey] = useState('');
   const [scheduledDeliveryDate, setScheduledDeliveryDate] = useState('');
+  const [shippingDate, setShippingDate] = useState<string | null>(null);
   const [items, setItems] = useState([{ productId: '', orderedQuantity: 1, deliveredQuantity: 0 }]);
   const [status, setStatus] = useState<OrderStatus>('open');
   const [comments, setComments] = useState('');
@@ -42,6 +43,9 @@ export function OrderFormPage() {
             setOrderKey(orderData.key || '');
             if (orderData.detail?.scheduledDeliveryDate || orderData.detail?.scheduled_delivery_date) {
               setScheduledDeliveryDate((orderData.detail.scheduledDeliveryDate || orderData.detail.scheduled_delivery_date).split('T')[0]);
+            }
+            if (orderData.detail?.shippingDate || orderData.detail?.shipping_date) {
+              setShippingDate(orderData.detail.shippingDate || orderData.detail.shipping_date);
             }
             setStatus(orderData.status || 'open');
             setComments(orderData.detail?.comments || '');
@@ -131,7 +135,7 @@ export function OrderFormPage() {
     }
 
     try {
-      const payload = {
+      const payload: any = {
         key: orderKey,
         status: status,
         scheduledDeliveryDate: scheduledDeliveryDate,
@@ -142,6 +146,10 @@ export function OrderFormPage() {
           deliveredQuantity: parseInt(item.deliveredQuantity as string, 10) || 0
         }))
       };
+
+      if (shippingDate) {
+        payload.shippingDate = shippingDate;
+      }
 
       if (isEditing) {
         await orderService.updateOrder(id!, payload);
