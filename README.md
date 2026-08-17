@@ -1,6 +1,6 @@
 # Sistema de Logística y Servicio al Cliente (Frontend)
 
-Este repositorio contiene la arquitectura Frontend (Single Page Application) diseñada a nivel corporativo para la **Gestión Operativa, Control de Producción y Logística de Envíos**. 
+Este repositorio contiene la arquitectura Frontend (Single Page Application) diseñada a nivel corporativo para la **Gestión Operativa, Control de Producción y Logística de Envíos**.
 
 El sistema actúa como la torre de control de la planta: permite a los operadores crear y monitorear transacciones de pedidos, gestionar la salida física (liberación) de camiones de entrega, y proyectar un Dashboard de Inteligencia de Negocios en tiempo real para gerencia, calculando métricas de rendimiento logístico y cumplimiento de productos.
 
@@ -30,7 +30,7 @@ sequenceDiagram
 
     UI->>RQ: useReports() solicita datos
     RQ->>ACL: Llama a getAllCombinedOrders()
-    ACL->>API: Fetch paralelo (/orders, /orderDetails, /order_items)
+    ACL->>API: Fetch paralelo (/orders, /order_details, /order_items)
     API-->>ACL: JSON fragmentado y estricto
     Note over ACL: El servicio limpia, formatea a UPPERCASE,<br/>y une la orden con sus items.
     ACL-->>RQ: Retorna DTO hidratado y limpio
@@ -74,7 +74,7 @@ graph TD
 ### Diccionario Detallado del Proyecto
 
 #### 📁 `src/app/` (El Motor de Arranque)
-Es el punto de entrada de React. 
+Es el punto de entrada de React.
 * **`App.tsx`**: Contiene la definición de todas las rutas de la aplicación. Configura herramientas globales críticas: el `QueryClientProvider` para manejar la caché de datos asíncronos, el `ErrorBoundary` global para atrapar crashes, y `React.lazy` con `Suspense` para dividir el código (Code Splitting) y asegurar que el navegador solo descargue los módulos que el usuario realmente visita.
 
 #### 📁 `src/features/` (Los Dominios de Negocio Aislados)

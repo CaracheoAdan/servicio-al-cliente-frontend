@@ -70,7 +70,7 @@ describe('orderService', () => {
     });
 
     // Verify it created a new detail since none existed
-    expect(api.post).toHaveBeenCalledWith('/orderDetails', expect.objectContaining({
+    expect(api.post).toHaveBeenCalledWith('/order_details', expect.objectContaining({
       orderId: 2
     }));
   });
