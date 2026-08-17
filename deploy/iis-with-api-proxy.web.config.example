@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  OPTIONAL — only if you install ARR and want same-origin /api proxy.
+
+  Prerequisites:
+  - URL Rewrite
+  - Application Request Routing (ARR) + Server Proxy Settings → Enable proxy
+
+  Also build with a relative API base and disable same-host rewrite by
+  NOT using production auto-rewrite — set an absolute proxy path carefully.
+
+  Prefer the default setup instead: VITE_API_URL=same-host → :5041
+  (no ARR required; matches portal Option A).
+-->
+<configuration>
+  <system.webServer>
+    <defaultDocument enabled="true">
+      <files>
+        <clear />
+        <add value="index.html" />
+      </files>
+    </defaultDocument>
+
+    <rewrite>
+      <rules>
+        <rule name="API Reverse Proxy" stopProcessing="true">
+          <match url="^api/(.*)" />
+          <action type="Rewrite" url="http://127.0.0.1:5041/api/{R:1}" />
+        </rule>
+
+        <rule name="SPA History Fallback" stopProcessing="true">
+          <match url=".*" />
+          <conditions logicalGrouping="MatchAll">
+            <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+            <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+          </conditions>
+          <action type="Rewrite" url="index.html" />
+        </rule>
+      </rules>
+    </rewrite>
+  </system.webServer>
+</configuration>
