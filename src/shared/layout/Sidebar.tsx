@@ -93,11 +93,10 @@ export function Sidebar() {
         <div className={`flex items-center border-b border-[#E2E8F0] dark:border-slate-800 ${collapsed ? 'px-4 py-4 justify-center' : 'px-6 py-5'}`}>
           {collapsed ? (
             <img 
-              src="/logo-small.png" 
+              src="/logo.png" 
               alt="Logo Pequeño" 
               className="h-8 w-auto object-contain"
               onError={(e) => {
-                // Fallback si no encuentra la imagen
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.nextElementSibling?.classList.remove('hidden');
               }}
@@ -108,7 +107,6 @@ export function Sidebar() {
               alt="Logo" 
               className="h-8 w-auto object-contain"
               onError={(e) => {
-                // Fallback si no encuentra la imagen
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.nextElementSibling?.classList.remove('hidden');
               }}
