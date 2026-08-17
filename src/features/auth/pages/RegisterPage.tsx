@@ -7,9 +7,10 @@ import { authApi } from '../api/auth.api';
 export function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   
-  const [nameTouched, setNameTouched] = useState(false);
+  const [firstNameTouched, setFirstNameTouched] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
   
@@ -18,7 +19,14 @@ export function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await authApi.register({ email, password, name });
+      // Usamos roleId 2 por defecto para usuarios normales
+      const res = await authApi.register({ 
+        email, 
+        password, 
+        firstName, 
+        lastName,
+        roleId: 2 
+      });
       toast.success('Usuario registrado exitosamente. Ahora puedes iniciar sesión.', {
         style: { borderRadius: '10px', background: '#333', color: '#fff' }
       });
@@ -31,7 +39,8 @@ export function RegisterPage() {
     }
   };
 
-  const isNameValid = name.length >= 3;
+  const isFirstNameValid = firstName.length >= 2;
+  const isLastNameValid = lastName.length >= 2;
   const isEmailValid = email.includes('@') && email.includes('.');
   const isPasswordValid = password.length >= 6;
 
@@ -74,25 +83,46 @@ export function RegisterPage() {
 
           <form className="space-y-6" onSubmit={handleRegister}>
             <div className="animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
-              <label className="block text-sm font-semibold text-[#475569] dark:text-slate-300 mb-2">
-                Nombre Completo
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  onBlur={() => setNameTouched(true)}
-                  className={`appearance-none block w-full px-4 py-3.5 bg-[#F8FAFC] dark:bg-[#1E293B] border rounded-xl shadow-sm placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#2A5D8F]/20 sm:text-sm text-[#0F172A] dark:text-white transition-all
-                    ${nameTouched ? (isNameValid ? 'border-green-500 focus:border-green-500' : 'border-red-500 focus:border-red-500') : 'border-[#E2E8F0] dark:border-slate-700 focus:border-[#2A5D8F]'}
-                  `}
-                  placeholder="Ej. Juan Pérez"
-                />
+              <div className="flex gap-4">
+                <div className="w-1/2">
+                  <label className="block text-sm font-semibold text-[#475569] dark:text-slate-300 mb-2">
+                    Nombre(s)
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      onBlur={() => setFirstNameTouched(true)}
+                      className={`appearance-none block w-full px-4 py-3.5 bg-[#F8FAFC] dark:bg-[#1E293B] border rounded-xl shadow-sm placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#2A5D8F]/20 sm:text-sm text-[#0F172A] dark:text-white transition-all
+                        ${firstNameTouched ? (isFirstNameValid ? 'border-green-500 focus:border-green-500' : 'border-red-500 focus:border-red-500') : 'border-[#E2E8F0] dark:border-slate-700 focus:border-[#2A5D8F]'}
+                      `}
+                      placeholder="Ej. Juan"
+                    />
+                  </div>
+                  {firstNameTouched && !isFirstNameValid && (
+                    <p className="mt-1 text-sm text-red-500">Obligatorio.</p>
+                  )}
+                </div>
+                <div className="w-1/2">
+                  <label className="block text-sm font-semibold text-[#475569] dark:text-slate-300 mb-2">
+                    Apellidos
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className={`appearance-none block w-full px-4 py-3.5 bg-[#F8FAFC] dark:bg-[#1E293B] border rounded-xl shadow-sm placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#2A5D8F]/20 sm:text-sm text-[#0F172A] dark:text-white transition-all
+                        ${lastName.length > 0 ? (isLastNameValid ? 'border-green-500 focus:border-green-500' : 'border-red-500 focus:border-red-500') : 'border-[#E2E8F0] dark:border-slate-700 focus:border-[#2A5D8F]'}
+                      `}
+                      placeholder="Ej. Pérez"
+                    />
+                  </div>
+                </div>
               </div>
-              {nameTouched && !isNameValid && (
-                <p className="mt-1 text-sm text-red-500">El nombre es muy corto.</p>
-              )}
             </div>
             
             <div className="animate-fade-in-up" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>

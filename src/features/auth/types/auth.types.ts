@@ -12,7 +12,8 @@ export interface LoginResponse {
 
 export interface RegisterCommand {
   email: string;
-  passwordHash: string;
+  password: string;
   firstName: string;
   lastName: string;
+  roleId: number | string;
 }

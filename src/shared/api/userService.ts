@@ -29,22 +29,22 @@ export const userService = {
 
   // Roles
   async getRoles() {
-    const res = await api.get('/userRoles');
+    const res = await api.get('/user_roles');
     return Array.isArray(res.data) ? res.data : (res.data.items || res.data.data || []);
   },
 
   async createRole(payload: any) {
-    const res = await api.post('/userRoles', payload);
+    const res = await api.post('/user_roles', payload);
     return res.data.data || res.data;
   },
 
   async updateRole(id: number | string, payload: any) {
-    const res = await api.put(`/userRoles/${id}`, payload);
+    const res = await api.put(`/user_roles/${id}`, payload);
     return res.data.data || res.data;
   },
 
   async deleteRole(id: number | string) {
-    const res = await api.delete(`/userRoles/${id}`);
+    const res = await api.delete(`/user_roles/${id}`);
     return res.data;
   }
 };
