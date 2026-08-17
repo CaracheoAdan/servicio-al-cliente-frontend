@@ -30,7 +30,8 @@ export function UsersPage() {
     { id: 'catalogs', label: 'Catálogo de Productos' },
     { id: 'reports', label: 'Gráficas y Estadísticas' },
     { id: 'master_table', label: 'Exportar Excel' },
-    { id: 'users', label: 'Usuarios y Roles' }
+    { id: 'users', label: 'Usuarios y Roles' },
+    { id: 'full_screen', label: 'Modo Pantalla Completa (TV)' }
   ];
 
   const fetchData = async () => {
