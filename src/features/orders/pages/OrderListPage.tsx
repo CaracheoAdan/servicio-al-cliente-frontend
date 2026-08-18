@@ -97,6 +97,10 @@ export function OrderListPage() {
     setConfirmAction({ type: 'advance', order });
   };
 
+  const handleDelete = (order: any) => {
+    setConfirmAction({ type: 'delete', order });
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'open':

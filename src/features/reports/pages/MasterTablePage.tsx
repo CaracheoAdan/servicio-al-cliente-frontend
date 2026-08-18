@@ -15,13 +15,13 @@ export function MasterTablePage() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Fetch products to map product_id to product_key
-        const prodRes = await api.get('/products');
+        // Fetch products and fully hydrated orders in parallel
+        const [prodRes, orders] = await Promise.all([
+          api.get('/products'),
+          orderService.getAllCombinedOrders()
+        ]);
         const prodData = Array.isArray(prodRes.data) ? prodRes.data : (prodRes.data.items || prodRes.data.data || []);
         const productMap = new Map(prodData.map((p: any) => [p.id, p.key]));
-
-        // Fetch fully hydrated orders
-        const orders = await orderService.getAllCombinedOrders();
 
         const flattenedData: any[] = [];
 

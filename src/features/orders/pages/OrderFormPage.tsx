@@ -32,31 +32,32 @@ export function OrderFormPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const prodRes = await api.get('/products');
+        const prodPromise = api.get('/products');
+        const orderPromise = isEditing ? orderService.getOrderById(id!) : Promise.resolve(undefined);
+
+        const [prodRes, orderData] = await Promise.all([prodPromise, orderPromise]);
+
         const prodData = Array.isArray(prodRes.data) ? prodRes.data : (prodRes.data.items || prodRes.data.data || []);
         const activeProducts = prodData.filter((p: any) => p.isActive === true || p.is_active === true);
         setAvailableProducts(activeProducts);
 
-        if (isEditing) {
-          const orderData = await orderService.getOrderById(id!);
-          if (orderData) {
-            setOrderKey(orderData.key || '');
-            if (orderData.detail?.scheduledDeliveryDate || orderData.detail?.scheduled_delivery_date) {
-              setScheduledDeliveryDate((orderData.detail.scheduledDeliveryDate || orderData.detail.scheduled_delivery_date).split('T')[0]);
-            }
-            if (orderData.detail?.shippingDate || orderData.detail?.shipping_date) {
-              setShippingDate(orderData.detail.shippingDate || orderData.detail.shipping_date);
-            }
-            setStatus(orderData.status || 'open');
-            setComments(orderData.detail?.comments || '');
-            
-            if (orderData.items && orderData.items.length > 0) {
-              setItems(orderData.items.map((i: any) => ({
-                productId: i.product_id || i.productId || '',
-                orderedQuantity: i.ordered_quantity || i.orderedQuantity || 1,
-                deliveredQuantity: i.delivered_quantity || i.deliveredQuantity || 0
-              })));
-            }
+        if (orderData) {
+          setOrderKey(orderData.key || '');
+          if (orderData.detail?.scheduledDeliveryDate || orderData.detail?.scheduled_delivery_date) {
+            setScheduledDeliveryDate((orderData.detail.scheduledDeliveryDate || orderData.detail.scheduled_delivery_date).split('T')[0]);
+          }
+          if (orderData.detail?.shippingDate || orderData.detail?.shipping_date) {
+            setShippingDate(orderData.detail.shippingDate || orderData.detail.shipping_date);
+          }
+          setStatus(orderData.status || 'open');
+          setComments(orderData.detail?.comments || '');
+          
+          if (orderData.items && orderData.items.length > 0) {
+            setItems(orderData.items.map((i: any) => ({
+              productId: i.product_id || i.productId || '',
+              orderedQuantity: i.ordered_quantity || i.orderedQuantity || 1,
+              deliveredQuantity: i.delivered_quantity || i.deliveredQuantity || 0
+            })));
           }
         }
       } catch (error) {

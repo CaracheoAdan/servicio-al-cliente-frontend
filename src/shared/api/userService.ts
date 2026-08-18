@@ -7,11 +7,6 @@ export const userService = {
     return Array.isArray(res.data) ? res.data : (res.data.items || res.data.data || []);
   },
   
-  async getUserById(id: number | string) {
-    const res = await api.get(`/users/${id}`);
-    return res.data.data || res.data;
-  },
-
   async createUser(payload: any) {
     const res = await api.post('/auth/register', payload);
     return res.data.data || res.data;
