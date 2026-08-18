@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardList, Edit2, Trash2, Search, X, CheckCircle2, Clock, Inbox, Tag, Truck } from 'lucide-react';
-import { orderService } from '../../../shared/api/orderService';
+import { orderService, CombinedOrder, CreateOrderPayload } from '../../../shared/api/orderService';
 import toast from 'react-hot-toast';
 import { api } from '../../../shared/api/axiosInstance';
 import { KPICard } from '../../../shared/components/KPICard';
@@ -9,7 +9,7 @@ import { SkeletonLoader } from '../../../shared/components/SkeletonLoader';
 
 export function OrderListPage() {
   const navigate = useNavigate();
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<CombinedOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -33,7 +33,7 @@ export function OrderListPage() {
     fetchOrders();
   }, []);
 
-  const [confirmAction, setConfirmAction] = useState<{type: 'delete'|'release', order: any} | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{type: 'delete'|'release'|'advance', order: CombinedOrder} | null>(null);
 
   const proceedDelete = async (id: number) => {
     setConfirmAction(null);
@@ -61,15 +61,15 @@ export function OrderListPage() {
     }
   };
 
-  const proceedAdvanceStatus = async (order: any) => {
+  const proceedAdvanceStatus = async (order: CombinedOrder) => {
     const details = getAdvanceDetails(order.status);
     if (!details) return;
     
     setConfirmAction(null);
     try {
-      const payload: any = {
+      const payload: CreateOrderPayload = {
         key: order.key,
-        status: details.next,
+        status: details.next as CreateOrderPayload['status'],
         scheduledDeliveryDate: order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || new Date().toISOString(),
         items: order.items || []
       };
@@ -93,11 +93,11 @@ export function OrderListPage() {
     }
   };
 
-  const handleAdvanceStatus = (order: any) => {
+  const handleAdvanceStatus = (order: CombinedOrder) => {
     setConfirmAction({ type: 'advance', order });
   };
 
-  const handleDelete = (order: any) => {
+  const handleDelete = (order: CombinedOrder) => {
     setConfirmAction({ type: 'delete', order });
   };
 

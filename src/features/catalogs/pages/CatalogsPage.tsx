@@ -6,9 +6,11 @@ import { SkeletonLoader } from '../../../shared/components/SkeletonLoader';
 import { KPICard } from '../../../shared/components/KPICard';
 import { ConfirmModal } from '../../../shared/components/ConfirmModal';
 import { Card, CardHeader } from '../../../shared/components/Card';
+import { Product } from '../types/catalog.types';
+
 export function CatalogsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -47,14 +49,14 @@ export function CatalogsPage() {
     setIsModalOpen(true);
   };
 
-  const openEditModal = (p: any) => {
+  const openEditModal = (p: Product) => {
     setEditId(p.id);
     setNewKey(p.key);
-    setIsActive(p.isActive !== undefined ? p.isActive : p.is_active);
+    setIsActive(p.isActive !== undefined ? p.isActive : p.is_active || false);
     setIsModalOpen(true);
   };
 
-  const handleToggleActive = async (p: any) => {
+  const handleToggleActive = async (p: Product) => {
     const currentActive = p.isActive !== undefined ? p.isActive : p.is_active;
     try {
       await api.put(`/products/${p.id}`, { key: p.key, isActive: !currentActive });

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 import { Button } from '../../../shared/components/Button';
 
 import { AnimatedLogoContainer } from '../components/AnimatedLogoContainer';
@@ -25,37 +26,39 @@ export function LoginPage() {
         style: { borderRadius: '10px', background: '#333', color: '#fff' }
       });
       navigate('/');
-    } catch (error: any) {
+    } catch (error) {
       console.error("Login error:", error);
       let errorMsg = 'Error inesperado al intentar acceder al sistema.';
       
-      if (error.response) {
-        const status = error.response.status;
-        const serverDetail = error.response.data?.detail || error.response.data?.title || error.response.data?.message;
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          const status = error.response.status;
+          const serverDetail = error.response.data?.detail || error.response.data?.title || error.response.data?.message;
 
-        if (status === 401) {
-          errorMsg = 'El correo o la contraseña están equivocados.';
-        } else if (status === 404) {
-          errorMsg = 'No existe ninguna cuenta registrada con este correo.';
-        } else if (status === 400) {
-          errorMsg = serverDetail || 'Faltan datos o tienen un formato incorrecto.';
-        } else if (status === 403) {
-          errorMsg = 'Tu cuenta no tiene permisos para acceder o está suspendida.';
-        } else if (status >= 500) {
-          errorMsg = 'Problemas con el servidor. Intenta nuevamente más tarde.';
-        } else if (serverDetail) {
-          errorMsg = serverDetail;
-        }
-
-        // Si el backend manda un mensaje específico en 400/401, intentamos traducirlo o dar más contexto
-        const lowerDetail = serverDetail?.toLowerCase() || '';
-        if (lowerDetail.includes('not found') || lowerDetail.includes('no existe')) {
+          if (status === 401) {
+            errorMsg = 'El correo o la contraseña están equivocados.';
+          } else if (status === 404) {
             errorMsg = 'No existe ninguna cuenta registrada con este correo.';
-        } else if (lowerDetail.includes('password') || lowerDetail.includes('contraseña')) {
-            errorMsg = 'La contraseña ingresada es incorrecta.';
+          } else if (status === 400) {
+            errorMsg = serverDetail || 'Faltan datos o tienen un formato incorrecto.';
+          } else if (status === 403) {
+            errorMsg = 'Tu cuenta no tiene permisos para acceder o está suspendida.';
+          } else if (status >= 500) {
+            errorMsg = 'Problemas con el servidor. Intenta nuevamente más tarde.';
+          } else if (serverDetail) {
+            errorMsg = serverDetail;
+          }
+
+          // Si el backend manda un mensaje específico en 400/401, intentamos traducirlo o dar más contexto
+          const lowerDetail = serverDetail?.toLowerCase() || '';
+          if (lowerDetail.includes('not found') || lowerDetail.includes('no existe')) {
+              errorMsg = 'No existe ninguna cuenta registrada con este correo.';
+          } else if (lowerDetail.includes('password') || lowerDetail.includes('contraseña')) {
+              errorMsg = 'La contraseña ingresada es incorrecta.';
+          }
+        } else if (error.request) {
+          errorMsg = 'No se pudo conectar con el servidor. Revisa tu conexión a internet o intenta de nuevo.';
         }
-      } else if (error.request) {
-        errorMsg = 'No se pudo conectar con el servidor. Revisa tu conexión a internet o intenta de nuevo.';
       }
 
       toast.error(errorMsg, {

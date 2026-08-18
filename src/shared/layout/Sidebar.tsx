@@ -55,8 +55,15 @@ export function Sidebar() {
       ],
     },
   ]
+  
+  interface AuthUser {
+    firstName?: string;
+    lastName?: string;
+    role?: string;
+    permissions?: string | string[];
+  }
 
-  let user: any = null;
+  let user: AuthUser | null = null;
   try {
     const stored = localStorage.getItem('totebin_user');
     if (stored) user = JSON.parse(stored);

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart3, Clock, TrendingUp, Truck, CheckCircle2, Smile, Meh, Frown, Activity, Sun, Moon, Target } from 'lucide-react';
 import {
-
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, ReferenceArea, Cell
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, ReferenceArea, Cell, TooltipProps
 } from 'recharts';
+import { useReports, FulfillmentDataPoint, TransportDataPoint } from '../hooks/useReports';
 
 const formatTimeAxis = (val: number) => {
   const hours = Math.floor(val);
@@ -11,7 +11,7 @@ const formatTimeAxis = (val: number) => {
   return `${hours}:${mins.toString().padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`;
 };
 
-const CustomFulfillmentTooltip = ({ active, payload, label }: any) => {
+const CustomFulfillmentTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ payload: FulfillmentDataPoint }>; label?: string }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     const isPerfect = data.fulfillment === 100;
@@ -41,7 +41,7 @@ const CustomFulfillmentTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-const CustomTransportTooltip = ({ active, payload }: any) => {
+const CustomTransportTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: TransportDataPoint }> }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     const isLate = data.time > 11.5;
@@ -64,8 +64,6 @@ const CustomTransportTooltip = ({ active, payload }: any) => {
   }
   return null;
 };
-
-import { useReports } from '../hooks/useReports';
 
 const RealTimeClock = () => {
   const [time, setTime] = useState(new Date());
@@ -114,7 +112,14 @@ const RealTimeClock = () => {
   );
 };
 
-const AnimatedGauge = ({ value, faceConfig }: { value: number, faceConfig: any }) => {
+interface FaceConfig {
+  color: string;
+  emoji?: string;
+  bg?: string;
+  border?: string;
+}
+
+const AnimatedGauge = ({ value, faceConfig }: { value: number, faceConfig: FaceConfig }) => {
   const [animatedValue, setAnimatedValue] = useState(0);
   useEffect(() => {
     let start = 0;

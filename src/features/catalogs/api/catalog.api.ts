@@ -1,5 +1,5 @@
 import { api } from '../../../shared/api/axiosInstance';
-import { Product, CreateProductCommand } from '../types/catalog.types';
+import { Product, CreateProductCommand, UpdateProductCommand } from '../types/catalog.types';
 
 export const catalogApi = {
   // Products
@@ -11,7 +11,7 @@ export const catalogApi = {
     const { data } = await api.post('/products', command);
     return data;
   },
-  updateProduct: async (id: number | string, command: any): Promise<Product> => {
+  updateProduct: async (id: number | string, command: UpdateProductCommand): Promise<Product> => {
     const { data } = await api.put(`/products/${id}`, command);
     return data;
   },

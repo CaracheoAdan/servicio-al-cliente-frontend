@@ -6,9 +6,26 @@ import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
 import { SkeletonLoader } from '../../../shared/components/SkeletonLoader';
 import { Inbox } from 'lucide-react';
+import { Product } from '../../catalogs/types/catalog.types';
+import { CombinedOrder, CombinedOrderItem } from '../../../shared/api/orderService';
+
+interface MasterTableRow {
+  noOrden: string;
+  producto: string;
+  cantidadPedida: number | string;
+  fechaCompromiso: string;
+  cantidadSurtida: number | string;
+  producidoSi: string;
+  producidoNo: string;
+  salidaSi: string;
+  salidaNo: string;
+  horaEnvio: string;
+  cerrarPedido: string;
+  comentarios: string;
+}
 
 export function MasterTablePage() {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<MasterTableRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,12 +37,12 @@ export function MasterTablePage() {
           api.get('/products'),
           orderService.getAllCombinedOrders()
         ]);
-        const prodData = Array.isArray(prodRes.data) ? prodRes.data : (prodRes.data.items || prodRes.data.data || []);
-        const productMap = new Map(prodData.map((p: any) => [p.id, p.key]));
+        const prodData: Product[] = Array.isArray(prodRes.data) ? prodRes.data : (prodRes.data.items || prodRes.data.data || []);
+        const productMap = new Map(prodData.map((p: Product) => [p.id, p.key]));
 
-        const flattenedData: any[] = [];
+        const flattenedData: MasterTableRow[] = [];
 
-        orders.forEach((order: any) => {
+        orders.forEach((order: CombinedOrder) => {
           const items = order.items || [];
           const status = order.status;
           
@@ -49,7 +66,7 @@ export function MasterTablePage() {
               comentarios: order.detail.comments || ''
             });
           } else {
-            items.forEach((item: any, index: number) => {
+            items.forEach((item: CombinedOrderItem, index: number) => {
               flattenedData.push({
                 noOrden: index === 0 ? order.key : '',
                 producto: productMap.get(item.productId || item.product_id) || item.productId || item.product_id || '',

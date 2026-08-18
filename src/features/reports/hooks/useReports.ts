@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { orderService, CombinedOrder, OrderStatus } from '../../../shared/api/orderService';
 
 export interface TransportDataPoint {
+  order: string;
   time: number;
   label: string;
 }
@@ -18,6 +19,16 @@ export interface GeneralMetrics {
   onTimePct: number;
   fulfillPct: number;
   general: number;
+}
+
+export interface LatestOrder {
+  key: string;
+  status: string;
+  shippingDate: Date;
+  shippingTime: number;
+  fulfillment: number;
+  totalOrdered: number;
+  totalDelivered: number;
 }
 
 /**
@@ -72,7 +83,7 @@ export const useReports = () => {
   const { transportData, fulfillmentData, latestOrder, generalMetrics } = useMemo(() => {
     const transport: TransportDataPoint[] = [];
     const fulfillment: FulfillmentDataPoint[] = [];
-    let mostRecentOrder: any = null;
+    let mostRecentOrder: LatestOrder | null = null;
 
     orders.forEach(order => {
       // Logic for transport (only delivered or in_delivery)

@@ -5,17 +5,18 @@ import toast from 'react-hot-toast';
 import { SkeletonLoader } from '../../../shared/components/SkeletonLoader';
 import { ConfirmModal } from '../../../shared/components/ConfirmModal';
 import { Card, CardHeader } from '../../../shared/components/Card';
+import { User as UserType, UserRole } from '../types/user.types';
 
 export function UsersPage() {
   const [activeTab, setActiveTab] = useState<'users' | 'roles'>('users');
-  const [users, setUsers] = useState<any[]>([]);
-  const [roles, setRoles] = useState<any[]>([]);
+  const [users, setUsers] = useState<UserType[]>([]);
+  const [roles, setRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Modals state
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
+  const [editingItem, setEditingItem] = useState<UserType | UserRole | null>(null);
 
   // Form state
   const [userForm, setUserForm] = useState({ firstName: '', lastName: '', email: '', passwordHash: '', roleId: '' });
@@ -73,15 +74,16 @@ export function UsersPage() {
     }
   };
 
-  const handleOpenUserModal = (user?: any) => {
+  const handleOpenUserModal = (user?: UserType) => {
     if (user) {
       setEditingItem(user);
+      const u = user as UserType & { firstName?: string; first_name?: string; lastName?: string; last_name?: string };
       setUserForm({ 
-        firstName: user.firstName || user.first_name || '', 
-        lastName: user.lastName || user.last_name || '', 
+        firstName: u.firstName || u.first_name || '', 
+        lastName: u.lastName || u.last_name || '', 
         email: user.email || '', 
         passwordHash: '', // never load password 
-        roleId: user.roleId || user.role_id || '' 
+        roleId: (user.roleId || user.role_id || '').toString() 
       });
     } else {
       setEditingItem(null);
@@ -90,13 +92,14 @@ export function UsersPage() {
     setIsUserModalOpen(true);
   };
 
-  const handleOpenRoleModal = (role?: any) => {
+  const handleOpenRoleModal = (role?: UserRole) => {
     if (role) {
       setEditingItem(role);
       let perms: string[] = [];
       try {
-        if (typeof role.permissions === 'string') perms = JSON.parse(role.permissions);
-        else if (Array.isArray(role.permissions)) perms = role.permissions;
+        const r = role as UserRole & { permissions?: string | string[] };
+        if (typeof r.permissions === 'string') perms = JSON.parse(r.permissions);
+        else if (Array.isArray(r.permissions)) perms = r.permissions;
       } catch(e) {}
       setRoleForm({ name: role.name || '', permissions: perms });
     } else {
