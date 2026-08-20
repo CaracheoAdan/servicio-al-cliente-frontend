@@ -1,6 +1,8 @@
 export interface User {
   id: number;
   email: string;
+  firstName: string;
+  lastName: string;
   name?: string;
   roleId?: number;
   role_id?: number;
@@ -15,16 +17,24 @@ export interface UserRole {
 
 export interface CreateUserPayload {
   email: string;
-  password?: string;
-  name?: string;
-  roleId?: number;
+  password: string;
+  firstName: string;
+  lastName: string;
+  roleId: number;
 }
 
-export interface UpdateUserPayload {
+export interface UpdateUserInfoPayload {
+  id: string;
   email?: string;
   name?: string;
   roleId?: number;
   isActive?: boolean;
+}
+
+export interface UpdateUserPasswordPayload {
+  id: string;
+  currentPassword: string;
+  newPassword: string;
 }
 
 export interface CreateRolePayload {

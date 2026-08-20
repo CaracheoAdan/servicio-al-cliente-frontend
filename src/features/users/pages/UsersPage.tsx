@@ -19,7 +19,7 @@ export function UsersPage() {
   const [editingItem, setEditingItem] = useState<UserType | UserRole | null>(null);
 
   // Form state
-  const [userForm, setUserForm] = useState({ firstName: '', lastName: '', email: '', passwordHash: '', roleId: '' });
+  const [userForm, setUserForm] = useState({ id: '', firstName: '', lastName: '', email: '', passwordHash: '', roleId: '' });
   const [roleForm, setRoleForm] = useState<{ name: string; permissions: string[] }>({ name: '', permissions: [] });
 
   // Delete modal state
@@ -78,12 +78,12 @@ export function UsersPage() {
     if (user) {
       setEditingItem(user);
       const u = user as UserType & { firstName?: string; first_name?: string; lastName?: string; last_name?: string };
-      setUserForm({ 
-        firstName: u.firstName || u.first_name || '', 
-        lastName: u.lastName || u.last_name || '', 
-        email: user.email || '', 
-        passwordHash: '', // never load password 
-        roleId: (user.roleId || user.role_id || '').toString() 
+      setUserForm({
+        firstName: u.firstName || u.first_name || '',
+        lastName: u.lastName || u.last_name || '',
+        email: user.email || '',
+        passwordHash: '', // never load password
+        roleId: (user.roleId || user.role_id || '').toString()
       });
     } else {
       setEditingItem(null);
@@ -113,6 +113,7 @@ export function UsersPage() {
     e.preventDefault();
     try {
       const payload = {
+        id: userForm.id,
         firstName: userForm.firstName,
         lastName: userForm.lastName,
         email: userForm.email,
@@ -123,7 +124,7 @@ export function UsersPage() {
 
       if (editingItem) {
         // If editing and password is empty, ideally backend ignores it.
-        await userService.updateUser(editingItem.id, payload);
+        await userService.updateUserInfo(editingItem.id, payload);
         toast.success('Usuario actualizado');
       } else {
         await userService.createUser(payload);
@@ -181,7 +182,7 @@ export function UsersPage() {
           </button>
         </div>
         <div className="z-10">
-          <button 
+          <button
             onClick={() => activeTab === 'users' ? handleOpenUserModal() : handleOpenRoleModal()}
             className="bg-[#2A5D8F] hover:bg-[#1E4D73] disabled:opacity-60 text-white px-6 py-3.5 rounded-2xl font-display font-bold shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all flex items-center gap-2 text-sm whitespace-nowrap"
           >
@@ -189,7 +190,7 @@ export function UsersPage() {
           </button>
         </div>
       </CardHeader>
-      
+
       <div className="flex-1 bg-white dark:bg-[#0F172A] rounded-b-2xl overflow-hidden">
         {loading ? (
           <div className="p-6">
@@ -235,7 +236,7 @@ export function UsersPage() {
                         return (
                           <tr key={user.id} className="hover:bg-[#EFF6FF] dark:hover:bg-gray-800/50 transition-colors group relative border-l-4 border-l-[#2A5D8F] dark:text-gray-300">
                             <td className="px-8 py-5">
-                              <div className="font-display font-bold text-[#0F172A] dark:text-white text-sm">{user.firstName || user.first_name} {user.lastName || user.last_name}</div>
+                              <div className="font-display font-bold text-[#0F172A] dark:text-white text-sm">{user.firstName} {user.lastName}</div>
                               <div className="text-xs text-[#64748B] dark:text-gray-400 font-mono mt-0.5">{user.email}</div>
                             </td>
                             <td className="px-8 py-5">
@@ -245,13 +246,13 @@ export function UsersPage() {
                             </td>
                             <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium overflow-hidden">
                               <div className="flex justify-end space-x-2 md:translate-x-12 opacity-100 md:opacity-0 md:group-hover:translate-x-0 md:group-hover:opacity-100 transition-all duration-300 ease-out">
-                                <button 
+                                <button
                                   onClick={() => handleOpenUserModal(user)}
                                   className="flex items-center text-[#2A5D8F] bg-[#EFF6FF] dark:bg-blue-900/30 hover:bg-[#DBEAFE] dark:hover:bg-blue-900/50 px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
                                 >
                                   <Edit2 className="w-4 h-4 mr-1.5" /> Editar
                                 </button>
-                                <button 
+                                <button
                                   onClick={() => setConfirmDelete({ id: user.id, type: 'user' })}
                                   className="flex items-center text-[#DC2626] bg-[#FEF2F2] dark:bg-red-900/30 hover:bg-[#FEE2E2] dark:hover:bg-red-900/50 px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
                                 >
@@ -319,13 +320,13 @@ export function UsersPage() {
                           </td>
                           <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium overflow-hidden">
                             <div className="flex justify-end space-x-2 md:translate-x-12 opacity-100 md:opacity-0 md:group-hover:translate-x-0 md:group-hover:opacity-100 transition-all duration-300 ease-out">
-                              <button 
+                              <button
                                 onClick={() => handleOpenRoleModal(role)}
                                 className="flex items-center text-[#D97706] bg-[#FEF3C7] dark:bg-yellow-900/30 hover:bg-[#FDE68A] dark:hover:bg-yellow-900/50 px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
                               >
                                 <Edit2 className="w-4 h-4 mr-1.5" /> Editar
                               </button>
-                              <button 
+                              <button
                                 onClick={() => setConfirmDelete({ id: role.id, type: 'role' })}
                                 className="flex items-center text-[#DC2626] bg-[#FEF2F2] dark:bg-red-900/30 hover:bg-[#FEE2E2] dark:hover:bg-red-900/50 px-3 py-2 rounded-xl transition-colors font-display font-bold text-xs"
                               >
@@ -468,8 +469,8 @@ export function UsersPage() {
                     {pages.map(page => (
                       <label key={page.id} className="flex items-center gap-3 cursor-pointer group">
                         <div className="relative flex items-center">
-                          <input 
-                            type="checkbox" 
+                          <input
+                            type="checkbox"
                             className="peer appearance-none w-5 h-5 border-2 border-[#CBD5E1] rounded-md checked:bg-[#2A5D8F] checked:border-[#2A5D8F] transition-all cursor-pointer"
                             checked={roleForm.permissions.includes(page.id)}
                             onChange={(e) => {

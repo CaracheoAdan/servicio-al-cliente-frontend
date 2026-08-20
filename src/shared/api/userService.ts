@@ -1,5 +1,5 @@
 import { api } from './axiosInstance';
-import { User, UserRole, CreateUserPayload, UpdateUserPayload, CreateRolePayload } from '../../features/users/types/user.types';
+import { User, UserRole, CreateUserPayload, UpdateUserInfoPayload, UpdateUserPasswordPayload, CreateRolePayload } from '../../features/users/types/user.types';
 
 export const userService = {
   // Users
@@ -13,8 +13,13 @@ export const userService = {
     return res.data.data || res.data;
   },
 
-  async updateUser(id: number | string, payload: UpdateUserPayload): Promise<User> {
+  async updateUserInfo(id: number, payload: UpdateUserInfoPayload): Promise<User> {
     const res = await api.put(`/users/${id}`, payload);
+    return res.data.data || res.data;
+  },
+
+  async updateUserPassword(id: number, payload: UpdateUserPasswordPayload): Promise<User> {
+    const res = await api.put(`/users/${id}/update_password`, payload);
     return res.data.data || res.data;
   },
 
