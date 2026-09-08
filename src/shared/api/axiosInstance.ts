@@ -26,18 +26,19 @@ api.interceptors.response.use(
     // Let's import it at the top.
     
     let message = 'Ocurrió un error inesperado';
-    const isLoginEndpoint = error.config?.url?.includes('/auth/login');
+    const isAuthEndpoint = error.config?.url?.includes('/auth/login') || error.config?.url?.includes('/auth/register');
     let shouldShowToast = true;
 
     if (error.response) {
+      const serverDetail = error.response.data?.detail || error.response.data?.title;
       switch (error.response.status) {
         case 400:
-          message = 'Petición inválida. Verifica los datos.';
-          if (isLoginEndpoint) shouldShowToast = false; // Manejado en LoginPage
+          message = serverDetail || 'Petición inválida. Verifica los datos.';
+          if (isAuthEndpoint) shouldShowToast = false;
           break;
         case 401:
-          if (isLoginEndpoint) {
-            shouldShowToast = false; // Manejado en LoginPage
+          if (isAuthEndpoint) {
+            shouldShowToast = false;
           } else {
             message = 'Sesión expirada. Por favor, inicia sesión nuevamente.';
             localStorage.removeItem('totebin_token');
@@ -48,11 +49,15 @@ api.interceptors.response.use(
           break;
         case 403:
           message = 'No tienes permisos para realizar esta acción.';
-          if (isLoginEndpoint) shouldShowToast = false;
+          if (isAuthEndpoint) shouldShowToast = false;
           break;
         case 404:
           message = 'Recurso no encontrado.';
-          if (isLoginEndpoint) shouldShowToast = false;
+          if (isAuthEndpoint) shouldShowToast = false;
+          break;
+        case 409:
+          message = serverDetail || 'Conflicto: el registro ya existe.';
+          if (isAuthEndpoint) shouldShowToast = false;
           break;
         case 500:
           message = 'Error interno del servidor. Contacta a soporte.';
@@ -60,7 +65,7 @@ api.interceptors.response.use(
       }
     } else if (error.request) {
       message = 'No hay conexión con el servidor. Revisa tu red.';
-      if (isLoginEndpoint) shouldShowToast = false;
+      if (isAuthEndpoint) shouldShowToast = false;
     }
     
     // We import toast dynamically to avoid breaking tests or pure Node contexts

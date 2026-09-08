@@ -18,8 +18,9 @@ export function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    const cleanEmail = email.trim().toLowerCase();
     try {
-      const response = await authApi.login({ email, password });
+      const response = await authApi.login({ email: cleanEmail, password });
       localStorage.setItem('totebin_token', response.accessToken);
       localStorage.setItem('totebin_user', JSON.stringify(response.user));
       toast.success(`Bienvenido, ${response.user.firstName}!`, {
@@ -36,7 +37,7 @@ export function LoginPage() {
           const serverDetail = error.response.data?.detail || error.response.data?.title || error.response.data?.message;
 
           if (status === 401) {
-            errorMsg = 'El correo o la contraseña están equivocados.';
+            errorMsg = 'El correo o la contraseña son incorrectos.';
           } else if (status === 404) {
             errorMsg = 'No existe ninguna cuenta registrada con este correo.';
           } else if (status === 400) {
@@ -53,7 +54,9 @@ export function LoginPage() {
           const lowerDetail = serverDetail?.toLowerCase() || '';
           if (lowerDetail.includes('not found') || lowerDetail.includes('no existe')) {
               errorMsg = 'No existe ninguna cuenta registrada con este correo.';
-          } else if (lowerDetail.includes('password') || lowerDetail.includes('contraseña')) {
+          } else if (lowerDetail.includes('invalid credentials') || lowerDetail.includes('invalid email or password')) {
+              errorMsg = 'El correo o la contraseña son incorrectos.';
+          } else if (lowerDetail.includes('password') && !lowerDetail.includes('email')) {
               errorMsg = 'La contraseña ingresada es incorrecta.';
           }
         } else if (error.request) {

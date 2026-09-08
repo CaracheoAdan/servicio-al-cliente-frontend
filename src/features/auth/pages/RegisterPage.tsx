@@ -9,40 +9,77 @@ export function RegisterPage() {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   
   const [firstNameTouched, setFirstNameTouched] = useState(false);
+  const [lastNameTouched, setLastNameTouched] = useState(false);
   const [emailTouched, setEmailTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
   
   const navigate = useNavigate();
 
+  const isFirstNameValid = firstName.trim().length >= 3;
+  const isLastNameValid = lastName.trim().length >= 3;
+  const isEmailValid = email.includes('@') && email.includes('.');
+  const isPasswordValid = password.length >= 8;
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isFirstNameValid || !isLastNameValid || !isEmailValid || !isPasswordValid) {
+      setFirstNameTouched(true);
+      setLastNameTouched(true);
+      setEmailTouched(true);
+      setPasswordTouched(true);
+      toast.error('Por favor completa todos los campos correctamente.');
+      return;
+    }
+
+    setIsLoading(true);
     try {
       // Usamos roleId 2 por defecto para usuarios normales
-      const res = await authApi.register({ 
-        email, 
+      await authApi.register({ 
+        email: email.trim().toLowerCase(), 
         password, 
-        firstName, 
-        lastName,
+        firstName: firstName.trim(), 
+        lastName: lastName.trim(),
         roleId: 2 
       });
       toast.success('Usuario registrado exitosamente. Ahora puedes iniciar sesión.', {
         style: { borderRadius: '10px', background: '#333', color: '#fff' }
       });
       navigate('/login');
-    } catch (error) {
+    } catch (error: any) {
       console.error("Register error:", error);
-      toast.error('Error al registrar. Verifica tu backend o si el correo ya existe.', {
-        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      let errorMsg = 'Error al registrar la cuenta. Verifica los datos.';
+      if (error?.response) {
+        const status = error.response.status;
+        const data = error.response.data;
+        if (status === 409 || data?.title === 'User.EmailAlreadyExists') {
+          errorMsg = 'Este correo electrónico ya se encuentra registrado. Intenta iniciar sesión o usa otro correo.';
+        } else if (status === 400) {
+          if (data?.errors) {
+            const firstKey = Object.keys(data.errors)[0];
+            const messages = data.errors[firstKey];
+            if (Array.isArray(messages) && messages.length > 0) {
+              errorMsg = messages[0];
+            }
+          } else if (data?.detail) {
+            errorMsg = data.detail;
+          }
+        } else if (status >= 500) {
+          errorMsg = 'Error en el servidor. Intenta nuevamente más tarde.';
+        }
+      } else if (error?.request) {
+        errorMsg = 'No se pudo conectar con el servidor. Verifica tu conexión.';
+      }
+      toast.error(errorMsg, {
+        style: { borderRadius: '10px', background: '#EF4444', color: '#fff', fontWeight: 'bold' },
+        duration: 5000,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  const isFirstNameValid = firstName.length >= 2;
-  const isLastNameValid = lastName.length >= 2;
-  const isEmailValid = email.includes('@') && email.includes('.');
-  const isPasswordValid = password.length >= 6;
 
   return (
     <div className="min-h-screen flex flex-row-reverse font-sans bg-white dark:bg-[#0B1120]">
@@ -102,7 +139,7 @@ export function RegisterPage() {
                     />
                   </div>
                   {firstNameTouched && !isFirstNameValid && (
-                    <p className="mt-1 text-sm text-red-500">Obligatorio.</p>
+                    <p className="mt-1 text-sm text-red-500">Mínimo 3 caracteres.</p>
                   )}
                 </div>
                 <div className="w-1/2">
@@ -115,12 +152,16 @@ export function RegisterPage() {
                       required
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
+                      onBlur={() => setLastNameTouched(true)}
                       className={`appearance-none block w-full px-4 py-3.5 bg-[#F8FAFC] dark:bg-[#1E293B] border rounded-xl shadow-sm placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#2A5D8F]/20 sm:text-sm text-[#0F172A] dark:text-white transition-all
-                        ${lastName.length > 0 ? (isLastNameValid ? 'border-green-500 focus:border-green-500' : 'border-red-500 focus:border-red-500') : 'border-[#E2E8F0] dark:border-slate-700 focus:border-[#2A5D8F]'}
+                        ${lastNameTouched ? (isLastNameValid ? 'border-green-500 focus:border-green-500' : 'border-red-500 focus:border-red-500') : 'border-[#E2E8F0] dark:border-slate-700 focus:border-[#2A5D8F]'}
                       `}
                       placeholder="Ej. Pérez"
                     />
                   </div>
+                  {lastNameTouched && !isLastNameValid && (
+                    <p className="mt-1 text-sm text-red-500">Mínimo 3 caracteres.</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -165,13 +206,13 @@ export function RegisterPage() {
                 />
               </div>
               {passwordTouched && !isPasswordValid && (
-                <p className="mt-1 text-sm text-red-500">Mínimo 6 caracteres.</p>
+                <p className="mt-1 text-sm text-red-500">Mínimo 8 caracteres.</p>
               )}
             </div>
 
             <div className="animate-fade-in-up" style={{ animationDelay: '0.5s', animationFillMode: 'both' }}>
-              <Button type="submit" className="w-full flex justify-center py-3.5 text-base font-bold shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all">
-                Registrar Usuario
+              <Button type="submit" isLoading={isLoading} disabled={isLoading} className="w-full flex justify-center py-3.5 text-base font-bold shadow-[0_4px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-1 transition-all">
+                {isLoading ? 'Registrando...' : 'Registrar Usuario'}
               </Button>
             </div>
 
