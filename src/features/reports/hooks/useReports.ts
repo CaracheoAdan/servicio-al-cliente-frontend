@@ -72,7 +72,14 @@ export const calculateDecimalTime = (dateString: string): number | null => {
 /**
  * Hook to fetch and compute reports data
  */
-export const useReports = () => {
+export const useReports = (): {
+  loading: boolean;
+  error: Error | null;
+  transportData: TransportDataPoint[];
+  fulfillmentData: FulfillmentDataPoint[];
+  latestOrder: LatestOrder | null;
+  generalMetrics: GeneralMetrics;
+} => {
   const { data: orders = [], isLoading: loading, error } = useQuery<CombinedOrder[], Error>({
     queryKey: ['combinedOrders'],
     queryFn: () => orderService.getAllCombinedOrders(),

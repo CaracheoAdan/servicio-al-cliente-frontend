@@ -41,8 +41,7 @@ export function RegisterPage() {
         email: email.trim().toLowerCase(), 
         password, 
         firstName: firstName.trim(), 
-        lastName: lastName.trim(),
-        roleId: 2 
+        lastName: lastName.trim()
       });
       toast.success('Usuario registrado exitosamente. Ahora puedes iniciar sesión.', {
         style: { borderRadius: '10px', background: '#333', color: '#fff' }

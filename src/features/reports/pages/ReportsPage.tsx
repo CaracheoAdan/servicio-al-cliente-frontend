@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart3, Clock, TrendingUp, Truck, CheckCircle2, Smile, Meh, Frown, Activity, Sun, Moon, Target } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { BarChart3, Clock, TrendingUp, Truck, CheckCircle2, Activity, Sun, Moon, Target } from 'lucide-react';
 import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, ReferenceArea, Cell, TooltipProps
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, ReferenceArea, Cell
 } from 'recharts';
 import { useReports, FulfillmentDataPoint, TransportDataPoint } from '../hooks/useReports';
 
@@ -176,7 +176,7 @@ export function ReportsPage() {
   if (error) {
     return (
       <div className="flex justify-center items-center h-64 bg-white rounded-2xl shadow-card-base border border-red-200">
-        <p className="text-red-500 font-bold">{error}</p>
+        <p className="text-red-500 font-bold">{error.message}</p>
       </div>
     );
   }
@@ -400,7 +400,7 @@ export function ReportsPage() {
                         radius={[8, 8, 0, 0]}
                         barSize={48}
                         animationDuration={1500}
-                        label={{ position: 'top', fill: '#0F172A', fontSize: 12, fontWeight: 'bold', fontFamily: 'IBM Plex Mono', formatter: (val: number) => `${val}%` }}
+                        label={{ position: 'top', fill: '#0F172A', fontSize: 12, fontWeight: 'bold', fontFamily: 'IBM Plex Mono', formatter: ((val: number) => `${val}%`) as any }}
                       >
                         {fulfillmentData.map((entry, index) => (
                           <Cell 

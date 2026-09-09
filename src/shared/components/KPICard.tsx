@@ -25,28 +25,31 @@ export function KPICard({
   const [displayValue, setDisplayValue] = useState(0);
   const numericValue = typeof value === 'number' ? value : parseFloat(value as string) || 0;
   
-  // Count-up animation
+  // Count-up animation using requestAnimationFrame for smooth rendering
   useEffect(() => {
-    let start = 0;
-    const duration = 1500;
-    const increment = numericValue / (duration / 16); // 60fps
-    
-    if (numericValue === 0) {
-      setDisplayValue(0);
+    if (numericValue <= 0) {
+      setDisplayValue(numericValue);
       return;
     }
 
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= numericValue) {
-        clearInterval(timer);
-        setDisplayValue(numericValue);
-      } else {
-        setDisplayValue(start);
-      }
-    }, 16);
+    const duration = 1500; // ms
+    let startTime: number | null = null;
+    let rafId: number;
 
-    return () => clearInterval(timer);
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      setDisplayValue(progress * numericValue);
+
+      if (progress < 1) {
+        rafId = requestAnimationFrame(animate);
+      }
+    };
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
   }, [numericValue]);
 
   const formattedValue = isPercentage 
@@ -73,7 +76,7 @@ export function KPICard({
       <div className="flex items-start justify-between relative z-10">
         <div className="flex items-center gap-3">
           <div className={`p-2.5 rounded-xl bg-white dark:bg-[#0F172A] border border-[#E2E8F0] dark:border-[#334155] shadow-sm transition-transform group-hover:scale-110`}>
-            {React.cloneElement(icon as React.ReactElement, { className: `w-5 h-5 ${iconColorClass}` })}
+            {React.cloneElement(icon as React.ReactElement<any>, { className: `w-5 h-5 ${iconColorClass}` })}
           </div>
           <div>
             <div className="text-[10px] font-display font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-wide">{title}</div>

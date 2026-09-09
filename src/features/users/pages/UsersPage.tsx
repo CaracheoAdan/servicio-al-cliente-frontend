@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Plus, Edit2, Trash2, Shield, User, Inbox, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Shield, User, X } from 'lucide-react';
 import { userService } from '../../../shared/api/userService';
 import toast from 'react-hot-toast';
 import { SkeletonLoader } from '../../../shared/components/SkeletonLoader';

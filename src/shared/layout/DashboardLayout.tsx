@@ -2,29 +2,18 @@ import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
+import { useAuth } from '../context/AuthContext'
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [transitionKey, setTransitionKey] = useState(location.pathname);
+  const { hasPermission } = useAuth();
 
   useEffect(() => {
     setTransitionKey(location.pathname);
   }, [location.pathname]);
 
-  let userPermissions: string[] = [];
-  try {
-    const stored = localStorage.getItem('totebin_user');
-    if (stored) {
-      const user = JSON.parse(stored);
-      if (user?.permissions && typeof user.permissions === 'string') {
-        userPermissions = JSON.parse(user.permissions);
-      } else if (Array.isArray(user?.permissions)) {
-        userPermissions = user.permissions;
-      }
-    }
-  } catch (e) {}
-
-  const isFullScreen = userPermissions.includes('full_screen');
+  const isFullScreen = hasPermission('full_screen');
 
   return (
     <div className="dashboard-shell flex h-screen overflow-hidden font-body relative transition-colors duration-300">

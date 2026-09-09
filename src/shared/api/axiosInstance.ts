@@ -1,7 +1,10 @@
 import axios from 'axios';
+import toast from 'react-hot-toast';
+import { AUTH_SESSION_EXPIRED_EVENT } from '../context/AuthContext';
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5041/api/v1',
+  timeout: 15000, // 15 second timeout to prevent hanging requests
   headers: {
     'Content-Type': 'application/json',
   },
@@ -20,11 +23,6 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Only import toast dynamically if we want to avoid circular deps or just statically if possible,
-    // but axiosInstance is pure so we can statically import toast.
-    // wait, we can't import toast directly here if it causes a circular dependency, but usually it doesn't.
-    // Let's import it at the top.
-    
     let message = 'Ocurrió un error inesperado';
     const isAuthEndpoint = error.config?.url?.includes('/auth/login') || error.config?.url?.includes('/auth/register');
     let shouldShowToast = true;
@@ -41,10 +39,8 @@ api.interceptors.response.use(
             shouldShowToast = false;
           } else {
             message = 'Sesión expirada. Por favor, inicia sesión nuevamente.';
-            localStorage.removeItem('totebin_token');
-            if (window.location.pathname !== '/login') {
-              window.location.href = '/login';
-            }
+            // Dispatch event — AuthContext will handle cleanup and redirect via React Router
+            window.dispatchEvent(new CustomEvent(AUTH_SESSION_EXPIRED_EVENT));
           }
           break;
         case 403:
@@ -59,8 +55,20 @@ api.interceptors.response.use(
           message = serverDetail || 'Conflicto: el registro ya existe.';
           if (isAuthEndpoint) shouldShowToast = false;
           break;
+        case 422:
+          message = serverDetail || 'Los datos enviados no son válidos.';
+          if (isAuthEndpoint) shouldShowToast = false;
+          break;
+        case 429:
+          message = 'Demasiadas solicitudes. Espera un momento e intenta de nuevo.';
+          break;
         case 500:
           message = 'Error interno del servidor. Contacta a soporte.';
+          break;
+        default:
+          if (error.response.status >= 500) {
+            message = 'Error en el servidor. Intenta nuevamente más tarde.';
+          }
           break;
       }
     } else if (error.request) {
@@ -68,11 +76,8 @@ api.interceptors.response.use(
       if (isAuthEndpoint) shouldShowToast = false;
     }
     
-    // We import toast dynamically to avoid breaking tests or pure Node contexts
     if (shouldShowToast) {
-      import('react-hot-toast').then(({ toast }) => {
-        toast.error(message, { id: 'global-axios-error' }); // Use id to prevent duplicate toasts
-      });
+      toast.error(message, { id: 'global-axios-error' });
     }
 
     return Promise.reject(error);

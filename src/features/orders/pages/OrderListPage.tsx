@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Edit2, Trash2, Search, X, CheckCircle2, Clock, Inbox, Tag, Truck } from 'lucide-react';
+import { ClipboardList, Edit2, Trash2, Search, X, CheckCircle2, Clock, Tag, Truck } from 'lucide-react';
 import { orderService, CombinedOrder, CreateOrderPayload } from '../../../shared/api/orderService';
 import toast from 'react-hot-toast';
 import { api } from '../../../shared/api/axiosInstance';
@@ -318,7 +318,7 @@ export function OrderListPage() {
                       {getStatusBadge(order.status?.toLowerCase())}
                     </td>
                     <td className="px-8 py-5 whitespace-nowrap">
-                      <div className="text-sm font-mono text-[#475569] font-medium">{formatDate(order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || order.scheduled_delivery_date)}</div>
+                      <div className="text-sm font-mono text-[#475569] font-medium">{formatDate(order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date || order.scheduled_delivery_date || '')}</div>
                     </td>
                     <td className="px-8 py-5 whitespace-nowrap text-right text-sm font-medium overflow-hidden">
                       <div className="flex justify-end space-x-2 md:translate-x-12 opacity-100 md:opacity-0 md:group-hover:translate-x-0 md:group-hover:opacity-100 transition-all duration-300 ease-out">

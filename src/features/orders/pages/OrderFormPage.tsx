@@ -45,17 +45,17 @@ export function OrderFormPage() {
         if (orderData) {
           setOrderKey(orderData.key || '');
           if (orderData.detail?.scheduledDeliveryDate || orderData.detail?.scheduled_delivery_date) {
-            setScheduledDeliveryDate((orderData.detail.scheduledDeliveryDate || orderData.detail.scheduled_delivery_date).split('T')[0]);
+            setScheduledDeliveryDate((orderData.detail.scheduledDeliveryDate || orderData.detail.scheduled_delivery_date!).split('T')[0]);
           }
           if (orderData.detail?.shippingDate || orderData.detail?.shipping_date) {
-            setShippingDate(orderData.detail.shippingDate || orderData.detail.shipping_date);
+            setShippingDate(orderData.detail.shippingDate || orderData.detail.shipping_date || null);
           }
-          setStatus(orderData.status || 'open');
+          setStatus((orderData.status?.toString().toLowerCase() || 'open') as OrderStatus);
           setComments(orderData.detail?.comments || '');
           
           if (orderData.items && orderData.items.length > 0) {
             setItems(orderData.items.map((i: CombinedOrderItem) => ({
-              productId: i.product_id || i.productId || '',
+              productId: String(i.product_id || i.productId || ''),
               orderedQuantity: i.ordered_quantity || i.orderedQuantity || 1,
               deliveredQuantity: i.delivered_quantity || i.deliveredQuantity || 0
             })));
@@ -143,9 +143,9 @@ export function OrderFormPage() {
         scheduledDeliveryDate: scheduledDeliveryDate,
         comments: comments,
         items: items.map(item => ({
-          productId: parseInt(item.productId as string, 10),
-          orderedQuantity: parseInt(item.orderedQuantity as string, 10),
-          deliveredQuantity: parseInt(item.deliveredQuantity as string, 10) || 0
+          productId: Number(item.productId),
+          orderedQuantity: Number(item.orderedQuantity),
+          deliveredQuantity: Number(item.deliveredQuantity) || 0
         }))
       };
 

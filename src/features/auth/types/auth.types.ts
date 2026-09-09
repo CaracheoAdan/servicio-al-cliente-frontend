@@ -1,6 +1,6 @@
 export interface LoginCredentials {
-  email?: string;
-  password?: string;
+  email: string;
+  password: string;
 }
 
 export interface LoginResponse {
@@ -12,6 +12,7 @@ export interface LoginResponse {
     firstName: string;
     lastName: string;
     role: string;
+    permissions?: string | string[];
   };
 }
 
@@ -20,5 +21,4 @@ export interface RegisterCommand {
   password: string;
   firstName: string;
   lastName: string;
-  roleId: number | string;
 }

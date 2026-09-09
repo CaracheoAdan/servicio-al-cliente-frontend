@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 type Variant = 'forklifts' | 'drones' | 'tanks' | 'humanoids' | 'crane';
 
