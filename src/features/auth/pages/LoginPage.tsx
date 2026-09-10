@@ -23,8 +23,8 @@ export function LoginPage() {
     const cleanEmail = email.trim().toLowerCase();
     try {
       const response = await authApi.login({ email: cleanEmail, password });
-      login(response as unknown as Record<string, unknown>);
-      toast.success(`Bienvenido, ${response.firstName || response.email}!`, {
+      login(response.accessToken, response.user as unknown as Record<string, unknown>);
+      toast.success(`Bienvenido, ${response.user.firstName}!`, {
         style: { borderRadius: '10px', background: '#333', color: '#fff' }
       });
       navigate('/');

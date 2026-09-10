@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
+import { isTokenExpired } from '../utils/jwt';
 
 // ─── Storage Keys ────────────────────────────────────────────────
 export const AUTH_STORAGE_KEYS = {
+  TOKEN: 'totebin_token',
   USER: 'totebin_user',
   USER_NAME: 'totebin_user_name',
 } as const;
@@ -20,10 +22,11 @@ export interface AuthUser {
 }
 
 interface AuthContextType {
+  token: string | null;
   user: AuthUser | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  login: (userData: Record<string, unknown>) => void;
+  login: (token: string, userData: Record<string, unknown>) => void;
   logout: () => void;
   hasPermission: (permission: string) => boolean;
 }
@@ -66,20 +69,34 @@ function clearAuthStorage(): void {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [token, setToken] = useState<string | null>(() => {
+    const stored = localStorage.getItem(AUTH_STORAGE_KEYS.TOKEN);
+    if (!stored) return null;
+    if (isTokenExpired(stored)) {
+      clearAuthStorage();
+      return null;
+    }
+    return stored;
+  });
+
   const [user, setUser] = useState<AuthUser | null>(() => {
+    if (!localStorage.getItem(AUTH_STORAGE_KEYS.TOKEN)) return null;
     return parseStoredUser();
   });
 
   // ── Logout ──────────────────────────────────────────────────
   const logout = useCallback(() => {
     clearAuthStorage();
+    setToken(null);
     setUser(null);
   }, []);
 
   // ── Login ───────────────────────────────────────────────────
-  const login = useCallback((userData: Record<string, unknown>) => {
+  const login = useCallback((newToken: string, userData: Record<string, unknown>) => {
+    localStorage.setItem(AUTH_STORAGE_KEYS.TOKEN, newToken);
     localStorage.setItem(AUTH_STORAGE_KEYS.USER, JSON.stringify(userData));
 
+    setToken(newToken);
     setUser({
       id: userData.id as number,
       email: (userData.email as string) || '',
@@ -97,6 +114,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener(AUTH_SESSION_EXPIRED_EVENT, handler);
   }, [logout]);
 
+  // ── Periodically check JWT expiration (every 60 seconds) ──
+  useEffect(() => {
+    if (!token) return;
+    const interval = setInterval(() => {
+      if (isTokenExpired(token)) {
+        logout();
+      }
+    }, 60_000);
+    return () => clearInterval(interval);
+  }, [token, logout]);
+
   // ── Derived state ─────────────────────────────────────────
   const isAdmin = useMemo(() => {
     return !!user?.role && user.role.toLowerCase().includes('admin');
@@ -110,11 +138,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [isAdmin, user?.permissions],
   );
 
-  const isAuthenticated = !!user;
+  const isAuthenticated = !!token && !!user;
 
   const value = useMemo<AuthContextType>(
-    () => ({ user, isAuthenticated, isAdmin, login, logout, hasPermission }),
-    [user, isAuthenticated, isAdmin, login, logout, hasPermission],
+    () => ({ token, user, isAuthenticated, isAdmin, login, logout, hasPermission }),
+    [token, user, isAuthenticated, isAdmin, login, logout, hasPermission],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

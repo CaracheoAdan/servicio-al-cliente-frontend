@@ -4,12 +4,16 @@ export interface LoginCredentials {
 }
 
 export interface LoginResponse {
-  id: number;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  permissions?: string | string[];
+  accessToken: string;
+  tokenType: string;
+  user: {
+    id: number;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    permissions?: string | string[];
+  };
 }
 
 export interface RegisterCommand {

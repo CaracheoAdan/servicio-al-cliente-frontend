@@ -5,10 +5,18 @@ import { AUTH_SESSION_EXPIRED_EVENT } from '../context/AuthContext';
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5041/api/v1',
   timeout: 15000, // 15 second timeout to prevent hanging requests
-  withCredentials: true, // Crucial para enviar las cookies HttpOnly (access_token, refresh_token) automáticamente
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// Interceptor para inyectar el token JWT en cada petición
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('totebin_token');
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // Interceptor global para manejo de errores
