@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { AlertTriangle, AlertCircle, Info, X } from 'lucide-react';
 import { Button } from './Button';
 
@@ -23,6 +23,9 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onConfirm,
   onCancel
 }) => {
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Escape key handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -32,6 +35,23 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onCancel]);
+
+  // Body scroll lock when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
+  // Focus trap — focus the dialog when it opens
+  useEffect(() => {
+    if (isOpen && dialogRef.current) {
+      dialogRef.current.focus();
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -56,11 +76,17 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   const config = variantConfig[variant];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F172A]/60 dark:bg-[#0F172A]/80 backdrop-blur-sm animate-fade-in">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F172A]/60 dark:bg-[#0F172A]/80 backdrop-blur-sm animate-fade-in"
+      onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
+    >
       <div 
+        ref={dialogRef}
         className="bg-white dark:bg-[#1E293B] rounded-2xl shadow-2xl w-full max-w-md p-6 lg:p-8 font-body border border-[#E2E8F0] dark:border-slate-700 animate-fade-in-up transition-all"
         role="dialog"
         aria-modal="true"
+        aria-labelledby="confirm-modal-title"
+        tabIndex={-1}
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
@@ -68,7 +94,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
               {config.icon}
             </div>
             <div>
-              <h3 className="font-display font-bold text-[#0F172A] dark:text-white text-xl">
+              <h3 id="confirm-modal-title" className="font-display font-bold text-[#0F172A] dark:text-white text-xl">
                 {title}
               </h3>
             </div>

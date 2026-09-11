@@ -1,6 +1,7 @@
-import React from 'react'
+
 import { useNavigate, useLocation } from 'react-router-dom'
 import { LogOut } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 
 const routeMeta: Record<string, { breadcrumb: string; title: string; subtitle: string }> = {
   '/orders': { breadcrumb: 'PRODUCCIÓN', title: 'Gestión de Órdenes', subtitle: 'Control visual del avance y estatus en el piso de producción' },
@@ -14,11 +15,10 @@ const routeMeta: Record<string, { breadcrumb: string; title: string; subtitle: s
 export function Header() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem('totebin_token');
-    localStorage.removeItem('totebin_user_name');
-    localStorage.removeItem('totebin_user');
+    logout();
     navigate('/login');
   }
 
@@ -45,12 +45,6 @@ export function Header() {
     return 'Turno Nocturno';
   };
 
-  let user = null;
-  try {
-    const stored = localStorage.getItem('totebin_user');
-    if (stored) user = JSON.parse(stored);
-  } catch(e) {}
-  
   const userName = user?.firstName || '';
 
   return (

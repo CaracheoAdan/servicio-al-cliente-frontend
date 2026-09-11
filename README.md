@@ -37,6 +37,13 @@ sequenceDiagram
     RQ-->>UI: Proveé métricas en caché a las gráficas
 ```
 
+### C. Control de Acceso y Seguridad (RBAC)
+La plataforma emplea un sistema de seguridad basado en roles (RBAC) gestionado localmente mediante un `AuthContext` reactivo y el componente `PermissionGuard`.
+* **Protección de Rutas:** Cada módulo está protegido por un permiso específico (ej. `orders`, `reports`, `users`). 
+* **Prevención de Escalación de Privilegios:** El payload de registro de usuarios previene activamente inyecciones de `roleId`.
+* **Mitigación CWE-204:** Los endpoints de autenticación previenen la enumeración de usuarios utilizando mensajes de error genéricos ante credenciales inválidas.
+* **Manejo Reactivo de Sesiones:** Cuando un token JWT expira (validado en cliente periódicamente o rechazado con un HTTP 401), se despacha un `CustomEvent` que limpia la sesión limpiamente a través de React Router en lugar de forzar recargas destructivas de la ventana.
+
 ---
 
 ## 2. Árbol de Directorios y Silos de Negocio
@@ -83,9 +90,10 @@ Es el punto de entrada de React.
 * **`catalogs/` & `users/` & `auth/`**: Módulos encargados de la administración maestra de la plataforma.
 
 #### 📁 `src/shared/` (El Núcleo Reutilizable)
-* **`api/axiosInstance.ts`**: El guardián de la red. Contiene un interceptor global que captura respuestas fallidas (400, 401, 500) y lanza notificaciones emergentes amigables (`react-hot-toast`), ocultando el terror técnico al usuario y cerrando sesiones expiradas automáticamente.
+* **`api/axiosInstance.ts`**: El guardián de la red. Contiene un interceptor global que captura respuestas fallidas (400, 401, 429, 500) y lanza notificaciones emergentes amigables (`react-hot-toast`), ocultando el terror técnico al usuario y cerrando sesiones expiradas automáticamente mediante eventos custom.
 * **`api/orderService.ts`**: El cerebro de orquestación. Intercepta los objetos de la interfaz y los moldea obligatoriamente a los caprichos del backend antes de enviarlos a la red.
-* **`components/`**: El "Design System" de la empresa. Contiene componentes de infraestructura UI pura como `Button.tsx`, `Card.tsx` y el `ErrorBoundary.tsx`.
+* **`context/AuthContext.tsx`**: Estado centralizado de seguridad que gestiona sesión, permisos JWT, perfiles y persistencia.
+* **`components/`**: El "Design System" de la empresa. Contiene componentes de infraestructura UI pura como `Button.tsx`, `PermissionGuard.tsx` para RBAC y el `ErrorBoundary.tsx`.
 
 ---
 

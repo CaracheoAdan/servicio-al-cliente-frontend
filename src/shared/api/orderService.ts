@@ -49,31 +49,49 @@ export interface RawOrderItem {
 export interface CombinedOrderItem {
   id: number;
   productId: number;
+  product_id?: number;
   productName: string;
   orderedQuantity: number;
+  ordered_quantity?: number;
   deliveredQuantity: number;
+  delivered_quantity?: number;
 }
 
 export interface CombinedOrderDetail {
   id: number;
   scheduledDeliveryDate: string;
+  scheduled_delivery_date?: string;
   shippingDate: string;
+  shipping_date?: string;
+  comments?: string;
 }
 
 export interface CombinedOrder {
   id: number;
   key: string;
   status: OrderStatus;
+  scheduled_delivery_date?: string;
   detail: CombinedOrderDetail | null;
   items: CombinedOrderItem[];
 }
 
 export interface CreateOrderPayload {
   key: string;
-  status: OrderStatus;
+  status: OrderStatus | string;
   scheduledDeliveryDate?: string;
   shippingDate?: string;
-  items: Omit<CombinedOrderItem, 'id' | 'productName'>[];
+  comments?: string;
+  items: Omit<CombinedOrderItem, 'id' | 'productName' | 'product_id' | 'ordered_quantity' | 'delivered_quantity'>[];
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────
+
+/** Safely converts a date string to ISO format, falling back to current date */
+function toISOStringOrDefault(dateStr?: string): string {
+  if (!dateStr) return new Date().toISOString();
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return new Date().toISOString();
+  return d.toISOString();
 }
 
 export const orderService = {
@@ -116,12 +134,12 @@ export const orderService = {
   },
 
   async getOrderById(id: string | number): Promise<CombinedOrder | undefined> {
-    const combinedOrders = await this.getAllCombinedOrders();
-    return combinedOrders.find(o => o.id.toString() === id.toString());
+    const allOrders = await this.getAllCombinedOrders();
+    return allOrders.find(o => o.id.toString() === id.toString());
   },
 
   async createOrder(payload: CreateOrderPayload): Promise<number> {
-    const statusUpper = payload.status.toUpperCase();
+    const statusUpper = (payload.status || 'OPEN').toString().toUpperCase();
     const orderRes = await api.post('/orders', { key: payload.key, status: statusUpper });
     
     let orderId: number;
@@ -135,8 +153,8 @@ export const orderService = {
     if (payload.scheduledDeliveryDate || payload.shippingDate) {
       await api.post('/order_details', {
         orderId,
-        scheduledDeliveryDate: payload.scheduledDeliveryDate ? new Date(payload.scheduledDeliveryDate).toISOString() : new Date().toISOString(),
-        shippingDate: payload.shippingDate ? new Date(payload.shippingDate).toISOString() : new Date().toISOString()
+        scheduledDeliveryDate: toISOStringOrDefault(payload.scheduledDeliveryDate),
+        shippingDate: toISOStringOrDefault(payload.shippingDate)
       });
     }
 
@@ -157,31 +175,44 @@ export const orderService = {
   },
 
   async updateOrder(id: string | number, payload: CreateOrderPayload): Promise<void> {
-    const statusUpper = payload.status.toUpperCase();
+    const statusUpper = (payload.status || 'OPEN').toString().toUpperCase();
     // PUT sin id en el payload, solo en la URL
     await api.put(`/orders/${id}`, { key: payload.key, status: statusUpper });
 
-    const detailsRes = await api.get('/order_details');
+    // Fetch existing detail/items for this order
+    let existingDetailId: number | null = null;
+    let existingItemIds: number[] = [];
+
+    const [detailsRes, itemsRes] = await Promise.all([
+      api.get('/order_details'),
+      api.get('/order_items')
+    ]);
     const details: RawOrderDetail[] = Array.isArray(detailsRes.data) ? detailsRes.data : (detailsRes.data.items || detailsRes.data.data || []);
+    const items: RawOrderItem[] = Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data.items || itemsRes.data.data || []);
     const existingDetail = details.find(d => d.orderId?.toString() === id.toString() || d.order_id?.toString() === id.toString());
+    existingDetailId = existingDetail?.id || null;
+    existingItemIds = items.filter(i => i.orderId?.toString() === id.toString() || i.order_id?.toString() === id.toString()).map(i => i.id);
 
     const detailPayload = {
       orderId: Number(id),
-      scheduledDeliveryDate: payload.scheduledDeliveryDate ? new Date(payload.scheduledDeliveryDate).toISOString() : new Date().toISOString(),
-      shippingDate: payload.shippingDate ? new Date(payload.shippingDate).toISOString() : new Date().toISOString()
+      scheduledDeliveryDate: toISOStringOrDefault(payload.scheduledDeliveryDate),
+      shippingDate: toISOStringOrDefault(payload.shippingDate)
     };
 
-    if (existingDetail) {
-      await api.put(`/order_details/${existingDetail.id}`, detailPayload);
+    if (existingDetailId) {
+      await api.put(`/order_details/${existingDetailId}`, detailPayload);
     } else {
       await api.post('/order_details', detailPayload);
     }
 
-    const itemsRes = await api.get('/order_items');
-    const items: RawOrderItem[] = Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data.items || itemsRes.data.data || []);
-    const existingItems = items.filter(i => i.orderId?.toString() === id.toString() || i.order_id?.toString() === id.toString());
-
-    await Promise.all(existingItems.map(i => api.delete(`/order_items/${i.id}`).catch(() => {})));
+    // Delete existing items with proper error reporting instead of silent catch
+    const deleteResults = await Promise.allSettled(
+      existingItemIds.map(itemId => api.delete(`/order_items/${itemId}`))
+    );
+    const failedDeletes = deleteResults.filter(r => r.status === 'rejected');
+    if (failedDeletes.length > 0) {
+      console.error(`Failed to delete ${failedDeletes.length} order items during update`);
+    }
 
     if (payload.items && payload.items.length > 0) {
       await Promise.all(

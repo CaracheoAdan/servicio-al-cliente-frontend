@@ -3,8 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Save, Plus, X, FileText, CheckCircle2, MessageSquare, Package, Truck, Check, Clock } from 'lucide-react';
 import { api } from '../../../shared/api/axiosInstance';
-import { orderService } from '../../../shared/api/orderService';
+import { orderService, CombinedOrderItem, CreateOrderPayload } from '../../../shared/api/orderService';
 import { OrderStatus } from '../types/order.types';
+import { Product } from '../../catalogs/types/catalog.types';
 
 export function OrderFormPage() {
   const { id } = useParams();
@@ -19,7 +20,7 @@ export function OrderFormPage() {
   const [comments, setComments] = useState('');
   
   const [loading, setLoading] = useState(true);
-  const [availableProducts, setAvailableProducts] = useState<any[]>([]);
+  const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const [isDirty, setIsDirty] = useState(false);
 
   // Mark as dirty when these change
@@ -32,31 +33,32 @@ export function OrderFormPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const prodRes = await api.get('/products');
+        const prodPromise = api.get('/products');
+        const orderPromise = isEditing ? orderService.getOrderById(id!) : Promise.resolve(undefined);
+
+        const [prodRes, orderData] = await Promise.all([prodPromise, orderPromise]);
+
         const prodData = Array.isArray(prodRes.data) ? prodRes.data : (prodRes.data.items || prodRes.data.data || []);
-        const activeProducts = prodData.filter((p: any) => p.isActive === true || p.is_active === true);
+        const activeProducts = prodData.filter((p: Product) => p.isActive === true || p.is_active === true);
         setAvailableProducts(activeProducts);
 
-        if (isEditing) {
-          const orderData = await orderService.getOrderById(id!);
-          if (orderData) {
-            setOrderKey(orderData.key || '');
-            if (orderData.detail?.scheduledDeliveryDate || orderData.detail?.scheduled_delivery_date) {
-              setScheduledDeliveryDate((orderData.detail.scheduledDeliveryDate || orderData.detail.scheduled_delivery_date).split('T')[0]);
-            }
-            if (orderData.detail?.shippingDate || orderData.detail?.shipping_date) {
-              setShippingDate(orderData.detail.shippingDate || orderData.detail.shipping_date);
-            }
-            setStatus(orderData.status || 'open');
-            setComments(orderData.detail?.comments || '');
-            
-            if (orderData.items && orderData.items.length > 0) {
-              setItems(orderData.items.map((i: any) => ({
-                productId: i.product_id || i.productId || '',
-                orderedQuantity: i.ordered_quantity || i.orderedQuantity || 1,
-                deliveredQuantity: i.delivered_quantity || i.deliveredQuantity || 0
-              })));
-            }
+        if (orderData) {
+          setOrderKey(orderData.key || '');
+          if (orderData.detail?.scheduledDeliveryDate || orderData.detail?.scheduled_delivery_date) {
+            setScheduledDeliveryDate((orderData.detail.scheduledDeliveryDate || orderData.detail.scheduled_delivery_date!).split('T')[0]);
+          }
+          if (orderData.detail?.shippingDate || orderData.detail?.shipping_date) {
+            setShippingDate(orderData.detail.shippingDate || orderData.detail.shipping_date || null);
+          }
+          setStatus((orderData.status?.toString().toLowerCase() || 'open') as OrderStatus);
+          setComments(orderData.detail?.comments || '');
+          
+          if (orderData.items && orderData.items.length > 0) {
+            setItems(orderData.items.map((i: CombinedOrderItem) => ({
+              productId: String(i.product_id || i.productId || ''),
+              orderedQuantity: i.ordered_quantity || i.orderedQuantity || 1,
+              deliveredQuantity: i.delivered_quantity || i.deliveredQuantity || 0
+            })));
           }
         }
       } catch (error) {
@@ -74,9 +76,9 @@ export function OrderFormPage() {
     setItems([...items, { productId: '', orderedQuantity: 1, deliveredQuantity: 0 }]);
   };
 
-  const handleItemChange = (index: number, field: string, value: any) => {
+  const handleItemChange = (index: number, field: string, value: string | number) => {
     const newItems = [...items];
-    (newItems[index] as any)[field] = value;
+    newItems[index] = { ...newItems[index], [field]: value };
     setItems(newItems);
   };
 
@@ -135,15 +137,15 @@ export function OrderFormPage() {
     }
 
     try {
-      const payload: any = {
+      const payload: CreateOrderPayload = {
         key: orderKey,
         status: status,
         scheduledDeliveryDate: scheduledDeliveryDate,
         comments: comments,
         items: items.map(item => ({
-          productId: parseInt(item.productId as string, 10),
-          orderedQuantity: parseInt(item.orderedQuantity as string, 10),
-          deliveredQuantity: parseInt(item.deliveredQuantity as string, 10) || 0
+          productId: Number(item.productId),
+          orderedQuantity: Number(item.orderedQuantity),
+          deliveredQuantity: Number(item.deliveredQuantity) || 0
         }))
       };
 
@@ -169,7 +171,7 @@ export function OrderFormPage() {
     return <div className="p-8 text-center text-[#64748B] dark:text-slate-400 font-display font-bold">Cargando datos...</div>;
   }
 
-  const statuses: { value: OrderStatus; label: string; icon: any }[] = [
+  const statuses: { value: OrderStatus; label: string; icon: React.ElementType }[] = [
     { value: 'open', label: 'Abierto', icon: FileText },
     { value: 'in_process', label: 'En Proceso', icon: Clock },
     { value: 'produced', label: 'Producido', icon: Package },

@@ -12,7 +12,8 @@ export const Button: React.FC<ButtonProps> = ({
   size = 'md', 
   isLoading, 
   className = '', 
-  disabled, 
+  disabled,
+  type = 'button',
   ...props 
 }) => {
   const baseClasses = 'inline-flex items-center justify-center font-display font-bold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#0F172A]';
@@ -32,12 +33,17 @@ export const Button: React.FC<ButtonProps> = ({
 
   return (
     <button 
+      type={type}
       className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`}
       disabled={disabled || isLoading}
+      aria-busy={isLoading || undefined}
       {...props}
     >
       {isLoading ? (
-        <div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+        <>
+          <div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true"></div>
+          <span className="sr-only">Cargando...</span>
+        </>
       ) : null}
       {children}
     </button>

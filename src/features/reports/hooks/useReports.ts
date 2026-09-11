@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { orderService, CombinedOrder, OrderStatus } from '../../../shared/api/orderService';
 
 export interface TransportDataPoint {
+  order: string;
   time: number;
   label: string;
 }
@@ -18,6 +19,16 @@ export interface GeneralMetrics {
   onTimePct: number;
   fulfillPct: number;
   general: number;
+}
+
+export interface LatestOrder {
+  key: string;
+  status: string;
+  shippingDate: Date;
+  shippingTime: number;
+  fulfillment: number;
+  totalOrdered: number;
+  totalDelivered: number;
 }
 
 /**
@@ -61,18 +72,25 @@ export const calculateDecimalTime = (dateString: string): number | null => {
 /**
  * Hook to fetch and compute reports data
  */
-export const useReports = () => {
+export const useReports = (): {
+  loading: boolean;
+  error: Error | null;
+  transportData: TransportDataPoint[];
+  fulfillmentData: FulfillmentDataPoint[];
+  latestOrder: LatestOrder | null;
+  generalMetrics: GeneralMetrics;
+} => {
   const { data: orders = [], isLoading: loading, error } = useQuery<CombinedOrder[], Error>({
     queryKey: ['combinedOrders'],
     queryFn: () => orderService.getAllCombinedOrders(),
-    refetchInterval: 15000, // Refetch every 15 seconds automatically
+    refetchInterval: 60000, // Refetch every 1 minute automatically
   });
 
   // useMemo used to optimize heavy client-side processing
   const { transportData, fulfillmentData, latestOrder, generalMetrics } = useMemo(() => {
     const transport: TransportDataPoint[] = [];
     const fulfillment: FulfillmentDataPoint[] = [];
-    let mostRecentOrder: any = null;
+    let mostRecentOrder: LatestOrder | null = null;
 
     orders.forEach(order => {
       // Logic for transport (only delivered or in_delivery)

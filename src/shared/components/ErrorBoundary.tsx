@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertOctagon } from 'lucide-react';
 
 interface Props {
@@ -37,6 +37,12 @@ export class ErrorBoundary extends Component<Props, State> {
           <p className="text-slate-500 text-sm max-w-md">
             Ocurrió un error inesperado al renderizar este componente. Por favor, recarga la página o contacta a soporte si el problema persiste.
           </p>
+          <button
+            onClick={() => this.setState({ hasError: false, errorMsg: '' })}
+            className="mt-4 px-6 py-2.5 bg-[#2A5D8F] text-white rounded-xl font-bold text-sm hover:bg-[#1E4D73] transition-colors shadow-[0_3px_0_#1B3D5C] active:shadow-[0_0px_0_#1B3D5C] active:translate-y-0.5"
+          >
+            Reintentar
+          </button>
         </div>
       );
     }

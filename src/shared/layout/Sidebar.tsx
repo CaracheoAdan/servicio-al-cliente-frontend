@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { 
   Plus, ClipboardList, Database, BarChart3, Table, Settings, 
   LogOut, ChevronLeft, ChevronRight, Moon, Sun 
 } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 
 export function Sidebar() {
   const navigate = useNavigate()
+  const { user, isAdmin, hasPermission, logout } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
   const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('totebin_dark_mode')
+    if (saved !== null) return saved === 'true'
     return document.documentElement.classList.contains('dark')
   })
 
@@ -18,12 +22,11 @@ export function Sidebar() {
     } else {
       document.documentElement.classList.remove('dark')
     }
+    localStorage.setItem('totebin_dark_mode', String(darkMode))
   }, [darkMode])
 
   const handleLogout = () => {
-    localStorage.removeItem('totebin_token')
-    localStorage.removeItem('totebin_user_name')
-    localStorage.removeItem('totebin_user')
+    logout()
     navigate('/login')
   }
 
@@ -56,44 +59,29 @@ export function Sidebar() {
     },
   ]
 
-  let user: any = null;
-  try {
-    const stored = localStorage.getItem('totebin_user');
-    if (stored) user = JSON.parse(stored);
-  } catch(e) {}
+  // Permission map for route-based filtering
+  const permMap: Record<string, string> = {
+    '/orders/new': 'orders_new',
+    '/orders': 'orders',
+    '/catalogs': 'catalogs',
+    '/reports': 'reports',
+    '/master-table': 'master_table',
+    '/users': 'users',
+  }
 
-  let userPermissions: string[] = [];
-  try {
-    if (user?.permissions && typeof user.permissions === 'string') {
-      userPermissions = JSON.parse(user.permissions);
-    } else if (Array.isArray(user?.permissions)) {
-      userPermissions = user.permissions;
-    }
-  } catch (e) {}
+  // Filter menu sections based on permissions from AuthContext
+  const filteredMenuSections = menuSections.map(section => ({
+    ...section,
+    items: section.items.filter(item => {
+      if (isAdmin) return true
+      const perm = permMap[item.path]
+      return perm ? hasPermission(perm) : false
+    })
+  })).filter(section => section.items.length > 0)
 
-  // Filter menu sections based on permissions
-  const roleName = user?.role || '';
-  const isSuperAdmin = roleName.toLowerCase().includes('admin');
-  
-  const filteredMenuSections = menuSections.map(section => {
-    return {
-      ...section,
-      items: section.items.filter(item => {
-        if (isSuperAdmin) return true; // Admins always have full access
-        
-        if (item.path === '/orders/new' && userPermissions.includes('orders_new')) return true;
-        if (item.path === '/orders' && userPermissions.includes('orders')) return true;
-        if (item.path === '/catalogs' && userPermissions.includes('catalogs')) return true;
-        if (item.path === '/reports' && userPermissions.includes('reports')) return true;
-        if (item.path === '/master-table' && userPermissions.includes('master_table')) return true;
-        if (item.path === '/users' && userPermissions.includes('users')) return true;
-        return false;
-      })
-    };
-  }).filter(section => section.items.length > 0);
-
-  const initials = user && user.firstName ? `${user.firstName.charAt(0)}${user.lastName ? user.lastName.charAt(0) : ''}`.toUpperCase() : '';
-  const fullName = user && user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : '';
+  const roleName = user?.role || ''
+  const initials = user?.firstName ? `${user.firstName.charAt(0)}${user.lastName ? user.lastName.charAt(0) : ''}`.toUpperCase() : ''
+  const fullName = user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : ''
 
   return (
     <aside className={`${collapsed ? 'w-24' : 'w-72'} flex-shrink-0 transition-all duration-300 ease-in-out pt-[15px] pb-3 pl-3 pr-3`}>
@@ -181,23 +169,10 @@ export function Sidebar() {
                               : 'bg-[#F1F5F9] group-hover:bg-[#DBEAFE] text-[#64748B] group-hover:text-[#2A5D8F]'
                           }`}>
                             <Icon className="w-[18px] h-[18px]" strokeWidth={2} />
-                            {collapsed && item.badge && (
-                              <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5BA3D9] opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-3 w-3 bg-[#5BA3D9]"></span>
-                              </span>
-                            )}
                           </div>
                           {!collapsed && (
                             <div className="flex-1 flex justify-between items-center">
                               <span>{item.name}</span>
-                              {item.badge && (
-                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${
-                                  isActive ? 'bg-white/20 text-white' : 'bg-[#E2E8F0] dark:bg-[#3F3F46] text-[#64748B] dark:text-[#A1A1AA]'
-                                }`}>
-                                  {item.badge}
-                                </span>
-                              )}
                             </div>
                           )}
                         </>

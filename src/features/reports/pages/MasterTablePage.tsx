@@ -1,68 +1,85 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Download, Table as TableIcon } from 'lucide-react';
 import { api } from '../../../shared/api/axiosInstance';
 import { orderService } from '../../../shared/api/orderService';
 import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
 import { SkeletonLoader } from '../../../shared/components/SkeletonLoader';
-import { Inbox } from 'lucide-react';
+import { Product } from '../../catalogs/types/catalog.types';
+import { CombinedOrder, CombinedOrderItem } from '../../../shared/api/orderService';
+
+interface MasterTableRow {
+  noOrden: string;
+  producto: string;
+  cantidadPedida: number | string;
+  fechaCompromiso: string;
+  cantidadSurtida: number | string;
+  producidoSi: string;
+  producidoNo: string;
+  salidaSi: string;
+  salidaNo: string;
+  horaEnvio: string;
+  cerrarPedido: string;
+  comentarios: string;
+}
 
 export function MasterTablePage() {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<MasterTableRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Fetch products to map product_id to product_key
-        const prodRes = await api.get('/products');
-        const prodData = Array.isArray(prodRes.data) ? prodRes.data : (prodRes.data.items || prodRes.data.data || []);
-        const productMap = new Map(prodData.map((p: any) => [p.id, p.key]));
+        // Fetch products and fully hydrated orders in parallel
+        const [prodRes, orders] = await Promise.all([
+          api.get('/products'),
+          orderService.getAllCombinedOrders()
+        ]);
+        const prodData: Product[] = Array.isArray(prodRes.data) ? prodRes.data : (prodRes.data.items || prodRes.data.data || []);
+        const productMap = new Map(prodData.map((p: Product) => [p.id, p.key]));
 
-        // Fetch fully hydrated orders
-        const orders = await orderService.getAllCombinedOrders();
+        const flattenedData: MasterTableRow[] = [];
 
-        const flattenedData: any[] = [];
-
-        orders.forEach((order: any) => {
+        orders.forEach((order: CombinedOrder) => {
           const items = order.items || [];
           const status = order.status;
           
-          const isProduced = ['produced', 'in_delivery', 'delivered', 'closed'].includes(status);
-          const isDelivered = ['in_delivery', 'delivered', 'closed'].includes(status);
-          const isClosed = status === 'closed';
+          const statusLower = status.toString().toLowerCase();
+          const isProduced = ['produced', 'in_delivery', 'delivered', 'closed'].includes(statusLower);
+          const isDelivered = ['in_delivery', 'delivered', 'closed'].includes(statusLower);
+          const isClosed = statusLower === 'closed';
 
           if (items.length === 0) {
             flattenedData.push({
               noOrden: order.key,
               producto: '',
               cantidadPedida: '',
-              fechaCompromiso: order.detail.scheduledDeliveryDate || order.detail.scheduled_delivery_date ? new Date(order.detail.scheduledDeliveryDate || order.detail.scheduled_delivery_date).toLocaleDateString() : '',
+              fechaCompromiso: order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date ? new Date(order.detail.scheduledDeliveryDate || order.detail.scheduled_delivery_date!).toLocaleDateString() : '',
               cantidadSurtida: '',
               producidoSi: isProduced ? 'X' : '',
               producidoNo: !isProduced ? 'X' : '',
               salidaSi: isDelivered ? 'X' : '',
               salidaNo: !isDelivered ? 'X' : '',
-              horaEnvio: order.detail.shippingDate || order.detail.shipping_date ? new Date(order.detail.shippingDate || order.detail.shipping_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+              horaEnvio: order.detail?.shippingDate || order.detail?.shipping_date ? new Date(order.detail.shippingDate || order.detail.shipping_date!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
               cerrarPedido: isClosed ? 'Cerrado' : '',
-              comentarios: order.detail.comments || ''
+              comentarios: order.detail?.comments || ''
             });
           } else {
-            items.forEach((item: any, index: number) => {
+            items.forEach((item: CombinedOrderItem, index: number) => {
               flattenedData.push({
                 noOrden: index === 0 ? order.key : '',
-                producto: productMap.get(item.productId || item.product_id) || item.productId || item.product_id || '',
+                producto: String(productMap.get(item.productId || item.product_id!) || item.productId || item.product_id || ''),
                 cantidadPedida: item.orderedQuantity || item.ordered_quantity || 0,
-                fechaCompromiso: index === 0 && (order.detail.scheduledDeliveryDate || order.detail.scheduled_delivery_date) ? new Date(order.detail.scheduledDeliveryDate || order.detail.scheduled_delivery_date).toLocaleDateString() : '',
+                fechaCompromiso: index === 0 && (order.detail?.scheduledDeliveryDate || order.detail?.scheduled_delivery_date) ? new Date(order.detail.scheduledDeliveryDate || order.detail.scheduled_delivery_date!).toLocaleDateString() : '',
                 cantidadSurtida: item.deliveredQuantity || item.delivered_quantity || 0,
                 producidoSi: index === 0 && isProduced ? 'X' : '',
                 producidoNo: index === 0 && !isProduced ? 'X' : '',
                 salidaSi: index === 0 && isDelivered ? 'X' : '',
                 salidaNo: index === 0 && !isDelivered ? 'X' : '',
-                horaEnvio: index === 0 && (order.detail.shippingDate || order.detail.shipping_date) ? new Date(order.detail.shippingDate || order.detail.shipping_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+                horaEnvio: index === 0 && (order.detail?.shippingDate || order.detail?.shipping_date) ? new Date(order.detail.shippingDate || order.detail.shipping_date!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
                 cerrarPedido: index === 0 && isClosed ? 'Cerrado' : '',
-                comentarios: index === 0 && order.detail.comments ? order.detail.comments : ''
+                comentarios: index === 0 && order.detail?.comments ? order.detail.comments : ''
               });
             });
           }

@@ -1,3 +1,8 @@
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
 export interface LoginResponse {
   accessToken: string;
   tokenType: string;
@@ -7,6 +12,7 @@ export interface LoginResponse {
     firstName: string;
     lastName: string;
     role: string;
+    permissions?: string | string[];
   };
 }
 
@@ -15,5 +21,4 @@ export interface RegisterCommand {
   password: string;
   firstName: string;
   lastName: string;
-  roleId: number | string;
 }

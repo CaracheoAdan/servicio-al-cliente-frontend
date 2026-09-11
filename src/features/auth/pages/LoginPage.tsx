@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 import { Button } from '../../../shared/components/Button';
+import { useAuth } from '../../../shared/context/AuthContext';
 
 import { AnimatedLogoContainer } from '../components/AnimatedLogoContainer';
 import { authApi } from '../api/auth.api';
@@ -13,49 +15,37 @@ export function LoginPage() {
   const [passwordTouched, setPasswordTouched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    const cleanEmail = email.trim().toLowerCase();
     try {
-      const response = await authApi.login({ email, password });
-      localStorage.setItem('totebin_token', response.accessToken);
-      localStorage.setItem('totebin_user', JSON.stringify(response.user));
+      const response = await authApi.login({ email: cleanEmail, password });
+      login(response.accessToken, response.user as unknown as Record<string, unknown>);
       toast.success(`Bienvenido, ${response.user.firstName}!`, {
         style: { borderRadius: '10px', background: '#333', color: '#fff' }
       });
       navigate('/');
-    } catch (error: any) {
-      console.error("Login error:", error);
+    } catch (error) {
       let errorMsg = 'Error inesperado al intentar acceder al sistema.';
       
-      if (error.response) {
-        const status = error.response.status;
-        const serverDetail = error.response.data?.detail || error.response.data?.title || error.response.data?.message;
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          const status = error.response.status;
 
-        if (status === 401) {
-          errorMsg = 'El correo o la contraseña están equivocados.';
-        } else if (status === 404) {
-          errorMsg = 'No existe ninguna cuenta registrada con este correo.';
-        } else if (status === 400) {
-          errorMsg = serverDetail || 'Faltan datos o tienen un formato incorrecto.';
-        } else if (status === 403) {
-          errorMsg = 'Tu cuenta no tiene permisos para acceder o está suspendida.';
-        } else if (status >= 500) {
-          errorMsg = 'Problemas con el servidor. Intenta nuevamente más tarde.';
-        } else if (serverDetail) {
-          errorMsg = serverDetail;
+          if (status === 400 || status === 401 || status === 404) {
+            // Generic message to prevent user enumeration (CWE-204)
+            errorMsg = 'Credenciales inválidas. Verifica tu correo y contraseña.';
+          } else if (status === 403) {
+            errorMsg = 'Tu cuenta no tiene permisos para acceder o está suspendida.';
+          } else if (status >= 500) {
+            errorMsg = 'Problemas con el servidor. Intenta nuevamente más tarde.';
+          }
+        } else if (error.request) {
+          errorMsg = 'No se pudo conectar con el servidor. Revisa tu conexión a internet o intenta de nuevo.';
         }
-
-        // Si el backend manda un mensaje específico en 400/401, intentamos traducirlo o dar más contexto
-        const lowerDetail = serverDetail?.toLowerCase() || '';
-        if (lowerDetail.includes('not found') || lowerDetail.includes('no existe')) {
-            errorMsg = 'No existe ninguna cuenta registrada con este correo.';
-        } else if (lowerDetail.includes('password') || lowerDetail.includes('contraseña')) {
-            errorMsg = 'La contraseña ingresada es incorrecta.';
-        }
-      } else if (error.request) {
-        errorMsg = 'No se pudo conectar con el servidor. Revisa tu conexión a internet o intenta de nuevo.';
       }
 
       toast.error(errorMsg, {
@@ -161,18 +151,6 @@ export function LoginPage() {
               {passwordTouched && !isPasswordValid && (
                 <p className="mt-1 text-sm text-red-500">Mínimo 6 caracteres.</p>
               )}
-            </div>
-
-            <div className="flex items-center animate-fade-in-up" style={{ animationDelay: '0.4s', animationFillMode: 'both' }}>
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-[#2A5D8F] focus:ring-[#2A5D8F] border-[#E2E8F0] dark:border-slate-600 dark:bg-slate-800 rounded transition-colors"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-[#475569] dark:text-slate-300">
-                Recordarme
-              </label>
             </div>
 
             <div className="animate-fade-in-up" style={{ animationDelay: '0.5s', animationFillMode: 'both' }}>

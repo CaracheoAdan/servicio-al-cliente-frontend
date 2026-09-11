@@ -41,6 +41,10 @@ export function ForgotPasswordPage() {
             </p>
           </div>
 
+          <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl text-amber-700 dark:text-amber-400 text-sm">
+            <strong>Nota:</strong> Esta funcionalidad está en desarrollo y aún no envía correos reales.
+          </div>
+
           {!isSent ? (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">

@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { DashboardLayout } from '../shared/layout/DashboardLayout';
 import { ErrorBoundary } from '../shared/components/ErrorBoundary';
+import { AuthProvider } from '../shared/context/AuthContext';
+import { PermissionGuard } from '../shared/components/PermissionGuard';
 
 // Lazy loading at route level (Code Splitting)
 const LoginPage = lazy(() => import('../features/auth/pages/LoginPage').then(m => ({ default: m.LoginPage })));
@@ -28,12 +30,16 @@ const queryClient = new QueryClient({
   },
 });
 
-function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const token = localStorage.getItem('totebin_token');
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
-  return <DashboardLayout>{children}</DashboardLayout>;
+/**
+ * Private route wrapper that enforces authentication + permission checks
+ * and wraps content in the dashboard layout.
+ */
+function PrivateRoute({ children, permission }: { children: React.ReactNode; permission?: string }) {
+  return (
+    <PermissionGuard permission={permission}>
+      <DashboardLayout>{children}</DashboardLayout>
+    </PermissionGuard>
+  );
 }
 
 // Fallback loader for Suspense
@@ -46,85 +52,87 @@ const GlobalLoader = () => (
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Toaster 
-          position="bottom-right" 
-          toastOptions={{
-            style: {
-              background: 'var(--surface-card)',
-              color: 'var(--text-primary)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '12px',
-              fontFamily: 'Inter, sans-serif',
-              boxShadow: '0 4px 24px -4px rgba(0, 0, 0, 0.1)',
-            },
-            success: {
-              iconTheme: { primary: '#10B981', secondary: '#fff' },
-            },
-            error: {
-              iconTheme: { primary: '#EF4444', secondary: '#fff' },
-            },
-          }} 
-        />
-        <ErrorBoundary>
-          <Suspense fallback={<GlobalLoader />}>
-            <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              
-              {/* Rutas Privadas */}
-              <Route path="/" element={<Navigate to="/orders" replace />} />
-              
-              <Route path="/orders" element={
-                <PrivateRoute>
-                  <OrderListPage />
-                </PrivateRoute>
-              } />
+      <AuthProvider>
+        <BrowserRouter>
+          <Toaster 
+            position="bottom-right" 
+            toastOptions={{
+              style: {
+                background: 'var(--surface-card)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '12px',
+                fontFamily: 'Inter, sans-serif',
+                boxShadow: '0 4px 24px -4px rgba(0, 0, 0, 0.1)',
+              },
+              success: {
+                iconTheme: { primary: '#10B981', secondary: '#fff' },
+              },
+              error: {
+                iconTheme: { primary: '#EF4444', secondary: '#fff' },
+              },
+            }} 
+          />
+          <ErrorBoundary>
+            <Suspense fallback={<GlobalLoader />}>
+              <Routes>
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                
+                {/* Rutas Privadas con RBAC */}
+                <Route path="/" element={<Navigate to="/orders" replace />} />
+                
+                <Route path="/orders" element={
+                  <PrivateRoute permission="orders">
+                    <OrderListPage />
+                  </PrivateRoute>
+                } />
 
-              <Route path="/orders/new" element={
-                <PrivateRoute>
-                  <OrderFormPage />
-                </PrivateRoute>
-              } />
+                <Route path="/orders/new" element={
+                  <PrivateRoute permission="orders_new">
+                    <OrderFormPage />
+                  </PrivateRoute>
+                } />
 
-              <Route path="/orders/:id" element={
-                <PrivateRoute>
-                  <OrderFormPage />
-                </PrivateRoute>
-              } />
+                <Route path="/orders/:id" element={
+                  <PrivateRoute permission="orders">
+                    <OrderFormPage />
+                  </PrivateRoute>
+                } />
 
-              <Route path="/catalogs" element={
-                <PrivateRoute>
-                  <CatalogsPage />
-                </PrivateRoute>
-              } />
+                <Route path="/catalogs" element={
+                  <PrivateRoute permission="catalogs">
+                    <CatalogsPage />
+                  </PrivateRoute>
+                } />
 
-              <Route path="/reports" element={
-                <PrivateRoute>
-                  <ErrorBoundary>
-                    <ReportsPage />
-                  </ErrorBoundary>
-                </PrivateRoute>
-              } />
+                <Route path="/reports" element={
+                  <PrivateRoute permission="reports">
+                    <ErrorBoundary>
+                      <ReportsPage />
+                    </ErrorBoundary>
+                  </PrivateRoute>
+                } />
 
-              <Route path="/master-table" element={
-                <PrivateRoute>
-                  <MasterTablePage />
-                </PrivateRoute>
-              } />
+                <Route path="/master-table" element={
+                  <PrivateRoute permission="master_table">
+                    <MasterTablePage />
+                  </PrivateRoute>
+                } />
 
-              <Route path="/users" element={
-                <PrivateRoute>
-                  <UsersPage />
-                </PrivateRoute>
-              } />
+                <Route path="/users" element={
+                  <PrivateRoute permission="users">
+                    <UsersPage />
+                  </PrivateRoute>
+                } />
 
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </Suspense>
-        </ErrorBoundary>
-      </BrowserRouter>
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
+        </BrowserRouter>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

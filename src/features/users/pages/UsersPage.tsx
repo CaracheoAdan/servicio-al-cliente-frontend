@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Plus, Edit2, Trash2, Shield, User, Inbox, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Shield, User, X } from 'lucide-react';
 import { userService } from '../../../shared/api/userService';
 import toast from 'react-hot-toast';
 import { SkeletonLoader } from '../../../shared/components/SkeletonLoader';
 import { ConfirmModal } from '../../../shared/components/ConfirmModal';
 import { Card, CardHeader } from '../../../shared/components/Card';
+import { User as UserType, UserRole } from '../types/user.types';
 
 export function UsersPage() {
   const [activeTab, setActiveTab] = useState<'users' | 'roles'>('users');
-  const [users, setUsers] = useState<any[]>([]);
-  const [roles, setRoles] = useState<any[]>([]);
+  const [users, setUsers] = useState<UserType[]>([]);
+  const [roles, setRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Modals state
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
+  const [editingItem, setEditingItem] = useState<UserType | UserRole | null>(null);
 
   // Form state
   const [userForm, setUserForm] = useState({ firstName: '', lastName: '', email: '', passwordHash: '', roleId: '' });
@@ -73,15 +74,16 @@ export function UsersPage() {
     }
   };
 
-  const handleOpenUserModal = (user?: any) => {
+  const handleOpenUserModal = (user?: UserType) => {
     if (user) {
       setEditingItem(user);
+      const u = user as UserType & { firstName?: string; first_name?: string; lastName?: string; last_name?: string };
       setUserForm({ 
-        firstName: user.firstName || user.first_name || '', 
-        lastName: user.lastName || user.last_name || '', 
+        firstName: u.firstName || u.first_name || '', 
+        lastName: u.lastName || u.last_name || '', 
         email: user.email || '', 
         passwordHash: '', // never load password 
-        roleId: user.roleId || user.role_id || '' 
+        roleId: (user.roleId || user.role_id || '').toString() 
       });
     } else {
       setEditingItem(null);
@@ -90,13 +92,14 @@ export function UsersPage() {
     setIsUserModalOpen(true);
   };
 
-  const handleOpenRoleModal = (role?: any) => {
+  const handleOpenRoleModal = (role?: UserRole) => {
     if (role) {
       setEditingItem(role);
       let perms: string[] = [];
       try {
-        if (typeof role.permissions === 'string') perms = JSON.parse(role.permissions);
-        else if (Array.isArray(role.permissions)) perms = role.permissions;
+        const r = role as UserRole & { permissions?: string | string[] };
+        if (typeof r.permissions === 'string') perms = JSON.parse(r.permissions);
+        else if (Array.isArray(r.permissions)) perms = r.permissions;
       } catch(e) {}
       setRoleForm({ name: role.name || '', permissions: perms });
     } else {
@@ -108,18 +111,30 @@ export function UsersPage() {
 
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (userForm.firstName.trim().length < 3 || userForm.lastName.trim().length < 3) {
+      toast.error('El nombre y los apellidos deben tener al menos 3 caracteres.');
+      return;
+    }
+    if (!editingItem && userForm.passwordHash.length < 8) {
+      toast.error('La contraseña debe tener al menos 8 caracteres.');
+      return;
+    }
+    if (editingItem && userForm.passwordHash && userForm.passwordHash.length < 8) {
+      toast.error('La nueva contraseña debe tener al menos 8 caracteres.');
+      return;
+    }
+
     try {
       const payload = {
-        firstName: userForm.firstName,
-        lastName: userForm.lastName,
-        email: userForm.email,
-        password: userForm.passwordHash,
-        passwordHash: userForm.passwordHash, // Keep for update just in case
+        firstName: userForm.firstName.trim(),
+        lastName: userForm.lastName.trim(),
+        email: userForm.email.trim().toLowerCase(),
+        password: userForm.passwordHash || undefined,
+        passwordHash: userForm.passwordHash || undefined, // Keep for update just in case
         roleId: Number(userForm.roleId)
       };
 
       if (editingItem) {
-        // If editing and password is empty, ideally backend ignores it.
         await userService.updateUser(editingItem.id, payload);
         toast.success('Usuario actualizado');
       } else {
@@ -128,8 +143,21 @@ export function UsersPage() {
       }
       setIsUserModalOpen(false);
       fetchData();
-    } catch (error) {
-      toast.error('Error al guardar usuario');
+    } catch (error: any) {
+      console.error(error);
+      const status = error?.response?.status;
+      const data = error?.response?.data;
+      if (status === 409 || data?.title === 'User.EmailAlreadyExists') {
+        toast.error('Ya existe un usuario con este correo electrónico.');
+      } else if (data?.errors) {
+        const firstKey = Object.keys(data.errors)[0];
+        const messages = data.errors[firstKey];
+        toast.error(Array.isArray(messages) && messages.length > 0 ? messages[0] : 'Datos incompletos o inválidos.');
+      } else if (data?.detail) {
+        toast.error(data.detail);
+      } else {
+        toast.error('Error al guardar usuario');
+      }
     }
   };
 
@@ -396,11 +424,13 @@ export function UsersPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-display font-bold text-[#0F172A] mb-1.5">
-                    Contraseña {editingItem && <span className="text-[#94A3B8] font-normal text-xs">(Dejar en blanco para no cambiar)</span>}
+                    Contraseña {editingItem ? <span className="text-[#94A3B8] font-normal text-xs">(Dejar en blanco para mantener la actual)</span> : <span className="text-[#94A3B8] font-normal text-xs">(Mínimo 8 caracteres)</span>}
                   </label>
                   <input
                     type="password"
                     required={!editingItem}
+                    minLength={8}
+                    placeholder={editingItem ? "••••••••" : "Mínimo 8 caracteres"}
                     value={userForm.passwordHash}
                     onChange={(e) => setUserForm({...userForm, passwordHash: e.target.value})}
                     className="w-full px-4 py-3 border-2 border-[#E2E8F0] rounded-xl focus:border-[#2A5D8F] focus:ring-4 focus:ring-[#2A5D8F]/10 outline-none text-[#0F172A] font-body transition-all"

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart3, Clock, TrendingUp, Truck, CheckCircle2, Smile, Meh, Frown, Activity, Sun, Moon, Target } from 'lucide-react';
-import { api } from '../../../shared/api/axiosInstance';
+import { useState, useEffect } from 'react';
+import { BarChart3, Clock, TrendingUp, Truck, CheckCircle2, Activity, Sun, Moon, Target } from 'lucide-react';
 import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, ReferenceArea, Cell
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, ReferenceArea, Cell
 } from 'recharts';
+import { useReports, FulfillmentDataPoint, TransportDataPoint } from '../hooks/useReports';
 
 const formatTimeAxis = (val: number) => {
   const hours = Math.floor(val);
@@ -11,9 +11,7 @@ const formatTimeAxis = (val: number) => {
   return `${hours}:${mins.toString().padStart(2, '0')} ${hours >= 12 ? 'PM' : 'AM'}`;
 };
 
-import { orderService } from '../../../shared/api/orderService';
-
-const CustomFulfillmentTooltip = ({ active, payload, label }: any) => {
+const CustomFulfillmentTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ payload: FulfillmentDataPoint }>; label?: string }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     const isPerfect = data.fulfillment === 100;
@@ -43,7 +41,7 @@ const CustomFulfillmentTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-const CustomTransportTooltip = ({ active, payload }: any) => {
+const CustomTransportTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: TransportDataPoint }> }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     const isLate = data.time > 11.5;
@@ -66,8 +64,6 @@ const CustomTransportTooltip = ({ active, payload }: any) => {
   }
   return null;
 };
-
-import { useReports } from '../hooks/useReports';
 
 const RealTimeClock = () => {
   const [time, setTime] = useState(new Date());
@@ -116,7 +112,14 @@ const RealTimeClock = () => {
   );
 };
 
-const AnimatedGauge = ({ value, faceConfig }: { value: number, faceConfig: any }) => {
+interface FaceConfig {
+  color: string;
+  emoji?: string;
+  bg?: string;
+  border?: string;
+}
+
+const AnimatedGauge = ({ value, faceConfig }: { value: number, faceConfig: FaceConfig }) => {
   const [animatedValue, setAnimatedValue] = useState(0);
   useEffect(() => {
     let start = 0;
@@ -173,7 +176,7 @@ export function ReportsPage() {
   if (error) {
     return (
       <div className="flex justify-center items-center h-64 bg-white rounded-2xl shadow-card-base border border-red-200">
-        <p className="text-red-500 font-bold">{error}</p>
+        <p className="text-red-500 font-bold">{error.message}</p>
       </div>
     );
   }
@@ -397,7 +400,7 @@ export function ReportsPage() {
                         radius={[8, 8, 0, 0]}
                         barSize={48}
                         animationDuration={1500}
-                        label={{ position: 'top', fill: '#0F172A', fontSize: 12, fontWeight: 'bold', fontFamily: 'IBM Plex Mono', formatter: (val: number) => `${val}%` }}
+                        label={{ position: 'top', fill: '#0F172A', fontSize: 12, fontWeight: 'bold', fontFamily: 'IBM Plex Mono', formatter: ((val: number) => `${val}%`) as any }}
                       >
                         {fulfillmentData.map((entry, index) => (
                           <Cell 
