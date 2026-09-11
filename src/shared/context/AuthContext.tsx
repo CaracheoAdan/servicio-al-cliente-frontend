@@ -132,6 +132,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const hasPermission = useCallback(
     (permission: string): boolean => {
+      // Full screen (TV kiosk mode) should only apply if explicitly assigned, not inherited by admin
+      if (permission === 'full_screen') {
+        return user?.permissions?.includes('full_screen') ?? false;
+      }
       if (isAdmin) return true;
       return user?.permissions?.includes(permission) ?? false;
     },
