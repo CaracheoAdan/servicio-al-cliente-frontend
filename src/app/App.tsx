@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { DashboardLayout } from '../shared/layout/DashboardLayout';
+import { TVLayout } from '../shared/layout/TVLayout';
 import { ErrorBoundary } from '../shared/components/ErrorBoundary';
 import { AuthProvider } from '../shared/context/AuthContext';
 import { PermissionGuard } from '../shared/components/PermissionGuard';
@@ -18,6 +19,7 @@ const MasterTablePage = lazy(() => import('../features/reports/pages/MasterTable
 const UsersPage = lazy(() => import('../features/users/pages/UsersPage').then(m => ({ default: m.UsersPage })));
 const ForgotPasswordPage = lazy(() => import('../features/auth/pages/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })));
 const NotFoundPage = lazy(() => import('../shared/pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
+const ProductionTVPage = lazy(() => import('../features/orders/pages/ProductionTVPage').then(m => ({ default: m.ProductionTVPage })));
 
 // React Query Client setup
 const queryClient = new QueryClient({
@@ -81,6 +83,14 @@ function App() {
                 
                 {/* Rutas Privadas con RBAC */}
                 <Route path="/" element={<Navigate to="/orders" replace />} />
+
+                <Route element={<TVLayout />}>
+                  <Route path="/tv-production" element={
+                    <PermissionGuard permission="orders">
+                      <ProductionTVPage />
+                    </PermissionGuard>
+                  } />
+                </Route>
                 
                 <Route path="/orders" element={
                   <PrivateRoute permission="orders">

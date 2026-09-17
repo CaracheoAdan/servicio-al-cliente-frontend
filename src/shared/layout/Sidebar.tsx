@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { 
   Plus, ClipboardList, Database, BarChart3, Table, Settings, 
-  LogOut, ChevronLeft, ChevronRight, Moon, Sun 
+  LogOut, ChevronLeft, ChevronRight, Moon, Sun, MonitorPlay 
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
@@ -47,6 +47,7 @@ export function Sidebar() {
     {
       label: 'REPORTES Y CAPTURA',
       items: [
+        { name: 'TV Producción', path: '/tv-production', icon: MonitorPlay },
         { name: 'Gráficas y Estadísticas', path: '/reports', icon: BarChart3 },
         { name: 'Exportar Excel', path: '/master-table', icon: Table },
       ],
@@ -61,6 +62,7 @@ export function Sidebar() {
 
   // Permission map for route-based filtering
   const permMap: Record<string, string> = {
+    '/tv-production': 'orders',
     '/orders/new': 'orders_new',
     '/orders': 'orders',
     '/catalogs': 'catalogs',
