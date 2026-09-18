@@ -7,6 +7,70 @@ import { orderService, CombinedOrderItem, CreateOrderPayload } from '../../../sh
 import { OrderStatus } from '../types/order.types';
 import { Product } from '../../catalogs/types/catalog.types';
 
+const ProductSearchSelect = ({ 
+  value, 
+  onChange, 
+  products 
+}: { 
+  value: string; 
+  onChange: (val: string) => void; 
+  products: Product[];
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  
+  const selectedProduct = products.find(p => p.id.toString() === value?.toString());
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSearch(selectedProduct?.key || '');
+    }
+  }, [selectedProduct, isOpen]);
+
+  const filteredProducts = products.filter(p => p.key.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div className="relative w-full">
+      <input
+        type="text"
+        placeholder="Buscar producto..."
+        value={isOpen ? search : (selectedProduct?.key || '')}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          if (!isOpen) setIsOpen(true);
+        }}
+        onFocus={() => {
+          setSearch('');
+          setIsOpen(true);
+        }}
+        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+        className="w-full p-2.5 border border-[#E2E8F0] dark:border-slate-700 rounded-lg focus:border-[#2A5D8F] dark:focus:border-[#5BA3D9] focus:ring-2 focus:ring-[#2A5D8F]/20 outline-none text-[#0F172A] dark:text-white bg-white dark:bg-[#1E293B] transition-all"
+        required={!selectedProduct}
+      />
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-[#1E293B] border border-[#E2E8F0] dark:border-slate-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+          {filteredProducts.length === 0 ? (
+            <div className="p-2 text-sm text-[#64748B] dark:text-slate-400">No se encontraron productos</div>
+          ) : (
+            filteredProducts.map(prod => (
+              <div
+                key={prod.id}
+                onClick={() => {
+                  onChange(prod.id.toString());
+                  setIsOpen(false);
+                }}
+                className="p-2.5 text-sm hover:bg-[#F1F5F9] dark:hover:bg-slate-800 cursor-pointer text-[#0F172A] dark:text-white"
+              >
+                {prod.key}
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export function OrderFormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -94,14 +158,16 @@ export function OrderFormPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!orderKey.trim()) {
-      toast.error('El No. de Orden es requerido y no puede estar vacío.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
-      return;
-    }
+    if (isEditing) {
+      if (!orderKey.trim()) {
+        toast.error('El No. de Orden es requerido y no puede estar vacío.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+        return;
+      }
 
-    if (!/^\d+$/.test(orderKey.trim())) {
-      toast.error('El No. de Orden debe contener únicamente números.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
-      return;
+      if (!/^\d+$/.test(orderKey.trim())) {
+        toast.error('El No. de Orden debe contener únicamente números.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+        return;
+      }
     }
 
     if (!scheduledDeliveryDate) {
@@ -137,8 +203,9 @@ export function OrderFormPage() {
     }
 
     try {
+      const finalOrderKey = isEditing ? orderKey : `TMP-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
       const payload: CreateOrderPayload = {
-        key: orderKey,
+        key: finalOrderKey,
         status: status,
         scheduledDeliveryDate: scheduledDeliveryDate,
         comments: comments,
@@ -157,8 +224,9 @@ export function OrderFormPage() {
         await orderService.updateOrder(id!, payload);
         toast.success('Orden actualizada en DB.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
       } else {
-        await orderService.createOrder(payload);
-        toast.success('Orden creada en DB.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
+        const newOrderId = await orderService.createOrder(payload);
+        await orderService.updateOrder(newOrderId, { ...payload, key: String(newOrderId) });
+        toast.success('Orden creada en DB con folio autogenerado.', { style: { borderRadius: '10px', background: '#333', color: '#fff' }});
         setTimeout(() => navigate('/orders'), 1000);
       }
       setIsDirty(false);
@@ -232,13 +300,9 @@ export function OrderFormPage() {
               <label className="block font-semibold text-sm text-[#475569] dark:text-slate-300 mb-2">No. Orden</label>
               <input
                 type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                required
-                value={orderKey}
-                onChange={(e) => setOrderKey(e.target.value.replace(/\D/g, ''))}
-                placeholder="Ej: 12515"
-                className="block w-full border border-[#E2E8F0] dark:border-slate-700 rounded-xl focus:border-[#2A5D8F] dark:focus:border-[#5BA3D9] focus:ring-2 focus:ring-[#2A5D8F]/20 px-4 py-3 bg-white dark:bg-[#0F172A] transition-all font-mono font-semibold text-[#0F172A] dark:text-white placeholder:text-[#94A3B8] outline-none"
+                disabled
+                value={isEditing ? orderKey : 'Autogenerado'}
+                className="block w-full border border-[#E2E8F0] dark:border-slate-700 rounded-xl px-4 py-3 bg-gray-100 dark:bg-slate-800 transition-all font-mono font-semibold text-[#94A3B8] dark:text-slate-400 outline-none cursor-not-allowed"
               />
             </div>
             <div>
@@ -282,8 +346,8 @@ export function OrderFormPage() {
             </button>
           </div>
 
-          <div className="border border-[#E2E8F0] dark:border-slate-800 rounded-2xl overflow-hidden bg-white dark:bg-[#0F172A]">
-            <div className="hidden md:grid grid-cols-12 gap-4 bg-[#F8FAFC] dark:bg-[#1E293B] p-4 border-b border-[#E2E8F0] dark:border-slate-800 font-semibold text-xs text-[#64748B] dark:text-slate-400 uppercase tracking-wider">
+          <div className="border border-[#E2E8F0] dark:border-slate-800 rounded-2xl bg-white dark:bg-[#0F172A]">
+            <div className="hidden md:grid grid-cols-12 gap-4 bg-[#F8FAFC] dark:bg-[#1E293B] p-4 border-b border-[#E2E8F0] dark:border-slate-800 font-semibold text-xs text-[#64748B] dark:text-slate-400 uppercase tracking-wider rounded-t-2xl">
               <div className="col-span-5">Producto</div>
               <div className="col-span-3 text-center">Cant. Pedida</div>
               <div className="col-span-3 text-center">Cant. Surtida</div>
@@ -295,17 +359,11 @@ export function OrderFormPage() {
                 <div key={index} className="flex flex-col md:grid md:grid-cols-12 gap-4 p-4 items-center">
                   <div className="w-full md:col-span-5">
                     <label className="md:hidden block text-xs font-semibold text-[#64748B] dark:text-slate-400 mb-1">Producto</label>
-                    <select
+                    <ProductSearchSelect
                       value={item.productId}
-                      onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
-                      className="w-full p-2.5 border border-[#E2E8F0] dark:border-slate-700 rounded-lg focus:border-[#2A5D8F] dark:focus:border-[#5BA3D9] focus:ring-2 focus:ring-[#2A5D8F]/20 outline-none text-[#0F172A] dark:text-white bg-white dark:bg-[#1E293B] transition-all"
-                      required
-                    >
-                      <option value="" disabled>-- Selecciona --</option>
-                      {availableProducts.map(prod => (
-                        <option key={prod.id} value={prod.id}>{prod.key}</option>
-                      ))}
-                    </select>
+                      onChange={(val) => handleItemChange(index, 'productId', val)}
+                      products={availableProducts}
+                    />
                   </div>
                   <div className="w-full md:col-span-3 flex md:justify-center">
                     <div className="w-full max-w-[120px]">
@@ -352,7 +410,7 @@ export function OrderFormPage() {
             </div>
             
             {/* Totals */}
-            <div className="bg-[#F8FAFC] dark:bg-[#1E293B] p-4 border-t border-[#E2E8F0] dark:border-slate-800 flex flex-col sm:flex-row justify-end items-center gap-6">
+            <div className="bg-[#F8FAFC] dark:bg-[#1E293B] p-4 border-t border-[#E2E8F0] dark:border-slate-800 flex flex-col sm:flex-row justify-end items-center gap-6 rounded-b-2xl">
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-[#64748B] dark:text-slate-400 font-semibold">Total Pedido:</span>
                 <span className="font-mono font-bold text-lg text-[#0F172A] dark:text-white">{totalOrdered}</span>

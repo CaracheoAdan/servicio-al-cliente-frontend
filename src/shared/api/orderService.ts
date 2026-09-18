@@ -99,15 +99,17 @@ export const orderService = {
    * Obtiene todas las ordenes, detalles e items, y los combina en objetos hidratados.
    */
   async getAllCombinedOrders(): Promise<CombinedOrder[]> {
-    const [ordersRes, detailsRes, itemsRes] = await Promise.all([
+    const [ordersRes, detailsRes, itemsRes, productsRes] = await Promise.all([
       api.get('/orders'),
       api.get('/order_details'),
-      api.get('/order_items')
+      api.get('/order_items'),
+      api.get('/products').catch(() => ({ data: [] }))
     ]);
 
     const orders: RawOrder[] = Array.isArray(ordersRes.data) ? ordersRes.data : (ordersRes.data.items || ordersRes.data.data || []);
     const details: RawOrderDetail[] = Array.isArray(detailsRes.data) ? detailsRes.data : (detailsRes.data.items || detailsRes.data.data || []);
     const items: RawOrderItem[] = Array.isArray(itemsRes.data) ? itemsRes.data : (itemsRes.data.items || itemsRes.data.data || []);
+    const products: any[] = Array.isArray(productsRes.data) ? productsRes.data : (productsRes.data.items || productsRes.data.data || []);
 
     return orders.map((order) => {
       const orderDetail = details.find(d => d.orderId === order.id || d.order_id === order.id);
@@ -122,13 +124,17 @@ export const orderService = {
           scheduledDeliveryDate: orderDetail.scheduledDeliveryDate || orderDetail.scheduled_delivery_date || '',
           shippingDate: orderDetail.shippingDate || orderDetail.shipping_date || ''
         } : null,
-        items: orderItemsList.map(i => ({
-          id: i.id,
-          productId: i.productId || i.product_id || 0,
-          productName: i.product?.name || i.product_name || `Producto #${i.productId || i.product_id}`,
-          orderedQuantity: i.orderedQuantity || i.ordered_quantity || 0,
-          deliveredQuantity: i.deliveredQuantity || i.delivered_quantity || 0
-        }))
+        items: orderItemsList.map(i => {
+          const prodId = i.productId || i.product_id || 0;
+          const foundProduct = products.find(p => p.id === prodId);
+          return {
+            id: i.id,
+            productId: prodId,
+            productName: foundProduct?.key || i.product?.name || i.product_name || `Producto #${prodId}`,
+            orderedQuantity: i.orderedQuantity || i.ordered_quantity || 0,
+            deliveredQuantity: i.deliveredQuantity || i.delivered_quantity || 0
+          };
+        })
       };
     });
   },
