@@ -138,3 +138,71 @@ npm run test
 ```bash
 npm run build
 ```
+
+---
+
+## 6. Despliegue y Desmontaje en Servidor (Nginx + UFW)
+
+Los scripts de administración y hosting en Linux mediante Nginx se localizan en [`res/`](file:///home/toreve/projects/web/servicio-al-cliente-frontend/res). La SPA se compila estáticamente y se sirve a través de Nginx en el puerto `5175`.
+
+### Despliegue del Frontend (`deployment.sh`)
+
+```bash
+# Compilar bundle, sincronizar a /srv/www, configurar Nginx y abrir puerto 5175 en UFW
+./res/deployment.sh
+```
+
+**Flujo de despliegue:**
+1. Compila el bundle estático de producción mediante `pnpm build`.
+2. Sincroniza los archivos de `dist/` hacia `/srv/www/servicio-al-cliente-frontend`.
+3. Abre el puerto `5175` en el firewall UFW mediante `sudo ufw allow 5175` (omitido si UFW no está instalado).
+4. Instala la configuración de Nginx en `/etc/nginx/sites-available/` y crea el enlace en `sites-enabled/`.
+5. Valida la configuración (`sudo nginx -t`) y recarga Nginx (`sudo systemctl reload nginx`).
+6. Verifica el endpoint de salud en `http://127.0.0.1:5175/health`.
+
+---
+
+### Desmontaje y Apagado Completo (`down.sh`)
+
+Para desmontar completamente la aplicación frontend, bloquear el puerto en el firewall y limpiar los recursos instalados, ejecuta [`res/down.sh`](file:///home/toreve/projects/web/servicio-al-cliente-frontend/res/down.sh):
+
+```bash
+# Desmontaje estándar: deshabilita sitio Nginx, recarga Nginx, bloquea puerto 5175 en UFW y elimina /srv/www
+./res/down.sh
+
+# Desmontaje conservando archivos instalados en /srv/www y dist/
+./res/down.sh --keep-files
+
+# Desmontaje purgando también el archivo de configuración en sites-available
+./res/down.sh --purge-nginx
+```
+
+#### Opciones de CLI
+
+| Opción | Descripción |
+|---|---|
+| `--keep-files` | Deshabilita el sitio Nginx y bloquea el puerto en UFW, pero preserva los archivos en `/srv/www/servicio-al-cliente-frontend` y `dist/`. |
+| `--purge-nginx` | Elimina `/etc/nginx/sites-available/servicioAlClienteFrontend.conf` además del enlace habilitado. |
+| `-h`, `--help` | Muestra la ayuda y descripción de opciones. |
+
+#### Secuencia de Desmontaje (Paso a Paso)
+
+1. **Deshabilitar Sitio Nginx:** Elimina el enlace simbólico `/etc/nginx/sites-enabled/servicioAlClienteFrontend.conf` (y `/etc/nginx/conf.d/` si aplica).
+2. **Recargar Nginx:** Ejecuta `sudo nginx -t` y recarga el servicio (`sudo systemctl reload nginx`) para dejar de servir el puerto.
+3. **Bloqueo de Puerto en Firewall (UFW):** Elimina reglas previas de permiso y bloquea el tráfico entrante ejecutando `sudo ufw deny 5175` (omitido con gracia si UFW no está instalado).
+4. **Liberación de Procesos:** Verifica que no queden procesos residuales escuchando en el puerto `5175` mediante `fuser` y los termina si existen.
+5. **Limpieza de Archivos:** Elimina el directorio de despliegue `/srv/www/servicio-al-cliente-frontend` y la carpeta `dist/` (salvo que se use `--keep-files`).
+6. **Verificación:** Realiza una sonda al puerto `5175` para confirmar que ya no responde y la aplicación está totalmente fuera de línea.
+
+---
+
+### Variables de Entorno y Sobrescritura
+
+Tanto `deployment.sh` como `down.sh` soportan las siguientes variables de entorno:
+
+| Variable | Valor por Defecto | Descripción |
+|---|---|---|
+| `REPO_ROOT` | Raíz detectada del repositorio | Ruta del repositorio frontend. |
+| `INSTALL_DIR` | `/srv/www/servicio-al-cliente-frontend` | Directorio de instalación web en el servidor. |
+| `PORT` | `5175` | Puerto HTTP configurado en Nginx. |
+

@@ -28,6 +28,16 @@ echo "==> Create install dir ($INSTALL_DIR)"
 sudo mkdir -p "$INSTALL_DIR"
 sudo rsync -a --delete "$REPO_ROOT/dist/" "$INSTALL_DIR/"
 sudo chown -R "$WEB_USER:$WEB_USER" "$INSTALL_DIR"
+
+echo "==> Configure firewall (UFW allow ${PORT})"
+if command -v ufw >/dev/null 2>&1; then
+  sudo ufw delete deny "$PORT" 2>/dev/null || true
+  sudo ufw delete deny "${PORT}/tcp" 2>/dev/null || true
+  sudo ufw allow "$PORT"
+else
+  echo "    ufw not found on this host; skipping firewall configuration"
+fi
+
 echo "==> Install Nginx site configuration"
 
 if [ -d "/etc/nginx/sites-available" ]; then
